@@ -28,8 +28,41 @@ Currnet local time shall be returned as bit-fields packed into a DWORD value. Th
 */
 DWORD get_fattime(void)
 {
-	return 0;
+	DWORD Time;
+	time_t rawtime;
+	struct tm* timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	Time = 0;
+
+	// get the seconds
+	Time |= timeinfo->tm_sec / 2;
+
+	// get the minutes
+	Time |= (timeinfo->tm_min) << 4;
+
+	// get the hours
+	Time |= (timeinfo->tm_hour) << 10;
+
+	// get the day
+	Time |= (timeinfo->tm_mday) << 15;
+
+	// get the month
+	Time |= (timeinfo->tm_mon + 1) << 20;
+
+	// get the year
+	Time |= (timeinfo->tm_year - 80) << 24;
+
+	return Time;
 }
+
+FATFS gFatFs;
+FRESULT gResult;
+FIL gFile;
+MKFS_PARM gParams;
+unsigned char gBuffer[4096];
 
 int main()
 {
@@ -38,5 +71,29 @@ int main()
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
+
 	printf("Current local time and date: %s", asctime(timeinfo));
+
+	gResult = f_mount(&gFatFs, "", 1);
+
+	if (gResult != FR_OK)
+		printf("Fail value %i", gResult);
+
+	//gResult = f_mkfs("", NULL, gBuffer, sizeof(gBuffer));
+
+	//if (gResult != FR_OK)
+		//printf("Fail value %i", gResult);
+
+	//gResult = f_mount(&gFatFs, "", 1);
+
+	//if (gResult != FR_OK)
+		//printf("Fail value %i", gResult);
+
+	gResult = f_open(&gFile, "", FA_CREATE_ALWAYS);
+
+	if (gResult != FR_OK)
+		printf("Fail value %i", gResult);
+
+	// now initialize the fatfs
+
 }
