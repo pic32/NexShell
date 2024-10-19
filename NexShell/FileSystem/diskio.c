@@ -13,7 +13,7 @@
 #include "GenericTypeDefs.h"
 
 /* Definitions of physical drive number for each drive */
-#define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
+#define DEV_RAM		3	/* Example: Map Ramdisk to physical drive 0 */
 #define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
 
@@ -34,8 +34,6 @@ DSTATUS disk_status (
 	{
 		case DEV_RAM :
 		{
-			memset(gRAMBuffer, 0, sizeof(gRAMBuffer));
-
 			// translate the reslut code here
 
 			return 0;
@@ -93,7 +91,14 @@ DRESULT disk_read (
 	{
 		case DEV_RAM:
 		{
-			memset(gRAMBuffer, 0, sizeof(gRAMBuffer));
+			UINT32 i;
+
+			for (i = 0; i < count; i++)
+			{
+				memcpy(buff, &gRAMBuffer[(sector + i) * 512], 512);
+
+				buff += 512;
+			}
 
 			// translate the reslut code here
 
@@ -126,9 +131,14 @@ DRESULT disk_write (
 	{
 		case DEV_RAM:
 		{
-			memset(gRAMBuffer, 0, sizeof(gRAMBuffer));
+			UINT32 i;
 
-			// translate the reslut code here
+			for (i = 0; i < count; i++)
+			{
+				memcpy(&gRAMBuffer[(sector + i) * 512], buff, 512);
+
+				buff += 512;
+			}
 
 			return RES_OK;
 		}
@@ -163,7 +173,7 @@ DRESULT disk_ioctl (
 					break;
 
 				case GET_SECTOR_COUNT:	/* Get number of sectors on the drive */
-					*(LBA_t*)buff = sizeof(gRAMBuffer) / 1224;
+					*(LBA_t*)buff = sizeof(gRAMBuffer);
 					res = RES_OK;
 					break;
 

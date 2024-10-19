@@ -1,0 +1,151 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|solutionrelative:NexShell\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\diskio.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|solutionrelative:NexShell\\FileSystem\\diskio.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\NexCANNodeServer.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\FileSystems.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\ffconf.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{BDED3F72-1562-41D2-95C6-B67E1D6511DA}|NexShell\\NexShell.vcxproj|solutionrelative:NexShell\\FileSystem\\ffconf.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{878E17CC-E3E3-461E-BABD-AFCC405F9CFA}|..\\..\\..\\AppData\\Roaming\\Microsoft\\VisualStudio\\17.0_7f48a137\\SingleFileISense\\_sfi_4cdedfc3-6a3f-4e7f-b365-e7983daa4237_.vcxproj|C:\\SOURCE CHECKOUTS\\NEXCAN\\NEXCAN SYSTEM SHUTTER NODE\\FFCONF.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\diskio.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "main.c",
+              "DocumentMoniker": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\main.c",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\main.c",
+              "ToolTip": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\main.c",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\main.c",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:30:31.058Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ffconf.h",
+              "DocumentMoniker": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\ffconf.h",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\ffconf.h",
+              "ToolTip": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\ffconf.h",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\ffconf.h",
+              "ViewState": "AgIAAJwAAAAAAAAAAAAAAKoAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-19T22:27:09.51Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FileSystems.c",
+              "DocumentMoniker": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\FileSystems.c",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\FileSystems.c",
+              "ToolTip": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\FileSystems.c",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\FileSystems.c",
+              "ViewState": "AgIAAJMCAAAAAAAAAAAiwJ4CAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:26:33.867Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NexCANNodeServer.c",
+              "DocumentMoniker": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\NexCANNodeServer.c",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\NexCANNodeServer.c",
+              "ToolTip": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\NexCANNodeServer.c",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\NexCANNodeServer.c",
+              "ViewState": "AgIAAJIIAAAAAAAAAAAiwKYIAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:25:44.561Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ffconf.h",
+              "DocumentMoniker": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\ffconf.h",
+              "RelativeDocumentMoniker": "NexShell\\FileSystem\\ffconf.h",
+              "ToolTip": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\ffconf.h",
+              "RelativeToolTip": "NexShell\\FileSystem\\ffconf.h",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAAAKgAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-19T22:23:41.222Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "diskio.c",
+              "DocumentMoniker": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\diskio.c",
+              "RelativeDocumentMoniker": "NexShell\\FileSystem\\diskio.c",
+              "ToolTip": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\FileSystem\\diskio.c",
+              "RelativeToolTip": "NexShell\\FileSystem\\diskio.c",
+              "ViewState": "AgIAAJUAAAAAAAAAAAAUwKgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:20:33.646Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.c",
+              "DocumentMoniker": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\main.c",
+              "RelativeDocumentMoniker": "NexShell\\main.c",
+              "ToolTip": "C:\\Users\\MFG-PC\\Documents\\GitHub\\NexShell\\NexShell\\main.c",
+              "RelativeToolTip": "NexShell\\main.c",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:20:08.897Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "diskio.c",
+              "DocumentMoniker": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\diskio.c",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\diskio.c",
+              "ToolTip": "C:\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\diskio.c",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Source Checkouts\\NexCAN\\NexCAN System Shutter Node\\diskio.c",
+              "ViewState": "AgIAAKwBAAAAAAAAAAAAANABAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2024-10-19T22:20:03.076Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

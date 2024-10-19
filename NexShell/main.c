@@ -74,25 +74,25 @@ int main()
 
 	printf("Current local time and date: %s", asctime(timeinfo));
 
-	gResult = f_mount(&gFatFs, "", 1);
+	gResult = f_mount(&gFatFs, "R:", 1);
 
 	if (gResult != FR_OK)
-		printf("Fail value %i", gResult);
+		printf("Fail value %i\r\n", gResult);
 
-	//gResult = f_mkfs("", NULL, gBuffer, sizeof(gBuffer));
+	gResult = f_mkfs("R:", NULL, gBuffer, sizeof(gBuffer));
 
-	//if (gResult != FR_OK)
-		//printf("Fail value %i", gResult);
+	if (gResult != FR_OK)
+		printf("Fail value %i\r\n", gResult);
 
-	//gResult = f_mount(&gFatFs, "", 1);
+	gResult = f_mount(&gFatFs, "R:", 1);
 
-	//if (gResult != FR_OK)
-		//printf("Fail value %i", gResult);
+	if (gResult != FR_OK)
+		printf("Fail value %i\r\n", gResult);
 
 	gResult = f_open(&gFile, "", FA_CREATE_ALWAYS);
 
 	if (gResult != FR_OK)
-		printf("Fail value %i", gResult);
+		printf("Fail value %i\r\n", gResult);
 
 	// now initialize the fatfs
 
