@@ -60,7 +60,7 @@ DSTATUS disk_initialize (
 	{
 		case DEV_RAM:
 		{
-			memset(gRAMBuffer, 0, sizeof(gRAMBuffer));
+			//memset(gRAMBuffer, 0xFFFF, sizeof(gRAMBuffer));
 
 			// translate the reslut code here
 
