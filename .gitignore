@@ -59,3 +59,7 @@ dkms.conf
 *.ipch
 *.ipch
 *.vsidx
+*.db
+*.recipe
+*.log
+*.tlog
