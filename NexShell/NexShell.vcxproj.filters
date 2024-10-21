@@ -25,6 +25,30 @@
     <Filter Include="Source Files\Support-Libraries\LinkedList">
       <UniqueIdentifier>{afe75894-dd79-42b5-8705-48327c3156da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FileSystem">
+      <UniqueIdentifier>{febcbd03-edc4-468f-99d6-dec9ba32bb25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Support-Libraries">
+      <UniqueIdentifier>{fcf51059-ad07-4521-b853-1db7201cd70d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Support-Libraries\GenericBuffer">
+      <UniqueIdentifier>{13467134-11c2-4133-a326-343336808c2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Support-Libraries\LinkedList">
+      <UniqueIdentifier>{357226c9-209d-4fd5-9b53-59c6492c2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NexShell">
+      <UniqueIdentifier>{47e96330-e670-4de8-a345-7e65a5e1d859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NexShell">
+      <UniqueIdentifier>{04412cc0-ed5c-4348-b64e-fa9917099ce5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NexShell\Time">
+      <UniqueIdentifier>{24eb27b8-457f-4b56-addf-4b106a40171c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NexShell\Time">
+      <UniqueIdentifier>{c2f24bc9-e6a6-452b-ad35-e78211f90f36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileSystem\diskio.c">
@@ -48,37 +72,52 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NexShell\Time\NexShellTime.c">
+      <Filter>Source Files\NexShell\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\NexShell.c">
+      <Filter>Source Files\NexShell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileSystem\diskio.h">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\ff.h">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\ffconf.h">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClInclude>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
       <Filter>Source Files\Support-Libraries</Filter>
     </ClInclude>
+    <ClInclude Include="FileSystem\diskio.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\ff.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\ffconf.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBuffer.h">
-      <Filter>Source Files\Support-Libraries\GenericBuffer</Filter>
+      <Filter>Header Files\Support-Libraries\GenericBuffer</Filter>
     </ClInclude>
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferConfig.h">
-      <Filter>Source Files\Support-Libraries\GenericBuffer</Filter>
+      <Filter>Header Files\Support-Libraries\GenericBuffer</Filter>
     </ClInclude>
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferObject.h">
-      <Filter>Source Files\Support-Libraries\GenericBuffer</Filter>
+      <Filter>Header Files\Support-Libraries\GenericBuffer</Filter>
     </ClInclude>
     <ClInclude Include="SupportLibraries\LinkedList\LinkedList.h">
-      <Filter>Source Files\Support-Libraries\LinkedList</Filter>
+      <Filter>Header Files\Support-Libraries\LinkedList</Filter>
     </ClInclude>
     <ClInclude Include="SupportLibraries\LinkedList\LinkedListConfig.h">
-      <Filter>Source Files\Support-Libraries\LinkedList</Filter>
+      <Filter>Header Files\Support-Libraries\LinkedList</Filter>
     </ClInclude>
     <ClInclude Include="SupportLibraries\LinkedList\LinkedListObject.h">
-      <Filter>Source Files\Support-Libraries\LinkedList</Filter>
+      <Filter>Header Files\Support-Libraries\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Time\NexShellTime.h">
+      <Filter>Header Files\NexShell\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\NexShell.h">
+      <Filter>Header Files\NexShell</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\NexShellConfig.h">
+      <Filter>Header Files\NexShell</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
