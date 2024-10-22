@@ -17,9 +17,9 @@
 // PROJECT_NAME + " " + MAJOR_VERSION + "." + MINOR_VERSION + "." + TEST_VERSION
 #define SHELL_USE_PROJECT_NAME										1
 #define SHELL_PROJECT_NAME											"NexShell"
-#define SHELL_MAJOR_VERSION											"1"
+#define SHELL_MAJOR_VERSION											"0"
 #define SHELL_MINOR_VERSION											"00"
-#define SHELL_TEST_VERSION											"00"
+#define SHELL_TEST_VERSION											"01"
 
 // this is the line end sequence, once this is received the
 // system will take the current input and process it as a valid line

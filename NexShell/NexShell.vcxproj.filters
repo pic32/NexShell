@@ -78,6 +78,9 @@
     <ClCompile Include="NexShell\NexShell.c">
       <Filter>Source Files\NexShell</Filter>
     </ClCompile>
+    <ClCompile Include="Thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">

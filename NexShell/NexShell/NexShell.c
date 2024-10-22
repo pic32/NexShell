@@ -31,7 +31,40 @@ BYTE gCurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1 + 2];
 
 // these are all the errors to stringed from the SHELL_RESULT data type
 const char* gNexShellError[] = {
-	""
+	"success",
+	"fs disk error",
+	"fs int error",
+	"fs not ready",
+	"fs no file",
+	"fs no path",
+	"fs invalid name",
+	"fs denied",
+	"fs exist",
+	"fs invalid object",
+	"fs write protected",
+	"fs invalid drive",
+	"fs vol not enabled",
+	"fs no fs",
+	"fs mkfs abort",
+	"fs timeout",
+	"fs locked",
+	"fs not enough core",
+	"fs too many open files",
+	"fs invalid param",
+	"shell invalid input parameter",
+	"shell argument overflow",
+	"shell invalid char found",
+	"shell file not found",
+	"shell file not executable",
+	"shell file not readable",
+	"shell file not writable",
+	"shell history buffer fail",
+	"shell invalid number of bytes transferred",
+	"shell generic buffer create fail",
+	"shell generic buffer write fail",
+	"shell generic buffer read fail",
+	"shell linked list create fail",
+	"shell linked list operation fail"
 };
 
 #if (USE_SHELL_COMMAND_HISTORY == 1)
@@ -212,13 +245,14 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 		// we're not dead in the water, attempt to initialize the disk then
 		SHELL_RESULT Result;
 		char TempDrivePath[3];
+		BYTE TempWorkingBuffer[512];
 
 		// construct the drive path
 		TempDrivePath[0] = CurrentDrive;
 		TempDrivePath[1] = ':';
 		TempDrivePath[2] = 0;
 
-		Result = f_mkfs(TempDrivePath, NULL, gCurrentWorkingDirectory, sizeof(gCurrentWorkingDirectory));
+		Result = f_mkfs(TempDrivePath, NULL, TempWorkingBuffer, sizeof(TempWorkingBuffer));
 
 		// did it work?
 		if (Result != SHELL_SUCCESS)
@@ -244,7 +278,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	return OutputPrompt(GetLastDirectoryPresent(&gCurrentWorkingDirectory[2]), &gStandardOutputStream);
 }
 
-SHELL_RESULT NanoShellWriteTasks(GENERIC_BUFFER *GenericBuffer)
+SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *GenericBuffer)
 {
 	if (GenericBufferGetSize(GenericBuffer) != 0)
 	{
@@ -366,7 +400,7 @@ static char* ParseArgument(char** Buffer)
 }
 
 
-static SHELL_RESULT NanoShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputStream)
+static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputStream)
 {
 	void *WorkingDirectory;
 	void *WorkingFile;
@@ -464,7 +498,7 @@ static SHELL_RESULT NanoShellProcessCommand(char* Buffer, GENERIC_BUFFER *Output
 				return FALSE;
 
 		// get the space
-		HistoryLine = NanoShellMalloc(strlen(Line) + 1);
+		HistoryLine = NexShellMalloc(strlen(Line) + 1);
 
 		// did we get the space?
 		if (HistoryLine == NULL)
@@ -547,7 +581,7 @@ static SHELL_RESULT NanoShellProcessCommand(char* Buffer, GENERIC_BUFFER *Output
 	}
 #endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
 
-SHELL_RESULT NanoShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER *Buffer))
+SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER *Buffer))
 {
 	SHELL_RESULT Result;
 	UINT32 DataWritten, NumberOfBytesToWrite;
@@ -738,13 +772,13 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 			return SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED;
 
 		// now write all the incoming data to our buffer
-		Result = NanoShellProcessIncomingBuffer(CharacterBuffer, BytesToTransfer, InputStream, OutputStream);
+		Result = NexShellProcessIncomingBuffer(CharacterBuffer, BytesToTransfer, InputStream, OutputStream);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
 	
 		// did we get an end of line sequence?
-		if (GenericBufferContainsSequence(&InputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, &NumberOfBytesToRead) == TRUE)
+		if (GenericBufferContainsSequence(InputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, &NumberOfBytesToRead) == TRUE)
 		{
 			SHELL_RESULT Result;
 
@@ -754,7 +788,7 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 			NumberOfBytesToRead += SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES;
 
 			// read the data out and process the command
-			if (GenericBufferRead(&InputStream, NumberOfBytesToRead, TempBuffer, sizeof(TempBuffer), TRUE) == NumberOfBytesToRead)
+			if (GenericBufferRead(InputStream, NumberOfBytesToRead, TempBuffer, sizeof(TempBuffer), TRUE) == NumberOfBytesToRead)
 			{
 				TempBuffer[NumberOfBytesToRead - SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES] = 0;
 
@@ -764,7 +798,7 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 				#endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
 
 				// now go ahead and process the command
-				Result = NanoShellProcessCommand(TempBuffer, OutputStream);
+				Result = NexShellProcessCommand(TempBuffer, OutputStream);
 			}
 			else
 			{

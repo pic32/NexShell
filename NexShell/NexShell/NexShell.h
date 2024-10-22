@@ -9,12 +9,12 @@ typedef enum
 {
 	SHELL_FILE_SUCCESS = 0,
 
-	SHELL_FILE_DISK_ERR,				/* (1) A hard error occurred in the low level disk I/O layer */
+	SHELL_FILE_DISK_ERR,			/* (1) A hard error occurred in the low level disk I/O layer */
 	SHELL_FILE_INT_ERR,				/* (2) Assertion failed */
 	SHELL_FILE_NOT_READY,			/* (3) The physical drive cannot work */
 	SHELL_FILE_NO_FILE,				/* (4) Could not find the file */
 	SHELL_FILE_NO_PATH,				/* (5) Could not find the path */
-	SHELL_FILE_INVALID_NAME,			/* (6) The path name format is invalid */
+	SHELL_FILE_INVALID_NAME,		/* (6) The path name format is invalid */
 	SHELL_FILE_DENIED,				/* (7) Access denied due to prohibited access or directory full */
 	SHELL_FILE_EXIST,				/* (8) Access denied due to prohibited access */
 	SHELL_FILE_INVALID_OBJECT,		/* (9) The file/directory object is invalid */
@@ -22,15 +22,12 @@ typedef enum
 	SHELL_FILE_INVALID_DRIVE,		/* (11) The logical drive number is invalid */
 	SHELL_FILE_NOT_ENABLED,			/* (12) The volume has no work area */
 	SHELL_FILE_NO_FILESYSTEM,		/* (13) There is no valid FAT volume */
-	SHELL_FILE_MKFS_ABORTED,			/* (14) The f_mkfs() aborted due to any problem */
+	SHELL_FILE_MKFS_ABORTED,		/* (14) The f_mkfs() aborted due to any problem */
 	SHELL_FILE_TIMEOUT,				/* (15) Could not get a grant to access the volume within defined period */
 	SHELL_FILE_LOCKED,				/* (16) The operation is rejected according to the file sharing policy */
 	SHELL_FILE_NOT_ENOUGH_CORE,		/* (17) LFN working buffer could not be allocated */
 	SHELL_FILE_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > FF_FS_LOCK */
 	SHELL_FILE_INVALID_PARAMETER,	/* (19) Given parameter is invalid */
-
-	// we pick up where the FatFS Left off
-	SHELL_VIRTUAL_FILE_CREATION_FAILED,
 
 	NUMBER_OF_NEXSHELL_FILE_RESULTS
 }NEXSHELL_FILE_RESULTS;
@@ -43,6 +40,8 @@ typedef enum
 	SHELL_INVALID_CHARACTER_FOUND,
 	SHELL_FILE_NOT_FOUND,
 	SHELL_FILE_NOT_EXECUTABLE,
+	SHELL_FILE_NOT_READABLE,
+	SHELL_FILE_NOT_WRITABLE,
 	SHELL_HISTORY_BUFFER_FAILURE,
 	SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED,
 	SHELL_GENERIC_BUFFER_CREATE_FAILURE,

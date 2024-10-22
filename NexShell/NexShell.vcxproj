@@ -161,6 +161,7 @@
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
     <ClCompile Include="SupportLibraries\GenericBuffer\GenericBuffer.c" />
     <ClCompile Include="SupportLibraries\LinkedList\LinkedList.c" />
+    <ClCompile Include="Thread.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileSystem\diskio.h" />
