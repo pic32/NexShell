@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;.\NexShell\Commands;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +157,8 @@
     <ClCompile Include="FileSystem\ffsystem.c" />
     <ClCompile Include="FileSystem\ffunicode.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="NexShell\Commands\clear_Command.c" />
+    <ClCompile Include="NexShell\Commands\ls_Command.c" />
     <ClCompile Include="NexShell\NexShell.c" />
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
     <ClCompile Include="SupportLibraries\GenericBuffer\GenericBuffer.c" />
@@ -167,6 +169,8 @@
     <ClInclude Include="FileSystem\diskio.h" />
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />
+    <ClInclude Include="NexShell\Commands\clear_Command.h" />
+    <ClInclude Include="NexShell\Commands\ls_Command.h" />
     <ClInclude Include="NexShell\NexShell.h" />
     <ClInclude Include="NexShell\NexShellConfig.h" />
     <ClInclude Include="NexShell\Time\NexShellTime.h" />

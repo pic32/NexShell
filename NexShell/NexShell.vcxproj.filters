@@ -49,6 +49,12 @@
     <Filter Include="Source Files\NexShell\Time">
       <UniqueIdentifier>{c2f24bc9-e6a6-452b-ad35-e78211f90f36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NexShell\Commands">
+      <UniqueIdentifier>{f8e63ccd-ece2-4f53-bda5-a320d144d0c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NexShell\Commands">
+      <UniqueIdentifier>{cbd8aa0c-a6c9-4c97-934c-a0416371925f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileSystem\diskio.c">
@@ -80,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="Thread.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\clear_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\ls_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="NexShell\NexShellConfig.h">
       <Filter>Header Files\NexShell</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\clear_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\ls_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

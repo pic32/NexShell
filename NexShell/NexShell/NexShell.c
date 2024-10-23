@@ -9,6 +9,10 @@
 #include "NexShell.h"
 #include "NexShellConfig.h"
 
+#if (USE_CLEAR_COMMAND == 1)
+	#include "clear_Command.h"
+#endif // end of #if (USE_CLEAR_COMMAND == 1)
+
 #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 	BOOL gConsoleEcho;
 #endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
@@ -18,11 +22,12 @@
 #endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
 
 // these are the standard stream inputs and outputs
-GENERIC_BUFFER gStandardOutputStream, gStandardInputStream;
+GENERIC_BUFFER gStandardOutputStream, gStandardInputStream, gShellOperatorStream;
 
 // these are the array buffers the gOutputStream and gInputStream use
 BYTE gOutputStreamBuffer[SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES];
 BYTE gInputStreamBuffer[SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES];
+BYTE gShellOperatorBuffer[SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES];
 
 // this is used to keep track of the escape sequences
 UINT32 gEscapeSequence;
@@ -193,6 +198,9 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
 	if (CreateGenericBuffer(&gStandardInputStream, SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES, gInputStreamBuffer) == NULL)
+		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
+
+	if (CreateGenericBuffer(&gShellOperatorStream, SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES, gShellOperatorBuffer) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
 	if (isalpha((int)CurrentDrive) == 0)
@@ -500,39 +508,6 @@ static char* GetNextCharInStream(char* Buffer)
 	return Buffer;
 }
 
-static SHELL_RESULT NexShellParseExpression(char** Buffer)
-{
-	/*	
-		This method will parse out an expression
-		What is an expression?
-		It is a file or command that generates output
-	 
-		Examples:
-			echo Test
-			echo "test"
-			ls
-			cat -E File-to-Cat
-			cat -E "File to Cat"
-			cat "File to Cat"
-			./ExecuteFileThing
-			/bin/usr/AnotherFileToExecute
-			/dev/tty0 "Send out a string over the RS-232 Port"
-
-		When does an expression end?
-		It ends at the end of line or a logical operator.
-		Supported operators are |, >, and >>
-
-		Examples:
-			echo "Test String" >> "A file to append Test String Into"
-			ls > /dev/ls_results
-	*/
-	
-	while (**Buffer != '|' && **Buffer != '>')
-	{
-
-	}
-}
-
 static BOOL UserCommandIsValid(char* Buffer)
 {
 	if ((BOOL)isprint((int)*Buffer) == FALSE)
@@ -572,8 +547,6 @@ static BOOL UserCommandIsValid(char* Buffer)
 					// are we quoting out?
 					if (*Buffer == '\"')
 					{
-						Buffer++;
-
 						break;
 					}
 				}
@@ -585,7 +558,22 @@ static BOOL UserCommandIsValid(char* Buffer)
 
 		if (*Buffer == '\'')
 		{
+			// skip ahead until the next \ or "
+			while (1)
+			{
+				// we can't end with a null, we have to quote out then null
+				if ((BOOL)isprint((int)*Buffer) == FALSE && *Buffer != '\n' && *Buffer != '\r')
+					return FALSE;
 
+				// are we quoting out?
+				if (*Buffer == '\'')
+				{
+					break;
+				}
+
+				// go to the next character
+				Buffer++;
+			}
 		}
 
 		Buffer++;
@@ -612,7 +600,7 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 			{
 				**Buffer = 0;
 
-				*Buffer++;
+				(*Buffer)++;
 
 				if ((BOOL)isprint(**Buffer) == FALSE)
 					return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
@@ -628,12 +616,12 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 				// keep going unil "
 				do
 				{
-					*Buffer++;
+					(*Buffer)++;
 
 					// if we got a quote, leave
 					if (**Buffer == '\"')
 					{
-						*Buffer++;
+						(*Buffer)++;
 
 						break;
 					}
@@ -641,7 +629,7 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 					// if we got a backslash, get the next item
 					if (**Buffer == '\\')
 					{
-						*Buffer++;
+						(*Buffer)++;
 
 						if ((BOOL)isprint(**Buffer) == FALSE)
 							return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
@@ -658,12 +646,12 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 				// keep going unil '"'
 				do
 				{
-					*Buffer++;
+					(*Buffer)++;
 
 					// if we got a quote, leave
 					if (**Buffer == '\'')
 					{
-						*Buffer++;
+						(*Buffer)++;
 
 						break;
 					}
@@ -671,7 +659,7 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 					// if we got a backslash, get the next item
 					if (**Buffer == '\\')
 					{
-						*Buffer++;
+						(*Buffer)++;
 
 						if ((BOOL)isprint(**Buffer) == FALSE)
 							return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
@@ -683,7 +671,7 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 
 			default:
 			{
-				*Buffer++;
+				(*Buffer)++;
 
 				break;
 			}
@@ -698,7 +686,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 	UINT32 argc;
 	UINT32 WorkingIndex;
 	SHELL_RESULT Result;
-	DIR Directory;
+	GENERIC_BUFFER* StreamPtr;
 
 	// we add 2 for the potential location and command name
 	// this way the command/file can get a full SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS
@@ -708,105 +696,67 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 	if (UserCommandIsValid(Buffer) == FALSE)
 		return SHELL_INVALID_INPUT;
 
-	// get the first arguments
-	for (argc = 0; argc < SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS; argc++)
+	// now truncate the expression
+	do
 	{
-		// get the next argument from the user
-		argv[argc] = ParseArgument(&Buffer);
+		char* TempBuffer = Buffer;
 
-		// we're done if it is NULL
-		if (argv[argc] == NULL)
-			break;
-	}
+		SHELL_LOGICAL_OPERATOR Operator = GetShellExpression(&Buffer);
 
-	// check for overflow
-	if (argc == SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS)
-		if (ParseArgument(&Buffer) != NULL)
-			return SHELL_ARGUMENT_OVERFLOW;
+		// was it valid
+		if (Operator == NUMBER_OF_SHELL_LOGICAL_OPERATORS)
+			return SHELL_INVALID_INPUT;
 
-	// did we get any arguemnts?
-	if (argc == 0)
-		return SHELL_SUCCESS;
-
-	WorkingIndex = 0;
-
-	if (IsDirectoryVirtual(argv[WorkingIndex]) == TRUE)
-	{
-		// they are asking for something in the DEV_FOLDER_NAME
-
-	}
-	else
-	{
-		#if (USING_USER_VIRTUAL_FILES == 1)
-			UINT32 Index;
-
-			if (IsFileVirtual(argv[WorkingIndex], &Index) == SHELL_SUCCESS)
-			{
-				// it was a virtual file
-
-			}
-		#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
-	}
-	
-	
-	
-	// now we have to assume that the first thing the user wrote is a directory, lets get the directory
-	Result = f_opendir(&Directory, argv[WorkingIndex]);
-
-	if (Result == SHELL_SUCCESS)
-	{
-		// the first item is a directory
-		WorkingIndex++;
-	}
-	else
-	{
-		// it wasn't a directory, was it a file?
-		if (FileExists(argv[WorkingIndex]) == TRUE)
-		{
-			// the first item was a file
-			WorkingIndex++;
-		}
+		// is it going to the standard stream?
+		if (Operator != SHELL_NO_LOGICAL_OPERATOR)
+			StreamPtr = &gShellOperatorStream;
 		else
+			StreamPtr = OutputStream;
+
+		// now we can perform the operation after getting the args
+
+		// get the first arguments
+		for (argc = 0; argc < SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS; argc++)
 		{
-			// no directory, no file
+			// get the next argument from the user
+			argv[argc] = ParseArgument(&TempBuffer);
+
+			// we're done if it is NULL
+			if (argv[argc] == NULL)
+				break;
 		}
-	}
 
+		// check for overflow
+		if (argc == SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS)
+			if (ParseArgument(&TempBuffer) != NULL)
+				return SHELL_ARGUMENT_OVERFLOW;
 
+		// did we get any arguemnts?
+		if (argc == 0)
+			return SHELL_SUCCESS;
 
-	// now do a search for local files first, then global
-	
-
-
-
-
-	// did we find anything
-	if (WorkingIndex == 0)
-	{
-		// we need to see if it is a global file
-		UINT32 i;
-
-		WorkingIndex = 0;
-
-		for (i = 0; i < (sizeof(gCommandList) / sizeof(COMMAND_INFO)) - 1; i++)
+		// now get the command
 		{
-			// compare it to a file
-			if (strcmp(gCommandList[i].CommandName, argv[WorkingIndex]) == 0)
+			UINT32 i;
+
+			WorkingIndex = 0;
+
+			for (i = 0; i < (sizeof(gCommandList) / sizeof(COMMAND_INFO)) - 1; i++)
 			{
-				// we found a winner
-				return gCommandList[i].ExecuteFile(&argv[++WorkingIndex], argc - WorkingIndex, OutputStream);
+				// compare it to a file
+				if (strcmp(gCommandList[i].CommandName, argv[0]) == 0)
+				{
+					// we found a winner
+					return gCommandList[i].ExecuteFile(&argv[1], argc - 1, StreamPtr);
+				}
 			}
+
+			return SHELL_FILE_NOT_FOUND;
 		}
-	}
-	//else
-	{
-		//if (WorkingFile->ExecuteFile == NULL)
-			return SHELL_FILE_NOT_EXECUTABLE;
+	} 
+	while (*Buffer);
 
-		//return WorkingFile->ExecuteFile(&argv[++WorkingIndex], argc - WorkingIndex, OutputStream);
-	}
-
-	return SHELL_FILE_NOT_FOUND;
+	return SHELL_SUCCESS;
 }
 
 #if (USE_SHELL_COMMAND_HISTORY == 1)

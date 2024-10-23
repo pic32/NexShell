@@ -48,6 +48,10 @@
 	#define SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES					256
 #endif // end of #ifndef SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES
 
+#ifndef SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES
+	#define SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES			256
+#endif // end of #ifndef SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES
+
 #ifndef SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES
 	#define SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES						256
 #endif // end of #ifndef SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES
@@ -71,6 +75,10 @@
 #if (SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES < 16)
 	#error "SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES Too Small! Must be at least 16 bytes large!"
 #endif // end of #if (SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES < 16)
+
+#if (SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES < 16)
+#error "SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES Too Small! Must be at least 16 bytes large!"
+#endif // end of #if (SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES < 16)
 
 #if (SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES < 16)
 	#error "SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES Too Small! Must be at least 16 bytes large!"
@@ -134,7 +142,7 @@
 #define USE_COMMAND_DESCRIPTIONS									1
 
 // use these to enable each command
-#define USE_CLEAR_COMMAND											0
+#define USE_CLEAR_COMMAND											1
 #define USE_ECHO_COMMAND											0
 #define USE_HELP_COMMAND											0
 #define USE_PWD_COMMAND												0
