@@ -13,6 +13,10 @@
 	BOOL gConsoleEcho;
 #endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 
+#if (USING_USER_VIRTUAL_FILES == 1)
+	LINKED_LIST gUserVirtualFiles;
+#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+
 // these are the standard stream inputs and outputs
 GENERIC_BUFFER gStandardOutputStream, gStandardInputStream;
 
@@ -25,6 +29,9 @@ UINT32 gEscapeSequence;
 
 // this is our main file system object
 FATFS gFatFs;
+
+// this is our pointer to a virtual directory portion
+char* gVirtualDirectory;
 
 // this is the current directory that the shell is working from, we add 1 for null, and 2 for the drive letter and :
 BYTE gCurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1 + 2];
@@ -52,6 +59,7 @@ const char* gNexShellError[] = {
 	"fs too many open files",
 	"fs invalid param",
 	"shell invalid input parameter",
+	"shell invalid input",
 	"shell argument overflow",
 	"shell invalid char found",
 	"shell file not found",
@@ -162,7 +170,7 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 {
 	char* LastDirectory = &DirectoryPath[strlen(DirectoryPath)];
 
-	while (*LastDirectory != '/')
+	while (*LastDirectory != '\\')
 		LastDirectory--;
 
 	return LastDirectory;
@@ -170,6 +178,16 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 
 SHELL_RESULT NexShellInit(char CurrentDrive)
 {
+	// NULL this out at startup
+	gVirtualDirectory = NULL;
+
+	gEscapeSequence = 0;
+
+	#if (USING_USER_VIRTUAL_FILES == 1)
+		if (CreateLinkedList(&gUserVirtualFiles, NULL, NexShellFreeMethod) == NULL)
+			return SHELL_LINKED_LIST_CREATE_FAILURE;
+	#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+
 	// initialize our input and output streams
 	if (CreateGenericBuffer(&gStandardOutputStream, SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES, gOutputStreamBuffer) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
@@ -183,9 +201,8 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	// get the working drive
 	gCurrentWorkingDirectory[0] = CurrentDrive;
 	gCurrentWorkingDirectory[1] = ':';
-	gCurrentWorkingDirectory[2] = 0;
-
-	gEscapeSequence = 0;
+	gCurrentWorkingDirectory[2] = '\\';
+	gCurrentWorkingDirectory[3] = 0;
 
 	#if (USE_SHELL_COMMAND_HISTORY == 1)
 		if (CreateLinkedList(&gHistoryList, NULL, NexShellFreeMethod) == NULL)
@@ -266,12 +283,20 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 			return Result;
 
 		// we have a valid file system now
+		Shell_sprintf(gCurrentWorkingDirectory, "%c:\\" DEV_FOLDER_NAME, CurrentDrive);
+
+		// now create the first folder which is dev, this is virtual
+		Result = f_mkdir(gCurrentWorkingDirectory);
+
+		// did it work?
+		if (Result != SHELL_SUCCESS)
+			return Result;
 	}
 
 	// get this back for use with the file system
 	gCurrentWorkingDirectory[0] = CurrentDrive;
 	gCurrentWorkingDirectory[1] = ':';
-	gCurrentWorkingDirectory[2] = '/';
+	gCurrentWorkingDirectory[2] = '\\';
 	gCurrentWorkingDirectory[3] = 0;
 
 	// now output the prompt
@@ -399,18 +424,289 @@ static char* ParseArgument(char** Buffer)
 	return StartOfString;
 }
 
+static BOOL IsDirectoryVirtual(const char* FullFilePath)
+{
+	char TempDirectory[8];
+
+	// make the virtual directory root path
+	Shell_sprintf(TempDirectory, "%c:\\" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
+
+	return (BOOL)(memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0);
+}
+
+#if (USING_USER_VIRTUAL_FILES == 1)
+	static SHELL_RESULT IsFileVirtual(const char* FullFilePath, UINT32 *Index)
+	{
+		UINT32 i, Size;
+		char* VirtualFileFullPath;
+		
+		// make the index invalid to begin with
+		*Index = 0;
+
+		Size = LinkedListGetSize(&gUserVirtualFiles);
+
+		for (i = 0; i < Size; i++)
+		{
+			// get the next item in the list
+			VirtualFileFullPath = (char*)LinkedListGetData(&gUserVirtualFiles, i + 1);
+
+			// is it valid?
+			if (VirtualFileFullPath == NULL)
+				return SHELL_LINKED_LIST_OPERATION_FAILURE;
+
+			// now compare
+			if (strcmp(FullFilePath, VirtualFileFullPath) == 0)
+			{
+				// it was valid
+				*Index = i + 1;
+
+				return SHELL_SUCCESS;
+			}
+		}
+
+		return SHELL_SUCCESS;
+	}
+#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+
+static BOOL FileExists(const char *FullFilePath)
+{
+	FIL File;
+
+	if (f_open(&File, FullFilePath, FA_OPEN_ALWAYS) == SHELL_FILE_SUCCESS)
+	{
+		f_close(&File);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+static char* GetNextCharInStream(char* Buffer)
+{
+	if (*Buffer == 0)
+		return NULL;
+
+	if (*Buffer++ == '\\')
+	{
+		if (*Buffer == 0)
+			return NULL;
+
+		Buffer++;
+
+		return Buffer;
+	}
+
+	return Buffer;
+}
+
+static SHELL_RESULT NexShellParseExpression(char** Buffer)
+{
+	/*	
+		This method will parse out an expression
+		What is an expression?
+		It is a file or command that generates output
+	 
+		Examples:
+			echo Test
+			echo "test"
+			ls
+			cat -E File-to-Cat
+			cat -E "File to Cat"
+			cat "File to Cat"
+			./ExecuteFileThing
+			/bin/usr/AnotherFileToExecute
+			/dev/tty0 "Send out a string over the RS-232 Port"
+
+		When does an expression end?
+		It ends at the end of line or a logical operator.
+		Supported operators are |, >, and >>
+
+		Examples:
+			echo "Test String" >> "A file to append Test String Into"
+			ls > /dev/ls_results
+	*/
+	
+	while (**Buffer != '|' && **Buffer != '>')
+	{
+
+	}
+}
+
+static BOOL UserCommandIsValid(char* Buffer)
+{
+	if ((BOOL)isprint((int)*Buffer) == FALSE)
+		return FALSE;
+
+	do
+	{
+		// if it is not printable, 0 is valid, otherwise theres an issue
+		if ((BOOL)isprint((int)*Buffer) == FALSE)
+		{
+			if (*Buffer == 0)
+				return TRUE;
+			else
+				return FALSE;
+		}
+
+		if (*Buffer == '"')
+		{
+			// skip ahead until the next \ or "
+			while (1)
+			{
+				// we can't end with a null, we have to quote out then null
+				if ((BOOL)isprint((int)*Buffer) == FALSE && *Buffer != '\n' && *Buffer != '\r')
+					return FALSE;
+
+				if (*Buffer == '\\')
+				{
+					// ignore the next character unless not printable
+
+					Buffer++;
+
+					if ((BOOL)isprint((int)*Buffer) == FALSE)
+						return FALSE;
+				}
+				else
+				{
+					// are we quoting out?
+					if (*Buffer == '\"')
+					{
+						Buffer++;
+
+						break;
+					}
+				}
+
+				// go to the next character
+				Buffer++;
+			}
+		}
+
+		if (*Buffer == '\'')
+		{
+
+		}
+
+		Buffer++;
+	} 
+	while (1);
+}
+
+static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
+{
+	// scan the buffer for a logical operator
+	while (**Buffer)
+	{
+		switch (**Buffer)
+		{
+			case '|':
+			{
+				// we found a pipe operator
+				**Buffer = 0;
+
+				return SHELL_PIPE;
+			}
+
+			case '>':
+			{
+				**Buffer = 0;
+
+				*Buffer++;
+
+				if ((BOOL)isprint(**Buffer) == FALSE)
+					return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
+
+				if (**Buffer == '>')
+					return SHELL_APPEND;
+
+				return SHELL_WRITE;
+			}
+
+			case '"':
+			{
+				// keep going unil "
+				do
+				{
+					*Buffer++;
+
+					// if we got a quote, leave
+					if (**Buffer == '\"')
+					{
+						*Buffer++;
+
+						break;
+					}
+
+					// if we got a backslash, get the next item
+					if (**Buffer == '\\')
+					{
+						*Buffer++;
+
+						if ((BOOL)isprint(**Buffer) == FALSE)
+							return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
+
+					}
+				} 
+				while (1);
+			
+				break;
+			}
+
+			case '\'':
+			{
+				// keep going unil '"'
+				do
+				{
+					*Buffer++;
+
+					// if we got a quote, leave
+					if (**Buffer == '\'')
+					{
+						*Buffer++;
+
+						break;
+					}
+
+					// if we got a backslash, get the next item
+					if (**Buffer == '\\')
+					{
+						*Buffer++;
+
+						if ((BOOL)isprint(**Buffer) == FALSE)
+							return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
+
+					}
+				}
+				while (1);
+			}
+
+			default:
+			{
+				*Buffer++;
+
+				break;
+			}
+		}
+	}
+
+	return SHELL_NO_LOGICAL_OPERATOR;
+}
 
 static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputStream)
 {
-	void *WorkingDirectory;
-	void *WorkingFile;
-	BOOL Outcome;
 	UINT32 argc;
 	UINT32 WorkingIndex;
+	SHELL_RESULT Result;
+	DIR Directory;
 
 	// we add 2 for the potential location and command name
 	// this way the command/file can get a full SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS
 	char *argv[SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS];
+
+	// is the input string even valid?
+	if (UserCommandIsValid(Buffer) == FALSE)
+		return SHELL_INVALID_INPUT;
 
 	// get the first arguments
 	for (argc = 0; argc < SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS; argc++)
@@ -434,13 +730,47 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 
 	WorkingIndex = 0;
 
-	
+	if (IsDirectoryVirtual(argv[WorkingIndex]) == TRUE)
+	{
+		// they are asking for something in the DEV_FOLDER_NAME
+
+	}
+	else
+	{
+		#if (USING_USER_VIRTUAL_FILES == 1)
+			UINT32 Index;
+
+			if (IsFileVirtual(argv[WorkingIndex], &Index) == SHELL_SUCCESS)
+			{
+				// it was a virtual file
+
+			}
+		#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+	}
 	
 	
 	
 	// now we have to assume that the first thing the user wrote is a directory, lets get the directory
+	Result = f_opendir(&Directory, argv[WorkingIndex]);
 
-
+	if (Result == SHELL_SUCCESS)
+	{
+		// the first item is a directory
+		WorkingIndex++;
+	}
+	else
+	{
+		// it wasn't a directory, was it a file?
+		if (FileExists(argv[WorkingIndex]) == TRUE)
+		{
+			// the first item was a file
+			WorkingIndex++;
+		}
+		else
+		{
+			// no directory, no file
+		}
+	}
 
 
 
@@ -450,8 +780,8 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 
 
 
-
-//	if (WorkingFile == NULL)
+	// did we find anything
+	if (WorkingIndex == 0)
 	{
 		// we need to see if it is a global file
 		UINT32 i;

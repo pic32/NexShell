@@ -103,6 +103,9 @@
 // if colors aren't used then the USE_SHELL_COLOR should be set to zero
 #define USE_SHELL_COLOR												1
 
+// enable this to make virtual files in something other than the DEV_FOLDER_NAME directory
+#define USING_USER_VIRTUAL_FILES									1
+
 // These are all the colors of the prompt and other text
 #if (USE_SHELL_COLOR == 1)
 	#define SHELL_PROJECT_NAME_TEXT_COLOR							SHELL_FONT_COLOR_BRIGHT_CYAN
