@@ -1,6 +1,8 @@
 ﻿#ifndef NEXSHELL_CONFIG_H
 	#define NEXSHELL_CONFIG_H
 
+#include "ffconf.h"
+
 // these are the defines for the prompt
 // the prompt looks like this with the defines
 // PROMPT_LEADING_SEQUENCE + USERNAME + USERNAME_DIRECTORY_SEPERATION_SEQUENCE + 
@@ -57,7 +59,7 @@
 #endif // end of #ifndef SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES
 
 #ifndef SHELL_MAX_DIRECTORY_SIZE_IN_BYTES
-	#define SHELL_MAX_DIRECTORY_SIZE_IN_BYTES						256
+	#define SHELL_MAX_DIRECTORY_SIZE_IN_BYTES						(FF_MAX_LFN)
 #endif // end of #ifndef SHELL_MAX_DIRECTORY_SIZE_IN_BYTES
 
 #ifndef SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES
@@ -135,7 +137,6 @@
 
 #define SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY					16
 
-#define USE_DIRECTORY_DESCRIPTION									1
 #define USE_FILE_DESCRIPTION										1
 #define USE_FILE_HELP												1
 #define USE_COMMAND_HELP											1
@@ -145,6 +146,7 @@
 #define USE_CLEAR_COMMAND											1
 #define USE_ECHO_COMMAND											0
 #define USE_HELP_COMMAND											0
+#define USE_LS_COMMAND												1
 #define USE_PWD_COMMAND												0
 #define USE_SHUTDOWN_COMMAND										0
 

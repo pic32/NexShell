@@ -4,6 +4,7 @@
 #include "NexShellConfig.h"
 #include "GenericTypeDefs.h"
 #include "GenericBuffer.h"
+#include "ff.h"
 
 typedef enum
 {
@@ -65,6 +66,36 @@ typedef enum
 	SHELL_APPEND,
 	NUMBER_OF_SHELL_LOGICAL_OPERATORS
 }SHELL_LOGICAL_OPERATOR;
+
+typedef enum
+{
+	SHELL_FILE_DISK = 0,
+	SHELL_FILE_VIRTUAL,
+	NUMBER_OF_SHELL_FILES
+}SHELL_FILE_TYPE;
+
+typedef struct
+{
+	SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER* OutputStream);
+	SHELL_RESULT(*WriteFileData)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+
+	char* FileName;
+
+	#if (USE_FILE_DESCRIPTION == 1)
+		char* FileDescription;
+	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
+
+	#if (USE_FILE_HELP == 1)
+		char* FileHelp;
+	#endif // end of #if (USE_FILE_HELP == 1)
+}VIRTUAL_FILE;
+
+typedef struct
+{
+	SHELL_FILE_TYPE FileType;
+	void *File; // this points to a FIL or a VIRTUAL_FILE
+}SHELL_FILE;
 
 #define SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS		(SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS + 2)
 

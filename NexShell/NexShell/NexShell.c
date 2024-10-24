@@ -13,6 +13,10 @@
 	#include "clear_Command.h"
 #endif // end of #if (USE_CLEAR_COMMAND == 1)
 
+#if (USE_LS_COMMAND == 1)
+	#include "ls_Command.h"
+#endif // end of #if (USE_LS_COMMAND == 1)
+
 #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 	BOOL gConsoleEcho;
 #endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
@@ -767,7 +771,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 		// if it is an empty string, just leave
 		// don't add it to the history
 		if (strlen(Line) == 0)
-			return FALSE;
+			return TRUE;
 
 		// clear out our history
 		gHistoryIndex = 0;
@@ -1072,13 +1076,31 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 			{
 				TempBuffer[NumberOfBytesToRead - SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES] = 0;
 
-				#if (USE_SHELL_COMMAND_HISTORY == 1)
-					if (AddLineToHistory(TempBuffer) == FALSE)
-						return SHELL_HISTORY_BUFFER_FAILURE;
-				#endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
+				// is it just an empty line?
+				if(strlen(TempBuffer) != 0)
+				{
+					SHELL_RESULT TempResult;
 
-				// now go ahead and process the command
-				Result = NexShellProcessCommand(TempBuffer, OutputStream);
+					#if (USE_SHELL_COMMAND_HISTORY == 1)
+						if (AddLineToHistory(TempBuffer) == FALSE)
+							return SHELL_HISTORY_BUFFER_FAILURE;
+					#endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
+
+					// now go ahead and process the command
+					Result = NexShellProcessCommand(TempBuffer, OutputStream);
+
+					// always attemp to do this afterwards
+					// this way each command doesn't need to remember to do it.
+					TempResult = f_chdir(gCurrentWorkingDirectory);
+
+					// if we didn't get a main error, output it, otherwise output the result of f_chdir()
+					if (Result == SHELL_SUCCESS)
+						Result = TempResult;
+				}
+				else
+				{
+					Result = SHELL_SUCCESS;
+				}
 			}
 			else
 			{

@@ -2,11 +2,18 @@
 //
 #include <stdio.h>
 #include <windows.h>
-#include "NexShell.h"
 
 HANDLE gThread;
 
 BYTE gDataRead = 0;
+
+// this is the ascii value for the backspace character
+#define BACKSPACE_ASCII_VALUE									0x08
+#define ESCAPE_ASCII_VALUE										0x1B
+#define UP_ARROW_ASCII_VALUE									41
+#define DOWN_ARROW_ASCII_VALUE									42
+#define RIGHT_ARROW_ASCII_VALUE									43
+#define LEFT_ARROW_ASCII_VALUE									44
 
 
 DWORD WINAPI ThreadFunc(void* data)
