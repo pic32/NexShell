@@ -137,18 +137,20 @@
 
 #define SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY					16
 
-#define USE_FILE_DESCRIPTION										1
+#define USE_FILE_DESCRIPTION										0
 #define USE_FILE_HELP												1
-#define USE_COMMAND_HELP											1
-#define USE_COMMAND_DESCRIPTIONS									1
 
 // use these to enable each command
+#define USE_CAT_COMMAND												1
+#define USE_CD_COMMAND												1
 #define USE_CLEAR_COMMAND											1
 #define USE_ECHO_COMMAND											0
-#define USE_HELP_COMMAND											0
+#define USE_HELP_COMMAND											1
 #define USE_LS_COMMAND												1
-#define USE_PWD_COMMAND												0
-#define USE_SHUTDOWN_COMMAND										0
+#define USE_PWD_COMMAND												1
+#define USE_SHUTDOWN_COMMAND										1
+
+#define EXTENDED_CD_SUPPORT											1
 
 // these are called when the shutdown command is received
 #define ShellPowerOff()												exit(0)
@@ -159,7 +161,7 @@
 #define USE_SHELL_HOME_DIRECTORY									1
 #define SHELL_HOME_DIRECTORY_CHARACTER								'~'
 #define SHELL_HOME_DIRECTORY_CHARACTER_STRING						"~"
-#define SHELL_HOME_DIRECTORY										"/folder"
+#define SHELL_HOME_DIRECTORY										"R:/"
 
 
 // this is the config for the history feature

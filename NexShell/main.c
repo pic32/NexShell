@@ -14,6 +14,8 @@ void ShellPowerDownCallback(void)
 void StartThread(void);
 
 FIL gFile;
+const char gTestTest[] = "This is some test text!\r\nHopefully it works.";
+UINT gBytesWritten;
 
 int main()
 {
@@ -40,9 +42,59 @@ int main()
 
 	gShellResult = f_close(&gFile);
 
+	gShellResult = f_open(&gFile, "R:\\File.txt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("f_open() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = f_write(&gFile, gTestTest, strlen(gTestTest), &gBytesWritten);
+
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("f_write() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = f_close(&gFile);
+
 	if (gShellResult != SHELL_SUCCESS)
 	{
 		printf("f_close() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = f_mkdir("R:/folder1");
+
+	// did it work?
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("f_mkdir() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = f_mkdir("R:/folder2");
+
+	// did it work?
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("f_mkdir() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = f_mkdir("R:/folder2/folder3");
+
+	// did it work?
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("f_mkdir() Failed\r\n");
 
 		exit(0);
 	}

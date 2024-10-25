@@ -40,6 +40,8 @@ typedef enum
 	SHELL_INVALID_INPUT,
 	SHELL_ARGUMENT_OVERFLOW,
 	SHELL_INVALID_CHARACTER_FOUND,
+	SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE,
+	SHELL_INVALID_ARGUMENT,
 	SHELL_FILE_NOT_FOUND,
 	SHELL_FILE_NOT_EXECUTABLE,
 	SHELL_FILE_NOT_READABLE,
@@ -157,15 +159,12 @@ typedef struct
 {
 	char* CommandName;
 	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* Buffer);
-
-
 	char* Description;
-
-	#if (USE_COMMAND_HELP == 1)
-		char* Help;
-	#endif // #if (USE_COMMAND_HELP == 1)
+	char* Help;
 }COMMAND_INFO;
 
+SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER* OutputStream));
+SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER* OutputStream);
 SHELL_RESULT NexShellInit(char CurrentDrive);
 
 // call this continuously

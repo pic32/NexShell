@@ -5,8 +5,6 @@
 #include "ff.h"
 #include "ls_Command.h"
 
-extern char gCurrentWorkingDirectory[];
-
 static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* OutputStream)
 {
 	#if (USE_FILE_HELP == 1)
@@ -222,10 +220,16 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 	SHELL_RESULT Result;
 	char* WorkingDirectoryPath;
 	DIR Directory;
+	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 
 	ArgIndex = 0;
 
 	// Args[0] holds the directory that we will be getting the list files of
+
+	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
 	do
 	{
@@ -233,14 +237,14 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		if (Args[ArgIndex] == 0)
 		{
 			// our working directory is the current one
-			WorkingDirectoryPath = gCurrentWorkingDirectory;
+			WorkingDirectoryPath = CurrentWorkingDirectory;
 		}
 		else
 		{
 			if (strlen(Args[ArgIndex]) == 0)
 			{
 				// our working directory is the current one
-				WorkingDirectoryPath = gCurrentWorkingDirectory;
+				WorkingDirectoryPath = CurrentWorkingDirectory;
 			}
 			else
 			{
@@ -257,7 +261,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		}
 		
 		// open the directory
-		Result = f_opendir(&Directory, WorkingDirectoryPath);
+		Result = f_opendir(&Directory, "./");
 
 		if (Result != SHELL_SUCCESS)
 			return Result;

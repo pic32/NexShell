@@ -93,6 +93,21 @@
     <ClCompile Include="NexShell\Commands\ls_Command.c">
       <Filter>Source Files\NexShell\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="NexShell\Commands\cd_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\shutdown_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\help_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\pwd_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="NexShell\Commands\cat_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
@@ -138,6 +153,21 @@
       <Filter>Header Files\NexShell\Commands</Filter>
     </ClInclude>
     <ClInclude Include="NexShell\Commands\ls_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\cd_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\shutdown_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\help_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\pwd_Command.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\cat_Command.h">
       <Filter>Header Files\NexShell\Commands</Filter>
     </ClInclude>
   </ItemGroup>

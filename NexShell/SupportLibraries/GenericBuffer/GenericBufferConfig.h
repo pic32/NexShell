@@ -81,7 +81,7 @@ GenericBufferRemoveLastByteWritten() method.
 	*Set USING_GENERIC_BUFFER_GET_REMAINING_BYTES_METHOD to 1 to enable the
 	GenericBufferGetRemainingBytes() method.
 */
-#define USING_GENERIC_BUFFER_GET_REMAINING_BYTES_METHOD		0
+#define USING_GENERIC_BUFFER_GET_REMAINING_BYTES_METHOD		1
 
 /**
 	*Set USING_GENERIC_BUFFER_GET_LIBRARY_VERSION to 1 to endable the 

@@ -157,8 +157,13 @@
     <ClCompile Include="FileSystem\ffsystem.c" />
     <ClCompile Include="FileSystem\ffunicode.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="NexShell\Commands\cat_Command.c" />
+    <ClCompile Include="NexShell\Commands\cd_Command.c" />
     <ClCompile Include="NexShell\Commands\clear_Command.c" />
+    <ClCompile Include="NexShell\Commands\help_Command.c" />
     <ClCompile Include="NexShell\Commands\ls_Command.c" />
+    <ClCompile Include="NexShell\Commands\pwd_Command.c" />
+    <ClCompile Include="NexShell\Commands\shutdown_Command.c" />
     <ClCompile Include="NexShell\NexShell.c" />
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
     <ClCompile Include="SupportLibraries\GenericBuffer\GenericBuffer.c" />
@@ -169,8 +174,13 @@
     <ClInclude Include="FileSystem\diskio.h" />
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />
+    <ClInclude Include="NexShell\Commands\cat_Command.h" />
+    <ClInclude Include="NexShell\Commands\cd_Command.h" />
     <ClInclude Include="NexShell\Commands\clear_Command.h" />
+    <ClInclude Include="NexShell\Commands\help_Command.h" />
     <ClInclude Include="NexShell\Commands\ls_Command.h" />
+    <ClInclude Include="NexShell\Commands\pwd_Command.h" />
+    <ClInclude Include="NexShell\Commands\shutdown_Command.h" />
     <ClInclude Include="NexShell\NexShell.h" />
     <ClInclude Include="NexShell\NexShellConfig.h" />
     <ClInclude Include="NexShell\Time\NexShellTime.h" />

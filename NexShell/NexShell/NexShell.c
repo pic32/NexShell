@@ -9,13 +9,33 @@
 #include "NexShell.h"
 #include "NexShellConfig.h"
 
+#if (USE_CAT_COMMAND == 1)
+	#include "cat_Command.h"
+#endif // end of #if (USE_CAT_COMMAND == 1)
+
+#if (USE_CD_COMMAND == 1)
+	#include "cd_Command.h"
+#endif // end of #if (USE_CD_COMMAND == 1)
+
 #if (USE_CLEAR_COMMAND == 1)
 	#include "clear_Command.h"
 #endif // end of #if (USE_CLEAR_COMMAND == 1)
 
+#if (USE_HELP_COMMAND == 1)
+	#include "help_Command.h"
+#endif // end of #if (USE_HELP_COMMAND == 1)
+
 #if (USE_LS_COMMAND == 1)
 	#include "ls_Command.h"
 #endif // end of #if (USE_LS_COMMAND == 1)
+
+#if (USE_PWD_COMMAND == 1)
+	#include "pwd_Command.h"
+#endif // end of #if (USE_PWD_COMMAND == 1)
+
+#if (USE_SHUTDOWN_COMMAND == 1)
+	#include "shutdown_Command.h"
+#endif // end of #if (USE_SHUTDOWN_COMMAND == 1)
 
 #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 	BOOL gConsoleEcho;
@@ -71,6 +91,8 @@ const char* gNexShellError[] = {
 	"shell invalid input",
 	"shell argument overflow",
 	"shell invalid char found",
+	"shell insufficient args for command",
+	"shell invalid argument",
 	"shell file not found",
 	"shell file not executable",
 	"shell file not readable",
@@ -179,7 +201,7 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 {
 	char* LastDirectory = &DirectoryPath[strlen(DirectoryPath)];
 
-	while (*LastDirectory != '\\')
+	while (*LastDirectory != '/')
 		LastDirectory--;
 
 	return LastDirectory;
@@ -187,6 +209,8 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 
 SHELL_RESULT NexShellInit(char CurrentDrive)
 {
+	SHELL_RESULT Result;
+
 	// NULL this out at startup
 	gVirtualDirectory = NULL;
 
@@ -272,7 +296,6 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	if ((SHELL_RESULT)f_mount(&gFatFs, gCurrentWorkingDirectory, 1) != SHELL_SUCCESS)
 	{
 		// we're not dead in the water, attempt to initialize the disk then
-		SHELL_RESULT Result;
 		char TempDrivePath[3];
 		BYTE TempWorkingBuffer[512];
 
@@ -295,7 +318,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 			return Result;
 
 		// we have a valid file system now
-		Shell_sprintf(gCurrentWorkingDirectory, "%c:\\" DEV_FOLDER_NAME, CurrentDrive);
+		Shell_sprintf(gCurrentWorkingDirectory, "%c:/" DEV_FOLDER_NAME, CurrentDrive);
 
 		// now create the first folder which is dev, this is virtual
 		Result = f_mkdir(gCurrentWorkingDirectory);
@@ -308,21 +331,29 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	// get this back for use with the file system
 	gCurrentWorkingDirectory[0] = CurrentDrive;
 	gCurrentWorkingDirectory[1] = ':';
-	gCurrentWorkingDirectory[2] = '\\';
+	gCurrentWorkingDirectory[2] = '/';
 	gCurrentWorkingDirectory[3] = 0;
+
+	#if (EXTENDED_CD_SUPPORT == 1)
+		Result = cdInit();
+
+		// did it work?
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 
 	// now output the prompt
 	return OutputPrompt(GetLastDirectoryPresent(&gCurrentWorkingDirectory[2]), &gStandardOutputStream);
 }
 
-SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *GenericBuffer)
+SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *OutputStream)
 {
-	if (GenericBufferGetSize(GenericBuffer) != 0)
+	if (GenericBufferGetSize(OutputStream) != 0)
 	{
 		BYTE CharacterBuffer[SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES + 1];
 		UINT32 BytesToTransfer, OriginalBytesToTransfer;
 
-		OriginalBytesToTransfer = GenericBufferPeek(GenericBuffer, 0, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE);
+		OriginalBytesToTransfer = GenericBufferPeek(OutputStream, 0, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE);
 
 		// now null it out for the method that is about to send it
 		CharacterBuffer[OriginalBytesToTransfer] = 0;
@@ -335,7 +366,7 @@ SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *GenericBuffer)
 				return SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED;
 
 			// some or all was written, now read what thye wrote out of the buffer since it was a peek prior
-			if(GenericBufferRead(GenericBuffer, BytesToTransfer, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE) != BytesToTransfer)
+			if(GenericBufferRead(OutputStream, BytesToTransfer, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE) != BytesToTransfer)
 				return SHELL_GENERIC_BUFFER_READ_FAILURE;
 		}
 	}
@@ -441,7 +472,7 @@ static BOOL IsDirectoryVirtual(const char* FullFilePath)
 	char TempDirectory[8];
 
 	// make the virtual directory root path
-	Shell_sprintf(TempDirectory, "%c:\\" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
+	Shell_sprintf(TempDirectory, "%c:/" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
 
 	return (BOOL)(memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0);
 }
@@ -865,7 +896,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 	}
 #endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
 
-SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER *Buffer))
+SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER * OutputStream))
 {
 	SHELL_RESULT Result;
 	UINT32 DataWritten, NumberOfBytesToWrite;
@@ -875,7 +906,7 @@ SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UIN
 		return SHELL_INVALID_INPUT_PARAMETER;
 
 	// perform the write tasks
-	Result = WriteTasks(Buffer);
+	Result = WriteTasks(OutputStream);
 
 	// did it work ok?
 	if (Result != SHELL_SUCCESS)
@@ -893,13 +924,13 @@ SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UIN
 		NumberOfBytesToProcess -= NumberOfBytesToWrite;
 
 		// now get some data
-		DataWritten = GenericBufferWrite(Buffer, NumberOfBytesToWrite, Data);
+		DataWritten = GenericBufferWrite(OutputStream, NumberOfBytesToWrite, Data);
 
 		// advance the pointer
 		Data += DataWritten;
 
 		// perform the write tasks
-		Result = WriteTasks(Buffer);
+		Result = WriteTasks(OutputStream);
 
 		// did it work ok?
 		if (Result != SHELL_SUCCESS)
