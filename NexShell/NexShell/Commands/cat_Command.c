@@ -175,7 +175,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						{
 							// output the new line if required
 
-							if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines <= SHELL_NEW_LINE_SUPPRESS_THRESHOLD))
+							if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines < SHELL_NEW_LINE_SUPPRESS_THRESHOLD))
 							{
 								Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
@@ -194,6 +194,17 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 				{
 					if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1)
 					{
+						// if they have line count on, output a new line
+						if (ReadInfo->NumberOfEmptyLines >= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)
+						{
+							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
+
+							Result = NexShellProcessOutgoingData(LineNumberBuffer, (GENERIC_BUFFER*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
+
+							if (Result != SHELL_SUCCESS)
+								return 0;
+						}
+
 						ReadInfo->NumberOfEmptyLines = 0;
 						ReadInfo->ReadOptions.Bits.NewLinePrior = 0;
 					}
@@ -221,6 +232,17 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 					if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1)
 					{
+						// if they have line count on, output a new line
+						if (ReadInfo->NumberOfEmptyLines >= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)
+						{
+							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
+
+							Result = NexShellProcessOutgoingData(LineNumberBuffer, (GENERIC_BUFFER*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
+
+							if (Result != SHELL_SUCCESS)
+								return 0;
+						}
+
 						ReadInfo->NumberOfEmptyLines = 0;
 						ReadInfo->ReadOptions.Bits.NewLinePrior = 0;
 					}
@@ -302,303 +324,79 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 	return btf;
 }
-#if(0)
-void test(READ_OPTIONS Options, GENERIC_BUFFER* Buffer, char* DataRead, UINT32 NumberOfBytesRead)
-{
-	char LineNumberBuffer[6];
-	UINT32 LineNumber = 0;
-	UINT32 NewLinePrior = 0;
-	BOOL PrintOutLineNumber = FALSE;
 
-	if (Buffer == NULL)
-		return SHELL_INVALID_INPUT_PARAMETER;
-
-	if (DataRead == NULL)
-		return SHELL_INVALID_INPUT_PARAMETER;
-
-	if (NumberOfBytesRead == 0)
-		return SHELL_SUCCESS;
-
-	// do they even have any options on?
-	if (Options.Value == 0)
-	{
-		// they don't, just write the data out
-		return NanoShellProcessOutgoingData(DataRead, Buffer, NumberOfBytesRead, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-	}
-
-	// we know they have at least 1 option on.
-	if (Options.Bits.NumberAllLines == TRUE)
-	{
-		// initialize the line buffer with all spaces and null terminate it
-		LineNumber = 1;
-
-		Shell_sprintf(LineNumberBuffer, "% 4i ", LineNumber);
-
-		if (GenericBufferWrite(Buffer, strlen(LineNumberBuffer), LineNumberBuffer) != strlen(LineNumberBuffer))
-			return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-	}
-
-	while (NumberOfBytesRead)
-	{
-		// we have enough data for a new line sequence, does it exist?
-		if (NumberOfBytesRead >= SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-		{
-			// find it if it exists
-			if (strncmp(DataRead, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES) == 0)
-			{
-				// it does exist, so now what are our options?
-				NumberOfBytesRead -= SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES;
-
-				// increment our line number too
-				LineNumber++;
-
-				// do they want to suppress the new lines?
-				if (NewLinePrior == SHELL_NEW_LINE_SUPPRESS_THRESHOLD && Options.Bits.SupressRepeativeEmptyLines == 1)
-				{
-					// increment our pointer
-					DataRead += SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES;
-}
-				else
-				{
-					// increment this so when it gets to 2, we don't display if the option
-					// is set
-					NewLinePrior++;
-
-					// do they want line ends?
-					if (Options.Bits.ShowLineEnds == TRUE)
-					{
-						// output $ before the new line
-						if (GenericBufferWrite(Buffer, 1, "$") != 1)
-							return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-					}
-
-					// output the new line sequence
-					if (GenericBufferWrite(Buffer, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, DataRead) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-						return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-
-					// increment our pointer
-					DataRead += SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES;
-
-					// do we number lines?
-					if (Options.Bits.NumberAllLines == TRUE && NewLinePrior == SHELL_NEW_LINE_SUPPRESS_THRESHOLD && Options.Bits.SupressRepeativeEmptyLines == 1)
-					{
-						PrintOutLineNumber = TRUE;
-					}
-					else
-					{
-						PrintOutLineNumber = FALSE;
-
-						// update the line number and output the value
-						Shell_sprintf(LineNumberBuffer, "% 4i ", LineNumber);
-
-						if (GenericBufferWrite(Buffer, strlen(LineNumberBuffer), LineNumberBuffer) != strlen(LineNumberBuffer))
-							return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-					}
-				}
-
-				// don't execute anything else in the loop
-				continue;
-				}
-			}
-
-		NewLinePrior = 0;
-
-		if (PrintOutLineNumber == TRUE)
-		{
-			PrintOutLineNumber = FALSE;
-
-			// update the line number and output the value
-			Shell_sprintf(LineNumberBuffer, "% 4i ", LineNumber);
-
-			if (GenericBufferWrite(Buffer, strlen(LineNumberBuffer), LineNumberBuffer) != strlen(LineNumberBuffer))
-				return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-		}
-
-		// do they want to show tabs?
-		if (Options.Bits.ShowTabs == 1)
-		{
-			// they do, do we have a tab
-			if (*DataRead == '\t')
-			{
-				if (GenericBufferWrite(Buffer, 2, "^I") != 2)
-					return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-
-				// update our size and pointer
-				NumberOfBytesRead -= 1;
-				DataRead++;
-
-				// do not execute anymore of the loop
-				continue;
-			}
-		}
-
-		// if the character is print, print it out
-		if (isprint(*DataRead) == FALSE && isspace(*DataRead) == FALSE)
-		{
-			// its not print
-
-			// do they have the option set for printing non printable characters?
-			if (Options.Bits.ShowControlCharacters == 1)
-			{
-				// do they have the option set
-				if (*DataRead < 128)
-				{
-					// we are under 128, use ^@
-					char TempBuffer[2];
-
-					TempBuffer[0] = '^';
-					TempBuffer[1] = '@' + *DataRead;
-
-					// now write the data
-					if (GenericBufferWrite(Buffer, 2, TempBuffer) != 2)
-						return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-				}
-				else
-				{
-					// we are at or over 128, use M-^@
-					char TempBuffer[4];
-
-					TempBuffer[0] = 'M';
-					TempBuffer[1] = '-';
-					TempBuffer[2] = '^';
-					TempBuffer[3] = '@' + (*DataRead) - 128;
-
-					// now write the data
-					if (GenericBufferWrite(Buffer, 4, TempBuffer) != 4)
-						return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-				}
-			}
-		}
-		else
-		{
-			// write the data out
-			if (GenericBufferWrite(Buffer, 1, DataRead) != 1)
-				return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
-		}
-
-		// update our size and pointer
-		NumberOfBytesRead -= 1;
-		DataRead++;
-		}
-
-	return SHELL_SUCCESS;
-}
-#endif
 SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
-	#if (EXTENDED_CAT_SUPPORT == 1)
-		SHELL_FILE* File;
-		SHELL_RESULT Result;
-		READ_OPTIONS ReadOptions;
-		UINT32 ArgsProcessed;
+	FIL File;
+	UINT DataRead;
+	SHELL_RESULT Result;
+	UINT32 ArgsProcessed;
+	READ_INFO ReadInfo;
+	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 
-		if (NumberOfArgs == 0)
-			return SHELL_INVALID_PARAMETERS;
+	if (NumberOfArgs == 0)
+		return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
 
-		// clear it out first
-		ReadOptions.Value = 0;
+	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
-		// zero this out at the start
-		ArgsProcessed = 0;
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
-		// get any potential options
-		if ((Result = ProcessOptions(Args[0], &ReadOptions)) == TRUE)
-		{
-			// if we only have one set of arguments, that's an issue
-			if (NumberOfArgs == 1)
-				return SHELL_INVALID_PARAMETERS;
+	// clear it out first
+	memset(&ReadInfo, 0, sizeof(ReadInfo));
 
-			ArgsProcessed++;
-		}
+	// zero this out at the start
+	ArgsProcessed = 0;
 
-		do
-		{
-			// find the file
-			File = NanoShellGetWorkingFile(Args[ArgsProcessed], gRootNanoDirectory, gCurrentWorkingNanoDirectory);
+	// get any potential options
+	if ((Result = ProcessOptions(Args[0], &ReadInfo.ReadOptions)) == TRUE)
+	{
+		// if we only have one set of arguments, that's an issue
+		if (NumberOfArgs == 1)
+			return SHELL_INVALID_INPUT_PARAMETER;
 
-			// did we find it?
-			if (File == NULL)
-				return SHELL_FILE_NOT_FOUND;
+		ArgsProcessed++;
+		NumberOfArgs--;
+	}
 
-			if (File->ReadFileData == NULL)
-				return SHELL_FILE_NOT_READABLE;
+	while (NumberOfArgs--)
+	{
+		Result = f_open(&File, Args[ArgsProcessed++], FA_OPEN_EXISTING | FA_READ);
 
-			Result = File->ReadFileData(Buffer, ReadOptions);
-
-			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			if (GenericBufferWrite(Buffer, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-				return SHELL_GENERIC_BUFFER_LIBRARY_FAILED;
-		}
-		while (++ArgsProcessed != NumberOfArgs);
-	#else
-		FIL File;
-		UINT DataRead;
-		SHELL_RESULT Result;
-		UINT32 ArgsProcessed;
-		READ_INFO ReadInfo;
-		char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-
-		if (NumberOfArgs == 0)
-			return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
-
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
+		// did we find it?
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
-		// clear it out first
-		memset(&ReadInfo, 0, sizeof(ReadInfo));
-
-		// zero this out at the start
-		ArgsProcessed = 0;
-
-		// get any potential options
-		if ((Result = ProcessOptions(Args[0], &ReadInfo.ReadOptions)) == TRUE)
+		// we did, now start reading the contents
+		while (Result == SHELL_SUCCESS && !f_eof(&File))
 		{
-			// if we only have one set of arguments, that's an issue
-			if (NumberOfArgs == 1)
-				return SHELL_INVALID_INPUT_PARAMETER;
+			// forward more data
+			Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
 
-			ArgsProcessed++;
-			NumberOfArgs--;
-		}
-
-		while (NumberOfArgs--)
-		{
-			Result = f_open(&File, Args[ArgsProcessed++], FA_OPEN_EXISTING | FA_READ);
-
-			// did we find it?
+			// did we read ok?
 			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			// we did, now start reading the contents
-			while (Result == SHELL_SUCCESS && !f_eof(&File))
 			{
-				// forward more data
-				Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
+				f_close(&File);
 
-				// did we read ok?
-				if (Result != SHELL_SUCCESS)
-				{
-					f_close(&File);
-
-					return Result;
-				}
-			}
-
-			// output a new line
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
-			Result = f_close(&File);
-
-			// did it close?
-			if (Result != SHELL_SUCCESS)
 				return Result;
+			}
 		}
-	#endif // end of #if (EXTENDED_CAT_SUPPORT == 1)
+
+		// output a new line
+		if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		Result = f_close(&File);
+
+		// did it close?
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		// clear out the status of the read info
+		ReadInfo.LineNumber = 0;
+		ReadInfo.NumberOfEmptyLines = 0;
+		ReadInfo.ReadOptions.Bits.NewLinePrior = ReadInfo.ReadOptions.Bits.OutputNewLine = 0;
+	}
 
 	return SHELL_SUCCESS;
 }

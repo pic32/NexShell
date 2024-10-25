@@ -160,6 +160,7 @@
     <ClCompile Include="NexShell\Commands\cat_Command.c" />
     <ClCompile Include="NexShell\Commands\cd_Command.c" />
     <ClCompile Include="NexShell\Commands\clear_Command.c" />
+    <ClCompile Include="NexShell\Commands\echo_Command.c" />
     <ClCompile Include="NexShell\Commands\help_Command.c" />
     <ClCompile Include="NexShell\Commands\ls_Command.c" />
     <ClCompile Include="NexShell\Commands\pwd_Command.c" />
@@ -177,6 +178,7 @@
     <ClInclude Include="NexShell\Commands\cat_Command.h" />
     <ClInclude Include="NexShell\Commands\cd_Command.h" />
     <ClInclude Include="NexShell\Commands\clear_Command.h" />
+    <ClInclude Include="NexShell\Commands\echo_Command.h" />
     <ClInclude Include="NexShell\Commands\help_Command.h" />
     <ClInclude Include="NexShell\Commands\ls_Command.h" />
     <ClInclude Include="NexShell\Commands\pwd_Command.h" />
