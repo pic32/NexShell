@@ -5660,10 +5660,11 @@ FRESULT f_expand (
 
 FRESULT f_forward (
 	FIL* fp, 						/* Pointer to the file object */
-	UINT (*func)(const BYTE*,UINT,void *),	/* Pointer to the streaming function */
+	UINT (*func)(const BYTE*,UINT,void *, void *),	/* Pointer to the streaming function */
 	UINT btf,						/* Number of bytes to forward */
 	UINT* bf,						/* Pointer to number of bytes forwarded */
-	void *data						/* Data to pass to callback */
+	void *data,						/* Data to pass to callback */
+	void *readoptions
 )
 {
 	FRESULT res;
@@ -5683,7 +5684,7 @@ FRESULT f_forward (
 	remain = fp->obj.objsize - fp->fptr;
 	if (btf > remain) btf = (UINT)remain;			/* Truncate btf by remaining bytes */
 
-	for ( ; btf > 0 && (*func)(0, 0, data); fp->fptr += rcnt, *bf += rcnt, btf -= rcnt) {	/* Repeat until all data transferred or stream goes busy */
+	for ( ; btf > 0 && (*func)(0, 0, data, readoptions); fp->fptr += rcnt, *bf += rcnt, btf -= rcnt) {	/* Repeat until all data transferred or stream goes busy */
 		csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));	/* Sector offset in the cluster */
 		if (fp->fptr % SS(fs) == 0) {				/* On the sector boundary? */
 			if (csect == 0) {						/* On the cluster boundary? */
@@ -5715,7 +5716,7 @@ FRESULT f_forward (
 		fp->sect = sect;
 		rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);	/* Number of bytes remains in the sector */
 		if (rcnt > btf) rcnt = btf;					/* Clip it by btr if needed */
-		rcnt = (*func)(dbuf + ((UINT)fp->fptr % SS(fs)), rcnt, data);	/* Forward the file data */
+		rcnt = (*func)(dbuf + ((UINT)fp->fptr % SS(fs)), rcnt, data, readoptions);	/* Forward the file data */
 		if (rcnt == 0) ABORT(fs, FR_INT_ERR);
 	}
 

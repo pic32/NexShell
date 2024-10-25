@@ -14,7 +14,7 @@ void ShellPowerDownCallback(void)
 void StartThread(void);
 
 FIL gFile;
-const char gTestTest[] = "This is some test text!\r\nHopefully it works.";
+const char gTestTest[] = "This is some test text!\r\n\r\n\r\n\r\nHopefully it works.\r\n\t\t\r\n";
 UINT gBytesWritten;
 
 int main()

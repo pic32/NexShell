@@ -76,6 +76,23 @@ typedef enum
 	NUMBER_OF_SHELL_FILES
 }SHELL_FILE_TYPE;
 
+typedef union
+{
+	BYTE Value;
+
+	struct
+	{
+		unsigned int ShowLineEnds : 1;					// -E
+		unsigned int NumberAllLines : 1;				// -n
+		unsigned int SupressRepeativeEmptyLines : 1;	// -s
+		unsigned int ShowTabs : 1;						// -T
+		unsigned int ShowControlCharacters : 1;			// -v
+		unsigned int OutputNewLine : 1;					// Internal Use
+		unsigned int NewLinePrior : 1;					// Internal Use
+		unsigned int Reserved : 1;
+	}Bits;
+}READ_OPTIONS;
+
 typedef struct
 {
 	SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER* OutputStream);
@@ -152,6 +169,9 @@ typedef struct
 #define DOWN_ARROW_ASCII_VALUE									42
 #define RIGHT_ARROW_ASCII_VALUE									43
 #define LEFT_ARROW_ASCII_VALUE									44
+
+// despite it being 1 char, it needs to have double quotes
+#define END_OF_LINE_CAT_PRINT_CHARACTER							"$"
 
 #define NexShellAssert(condition)								{if(!(condition)){while(1);}}
 

@@ -903,7 +903,7 @@ SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStrea
 
 	// check that they want to send a valid number of bytes
 	if (NumberOfBytesToProcess == 0)
-		return SHELL_INVALID_INPUT_PARAMETER;
+		return SHELL_SUCCESS;
 
 	// perform the write tasks
 	Result = WriteTasks(OutputStream);
