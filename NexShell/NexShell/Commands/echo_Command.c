@@ -163,12 +163,12 @@ void UpdateBackslashCharacters(char *String)
 
 SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
-	SHELL_FILE *File;
+	FIL File;
+	BYTE FSAppend;
 	char *SpecialCharacters;
 	UINT32 StringArguments;
 	SHELL_RESULT Result;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-	BOOL AppendMode = FALSE;
 	BOOL EnableBackslash = FALSE;
 	BOOL AppendNewLine = TRUE;
 
@@ -259,13 +259,15 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 	if (strcmp(Args[StringArguments + 1], ">>") == 0)
 	{
 		// we are
-		AppendMode = TRUE;
+		FSAppend = FA_OPEN_APPEND;
 	}
 	else
 	{
 		// we need to be in write mode
 		if (strcmp(Args[StringArguments + 1], ">") != 0)
 			return SHELL_INVALID_INPUT_PARAMETER;
+
+		FSAppend = 0;
 	}
 
 	NumberOfArgs--;
@@ -289,12 +291,12 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 	if(NumberOfArgs != 0)
 		return SHELL_INVALID_INPUT_PARAMETER;
 
-	// did we find it?
-	if(File == NULL)
-		return SHELL_FILE_NOT_FOUND;
+	// now open the file
+	Result = f_open(&File, Args[StringArguments + 2], FA_OPEN_ALWAYS | FA_WRITE | FSAppend);
 
-	// now pass it to the file
-	Result = File->WriteFileData(&Args[StringArguments], 2, OutputStream, AppendMode);
+	// did we find it?
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
 	// append the new line if they wanted it
 	if (AppendNewLine == TRUE)
