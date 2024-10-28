@@ -1110,11 +1110,15 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 
 					// always attemp to do this afterwards
 					// this way each command doesn't need to remember to do it.
-					TempResult = f_chdir(gCurrentWorkingDirectory);
+					// we only do this though if it is not a virtual directory
+					if (IsDirectoryVirtual(gCurrentWorkingDirectory) == FALSE)
+					{
+						TempResult = f_chdir(gCurrentWorkingDirectory);
 
-					// if we didn't get a main error, output it, otherwise output the result of f_chdir()
-					if (Result == SHELL_SUCCESS)
-						Result = TempResult;
+						// if we didn't get a main error, output it, otherwise output the result of f_chdir()
+						if (Result == SHELL_SUCCESS)
+							Result = TempResult;
+					}
 				}
 				else
 				{
