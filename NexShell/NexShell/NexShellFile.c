@@ -1,4 +1,51 @@
 #include "NexShellFile.h"
+#include "LinkedList.h"
+
+extern char gCurrentWorkingDirectory[];
+
+#if (USING_USER_VIRTUAL_FILES == 1)
+	LINKED_LIST gUserVirtualFiles;
+
+	static SHELL_RESULT IsFileVirtual(const char* FullFilePath, UINT32* Index)
+	{
+		UINT32 i, Size;
+		char* VirtualFileFullPath;
+
+		// make the index invalid to begin with
+		*Index = 0;
+
+		Size = LinkedListGetSize(&gUserVirtualFiles);
+
+		for (i = 0; i < Size; i++)
+		{
+			// get the next item in the list
+			VirtualFileFullPath = (char*)LinkedListGetData(&gUserVirtualFiles, i + 1);
+
+			// is it valid?
+			if (VirtualFileFullPath == NULL)
+				return SHELL_LINKED_LIST_OPERATION_FAILURE;
+
+			// now compare
+			if (strcmp(FullFilePath, VirtualFileFullPath) == 0)
+			{
+				// it was valid
+				*Index = i + 1;
+
+				return SHELL_SUCCESS;
+			}
+		}
+
+		return SHELL_SUCCESS;
+	}
+
+	SHELL_RESULT NexShellFileModuleInit(void)
+	{
+		if (CreateLinkedList(&gUserVirtualFiles, NULL, NULL) == FALSE)
+			return SHELL_LINKED_LIST_CREATE_FAILURE;
+
+		return SHELL_SUCCESS;
+	}
+#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
 
 SHELL_RESULT NexShellFileOpen(char* FilePath, SHELL_FILE* File, BYTE OperatingMode)
 {

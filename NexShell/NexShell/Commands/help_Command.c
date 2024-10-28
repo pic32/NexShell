@@ -7,8 +7,6 @@ extern COMMAND_INFO gCommandList[];
 
 SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
-	SHELL_FILE* File;
-
 	// if there are zero arguments just print out all the global 
 	// files that are available
 	switch (NumberOfArgs)

@@ -8,6 +8,8 @@
 
 #include "NexShell.h"
 #include "NexShellConfig.h"
+#include "VirtualDirectory.h"
+#include "VirtualFile.h"
 
 #if (USE_CAT_COMMAND == 1)
 	#include "cat_Command.h"
@@ -41,10 +43,6 @@
 	BOOL gConsoleEcho;
 #endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 
-#if (USING_USER_VIRTUAL_FILES == 1)
-	LINKED_LIST gUserVirtualFiles;
-#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
-
 // these are the standard stream inputs and outputs
 GENERIC_BUFFER gStandardOutputStream, gStandardInputStream, gShellOperatorStream;
 
@@ -60,10 +58,13 @@ UINT32 gEscapeSequence;
 FATFS gFatFs;
 
 // this is our pointer to a virtual directory portion
-char* gVirtualDirectory;
+VIRTUAL_DIRECTORY *gVirtualDirectory;
 
 // this is the current directory that the shell is working from, we add 1 for null, and 2 for the drive letter and :
 BYTE gCurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1 + 2];
+
+// this is the drive letter of the root
+BYTE gRootDirectoryDrive;
 
 // these are all the errors to stringed from the SHELL_RESULT data type
 const char* gNexShellError[] = {
@@ -103,7 +104,11 @@ const char* gNexShellError[] = {
 	"shell generic buffer write fail",
 	"shell generic buffer read fail",
 	"shell linked list create fail",
-	"shell linked list operation fail"
+	"shell linked list operation fail",
+	"shell malloc fail",
+	"shell invalid virtual directory name",
+	"shell virtual directory name already exists",
+	"shell virtual filename already exsits"
 };
 
 #if (USE_SHELL_COMMAND_HISTORY == 1)
@@ -207,19 +212,43 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 	return LastDirectory;
 }
 
+VIRTUAL_FILE gZeroFile;
+const BYTE gZeroFileDescription[] = { "Contains an infinite sequence of zeros" };
+
+SHELL_RESULT ZeroReadFileData(GENERIC_BUFFER* OutputStream)
+{
+	BYTE Data = 0;
+
+	if (GenericBufferWrite(OutputStream, 1, &Data) != 1)
+		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+	return SHELL_SUCCESS;
+}
+
+char NexShellGetRootDriveVolume(void)
+{
+	return gRootDirectoryDrive;
+}
+
 SHELL_RESULT NexShellInit(char CurrentDrive)
 {
 	SHELL_RESULT Result;
 
-	// NULL this out at startup
-	gVirtualDirectory = NULL;
-
 	gEscapeSequence = 0;
 
-	#if (USING_USER_VIRTUAL_FILES == 1)
-		if (CreateLinkedList(&gUserVirtualFiles, NULL, NexShellFreeMethod) == NULL)
-			return SHELL_LINKED_LIST_CREATE_FAILURE;
-	#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+	gVirtualDirectory = GenerateRootVirtualDirectory();
+
+	// now create the default dev files
+	Result = CreateVirtualFile("", &gZeroFile, "zero", ZeroReadFileData, NULL, NULL, gZeroFileDescription, NULL);
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
+
+	#if (USE_CD_COMMAND == 1)
+		#if (EXTENDED_CD_SUPPORT == 1)
+			cdInit();
+		#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
+	#endif // end of #if (USE_CD_COMMAND == 1)
 
 	// initialize our input and output streams
 	if (CreateGenericBuffer(&gStandardOutputStream, SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES, gOutputStreamBuffer) == NULL)
@@ -239,6 +268,9 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	gCurrentWorkingDirectory[1] = ':';
 	gCurrentWorkingDirectory[2] = '\\';
 	gCurrentWorkingDirectory[3] = 0;
+
+	// copy the root directory drive letter
+	gRootDirectoryDrive = CurrentDrive;
 
 	#if (USE_SHELL_COMMAND_HISTORY == 1)
 		if (CreateLinkedList(&gHistoryList, NULL, NexShellFreeMethod) == NULL)
@@ -466,50 +498,6 @@ static char* ParseArgument(char** Buffer)
 
 	return StartOfString;
 }
-
-static BOOL IsDirectoryVirtual(const char* FullFilePath)
-{
-	char TempDirectory[8];
-
-	// make the virtual directory root path
-	Shell_sprintf(TempDirectory, "%c:/" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
-
-	return (BOOL)(memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0);
-}
-
-#if (USING_USER_VIRTUAL_FILES == 1)
-	static SHELL_RESULT IsFileVirtual(const char* FullFilePath, UINT32 *Index)
-	{
-		UINT32 i, Size;
-		char* VirtualFileFullPath;
-		
-		// make the index invalid to begin with
-		*Index = 0;
-
-		Size = LinkedListGetSize(&gUserVirtualFiles);
-
-		for (i = 0; i < Size; i++)
-		{
-			// get the next item in the list
-			VirtualFileFullPath = (char*)LinkedListGetData(&gUserVirtualFiles, i + 1);
-
-			// is it valid?
-			if (VirtualFileFullPath == NULL)
-				return SHELL_LINKED_LIST_OPERATION_FAILURE;
-
-			// now compare
-			if (strcmp(FullFilePath, VirtualFileFullPath) == 0)
-			{
-				// it was valid
-				*Index = i + 1;
-
-				return SHELL_SUCCESS;
-			}
-		}
-
-		return SHELL_SUCCESS;
-	}
-#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
 
 static BOOL FileExists(const char *FullFilePath)
 {

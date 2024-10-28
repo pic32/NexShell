@@ -29,6 +29,16 @@ typedef struct
 	#endif // end of #if (USE_FILE_HELP == 1)
 }VIRTUAL_FILE;
 
+#if (USING_USER_VIRTUAL_FILES == 1)
+	typedef struct
+	{
+		VIRTUAL_FILE *File;
+
+		char *FilePath;
+		char *Filename;
+	}VIRTUAL_FILE_LIST_NODE;
+#endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
+
 typedef struct
 {
 	SHELL_FILE_TYPE FileType;

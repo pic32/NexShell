@@ -53,6 +53,10 @@ typedef enum
 	SHELL_GENERIC_BUFFER_READ_FAILURE,
 	SHELL_LINKED_LIST_CREATE_FAILURE,
 	SHELL_LINKED_LIST_OPERATION_FAILURE,
+	SHELL_MALLOC_FAILURE,
+	SHELL_INVALID_DIRECTORY_NAME,
+	SHELL_VIRTUAL_DIRECTORY_NAME_ALREADY_EXISTS,
+	SHELL_VIRTUAL_FILENAME_ALREADY_EXISTS,
 
 	// always put this one at the lowest of the valid list
 	SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER,
@@ -156,6 +160,7 @@ typedef struct
 SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER* OutputStream));
 SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER* OutputStream);
 SHELL_RESULT NexShellInit(char CurrentDrive);
+char NexShellGetRootDriveVolume(void);
 
 // call this continuously
 SHELL_RESULT NexShellTasks(void);

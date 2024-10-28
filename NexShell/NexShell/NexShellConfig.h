@@ -137,8 +137,8 @@
 
 #define SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY					16
 
-#define USE_FILE_DESCRIPTION										0
-#define USE_FILE_HELP												1
+#define USE_VIRTUAL_FILE_DESCRIPTION								1
+#define USE_VIRTUAL_FILE_HELP										1
 
 // use these to enable each command
 #define USE_CAT_COMMAND												1

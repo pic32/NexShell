@@ -114,6 +114,12 @@
     <ClCompile Include="NexShell\NexShellFile.c">
       <Filter>Source Files\NexShell</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\VirtualDirectory.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\VirtualFile.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
@@ -181,6 +187,15 @@
     </ClInclude>
     <ClInclude Include="NexShell\NexShellFile.h">
       <Filter>Header Files\NexShell</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\VirtualDirectory.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\VirtualFile.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\VirtualObjects.h">
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
