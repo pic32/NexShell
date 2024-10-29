@@ -25,7 +25,7 @@ extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
 	}
 #endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 
-SHELL_RESULT VirtualcdExecuteMethod(char* Args, UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+SHELL_RESULT VirtualcdExecuteMethod(char *Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	BOOL Outcome;
 	VIRTUAL_DIRECTORY* Directory;
@@ -125,6 +125,8 @@ SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 
 		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
 		{
+			Args[0] = CurrentWorkingDirectory;
+
 			return VirtualcdExecuteMethod(CurrentWorkingDirectory, NumberOfArgs, OutputStream);
 		}
 

@@ -4,14 +4,19 @@
 #include "NexShell.h"
 #include "ff.h"
 #include "ls_Command.h"
+#include "VirtualDirectory.h"
+
+extern char gCurrentWorkingDirectory[];
+extern VIRTUAL_DIRECTORY* gCurrentWorkingVirtualDirectory;
+extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
 
 static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* OutputStream)
 {
-	#if (USE_FILE_HELP == 1)
+	#if (USE_VIRTUAL_FILE_HELP == 1)
 		char FileAttributes[6];
 	#else
 		char FileAttributes[5];
-	#endif // end of #if (USE_FILE_HELP == 1)
+	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
 
 	// clear it out first
 	memset(FileAttributes, 0, sizeof(FileAttributes));
@@ -21,12 +26,12 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 	FileAttributes[2] = '-';
 	FileAttributes[3] = '-';
 
-	#if (USE_FILE_HELP == 1)
+	#if (USE_VIRTUAL_FILE_HELP == 1)
 		FileAttributes[4] = '-';
 		FileAttributes[5] = ' ';
 	#else
 		FileAttributes[4] = ' ';
-	#endif // end of #if (USE_FILE_HELP == 1)
+	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
 
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -55,11 +60,11 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 
 static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
 {
-		#if (USE_FILE_HELP == 1)
+		#if (USE_VIRTUAL_FILE_HELP == 1)
 			char FileAttributes[6];
 		#else
 			char FileAttributes[5];
-		#endif // end of #if (USE_FILE_HELP == 1)
+		#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
 
 		// clear it out first
 		memset(FileAttributes, 0, sizeof(FileAttributes));
@@ -84,7 +89,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 		else
 			FileAttributes[3] = '-';
 
-	#if (USE_FILE_HELP == 1)
+	#if (USE_VIRTUAL_FILE_HELP == 1)
 		if (Help != NULL)
 			FileAttributes[4] = 'h';
 		else
@@ -93,7 +98,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 		FileAttributes[5] = ' ';
 	#else
 		FileAttributes[4] = ' ';
-	#endif // end of #if (USE_FILE_HELP == 1)
+	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
 
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -114,7 +119,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
-	#if (USE_FILE_DESCRIPTION == 1)
+	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
 		if (Description != NULL)
 		{
 			if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
@@ -138,7 +143,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 			if (GenericBufferWrite(OutputStream, (UINT32)strlen(Description), Description) != (UINT32)strlen(Description))
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
-	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
+	#endif // end of #if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
 
 	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -162,6 +167,11 @@ static SHELL_RESULT OutputRelativeDirectories(GENERIC_BUFFER* OutuputStream)
 		return Result;
 
 	return SHELL_SUCCESS;
+}
+
+static SHELL_RESULT OutputVirtualDirectoryContents()
+{
+
 }
 
 static SHELL_RESULT OutputDirectoryContents(DIR *Directory, GENERIC_BUFFER* OutputStream)
@@ -214,6 +224,103 @@ static SHELL_RESULT OutputVirtualFiles(char *Path, GENERIC_BUFFER* OutputStream)
 	return SHELL_SUCCESS;
 }
 
+static SHELL_RESULT OutputVirtualDirectoryDirectories(VIRTUAL_DIRECTORY* LocalWorkingDirectory, GENERIC_BUFFER* OutputStream)
+{
+	VIRTUAL_DIRECTORY* Directory;
+	UINT32 Size, i;
+	SHELL_RESULT Result;
+
+	// now output all the directories present
+	Size = VirtualDirectoryGetNumberOfDirectories(LocalWorkingDirectory);
+
+	for (i = 1; i <= Size; i++)
+	{
+		Directory = VirtualDirectoryGetDirectory(LocalWorkingDirectory, i);
+
+		Result = OutputDirectoryInfo(Directory->DirectoryName, OutputStream
+
+			#if (USE_DIRECTORY_DESCRIPTION == 1)
+						, Directory->DirectoryDescription
+			#endif // end of #ifdef USE_DIRECTORY_DESCRIPTION
+
+		);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	}
+
+	return SHELL_SUCCESS;
+}
+
+static SHELL_RESULT OutputVirtualDirectoryFiles(VIRTUAL_DIRECTORY* LocalWorkingDirectory, GENERIC_BUFFER* OutputStream)
+{
+	UINT32 Size, i;
+	VIRTUAL_FILE* File;
+	SHELL_RESULT Result;
+
+	// now output all the file present
+	Size = VirtualDirectoryGetNumberOfFiles(LocalWorkingDirectory);
+
+	for (i = 1; i <= Size; i++)
+	{
+		File = VirtualDirectoryGetFile(LocalWorkingDirectory, i);
+
+		Result = OutputFileInfo(File->FileName, TRUE, (BOOL)(File->ReadFileData != NULL), (BOOL)(File->WriteFileData != NULL), (BOOL)(File->ExecuteFile != NULL), File->FileDescription, File->FileHelp, OutputStream);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	}
+
+	return SHELL_SUCCESS;
+}
+
+SHELL_RESULT VirtuallsExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+{
+	SHELL_RESULT Result;
+	VIRTUAL_DIRECTORY *LocalWorkingDirectory;
+	BOOL Outcome;
+	char* ModifiedDirectory = Args[0];
+
+	// go beyond the root volume
+	ModifiedDirectory += 3;
+
+	// what is the directory
+	LocalWorkingDirectory = FollowVirtualDirectory(Args[0], &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory, &Outcome);
+
+	// is it valid?
+	if (LocalWorkingDirectory == NULL || Outcome == FALSE)
+	{
+		if (NumberOfArgs != 0)
+			return SHELL_INVALID_INPUT_PARAMETER;
+
+		// we are just 1, and need to output the current directory
+		LocalWorkingDirectory = gCurrentWorkingVirtualDirectory;
+	}
+
+	// first output the current and upper directory shorthand symbols "." and ".." if we're not in root
+	if (LocalWorkingDirectory != &gRootVirtualDirectory)
+	{
+		Result = OutputRelativeDirectories(OutputStream);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	}
+
+	// output the directories
+	Result = OutputVirtualDirectoryDirectories(LocalWorkingDirectory, OutputStream);
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
+
+	// output the files
+	Result = OutputVirtualDirectoryFiles(LocalWorkingDirectory, OutputStream);
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
+
+	return SHELL_SUCCESS;
+}
+
 SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	UINT32 ArgIndex;
@@ -238,6 +345,9 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		{
 			// our working directory is the current one
 			WorkingDirectoryPath = CurrentWorkingDirectory;
+
+			// since it is current, add /
+			strcat(CurrentWorkingDirectory, "/");
 		}
 		else
 		{
@@ -260,6 +370,13 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 			}
 		}
 		
+		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
+		{
+			Args[0] = CurrentWorkingDirectory;
+
+			return VirtuallsExecuteMethod(Args, NumberOfArgs, OutputStream);
+		}
+
 		// open the directory
 		Result = f_opendir(&Directory, "./");
 

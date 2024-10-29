@@ -98,7 +98,14 @@ BOOL IsDirectoryVirtual(const char* FullFilePath)
 	// make the virtual directory root path
 	Shell_sprintf(TempDirectory, "%c:/" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
 
-	return (BOOL)(memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0);
+	if (memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0)
+	{
+		// if it is bigger than R:/dev then we are referencing something in the virtual path
+		if (strlen(FullFilePath) > strlen(TempDirectory))
+			return TRUE;
+	}
+
+	return FALSE;
 }
 
 VIRTUAL_DIRECTORY *GenerateRootVirtualDirectory(void)
