@@ -143,15 +143,7 @@ VIRTUAL_FILE* VirtualShellGetWorkingFile(char *Buffer, VIRTUAL_DIRECTORY*RootDir
 	}
 }
 
-SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToInitialize,
-
-	char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), 
-
-
-	SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), 
-
-
-	SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *)
+SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToInitialize, char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *)
 
 	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
 		, char* FileDescription

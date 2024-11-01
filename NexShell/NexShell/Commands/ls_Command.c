@@ -52,7 +52,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
-	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+	if (GenericBufferWrite(OutputStream, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, "/"  SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -169,11 +169,6 @@ static SHELL_RESULT OutputRelativeDirectories(GENERIC_BUFFER* OutuputStream)
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputVirtualDirectoryContents()
-{
-
-}
-
 static SHELL_RESULT OutputDirectoryContents(DIR *Directory, GENERIC_BUFFER* OutputStream)
 {
 	UINT32 Size, i;
@@ -240,7 +235,7 @@ static SHELL_RESULT OutputVirtualDirectoryDirectories(VIRTUAL_DIRECTORY* LocalWo
 		Result = OutputDirectoryInfo(Directory->DirectoryName, OutputStream
 
 			#if (USE_DIRECTORY_DESCRIPTION == 1)
-						, Directory->DirectoryDescription
+				, Directory->DirectoryDescription
 			#endif // end of #ifdef USE_DIRECTORY_DESCRIPTION
 
 		);

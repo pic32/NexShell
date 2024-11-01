@@ -10,6 +10,7 @@
 #include "NexShellConfig.h"
 #include "VirtualDirectory.h"
 #include "VirtualFile.h"
+#include "DevFiles.h"
 
 #if (USE_CAT_COMMAND == 1)
 	#include "cat_Command.h"
@@ -212,19 +213,6 @@ static char* GetLastDirectoryPresent(char* DirectoryPath)
 	return LastDirectory;
 }
 
-VIRTUAL_FILE gZeroFile;
-const BYTE gZeroFileDescription[] = { "Contains an infinite sequence of zeros" };
-
-SHELL_RESULT ZeroReadFileData(GENERIC_BUFFER* OutputStream)
-{
-	BYTE Data = 0;
-
-	if (GenericBufferWrite(OutputStream, 1, &Data) != 1)
-		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
-	return SHELL_SUCCESS;
-}
-
 char NexShellGetRootDriveVolume(void)
 {
 	return gRootDirectoryDrive;
@@ -239,7 +227,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	gVirtualDirectory = GenerateRootVirtualDirectory();
 
 	// now create the default dev files
-	Result = CreateVirtualFile("", &gZeroFile, "zero", ZeroReadFileData, NULL, NULL, gZeroFileDescription, NULL);
+	Result = CreateDevFiles();
 
 	if (Result != SHELL_SUCCESS)
 		return Result;

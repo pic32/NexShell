@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FileSystem\DevFiles.c" />
     <ClCompile Include="FileSystem\diskio.c" />
     <ClCompile Include="FileSystem\ff.c" />
     <ClCompile Include="FileSystem\ffsystem.c" />
@@ -175,6 +176,7 @@
     <ClCompile Include="Thread.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileSystem\DevFiles.h" />
     <ClInclude Include="FileSystem\diskio.h" />
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />

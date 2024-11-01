@@ -120,6 +120,9 @@
     <ClCompile Include="FileSystem\VirtualFile.c">
       <Filter>Source Files\FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\DevFiles.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
@@ -195,6 +198,9 @@
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\VirtualObjects.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\DevFiles.h">
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
