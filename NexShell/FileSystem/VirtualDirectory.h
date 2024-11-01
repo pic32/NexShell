@@ -5,7 +5,19 @@
 #include "LinkedList.h"
 #include "VirtualObjects.h"
 
+typedef enum
+{
+	PHSYCIAL_MEDIA = 0,
+	VIRTUAL_MEDIA,
+	TRANSITION_POINT_MEDIA,
+	NUMBER_OF_DIRECTORY_TYPES
+}DIRECTORY_TYPE;
+
 BOOL IsDirectoryVirtual(const char* FullFilePath);
+
+BOOL IsDirectoryAtVirtualTransition(const char* FullFilePath);
+
+BOOL DirectoryExists(char* DirectoryPath);
 
 SHELL_RESULT VirtualDirectoryGetPath(VIRTUAL_DIRECTORY* DirectoryToGetPath, char* PathBuffer);
 

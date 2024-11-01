@@ -38,6 +38,50 @@ static BOOL VirtualDirectoryNameIsValid(char* Buffer)
 	}
 }
 
+BOOL DirectoryExists(char* DirectoryPath)
+{
+	DIR Directory;
+	FRESULT FResult;
+
+	if (DirectoryPath == NULL)
+		return FALSE;
+
+	// just open the file
+	FResult = f_opendir(&Directory, (const TCHAR*)DirectoryPath);
+
+	// now close it
+	if (FResult == FR_OK)
+		f_closedir(&Directory);
+
+	// return the result
+	return (BOOL)(FResult == FR_OK);
+}
+
+DIRECTORY_TYPE GetDirectoryType(char *Path)
+{
+	if (IsDirectoryVirtual(Path) == TRUE)
+		return VIRTUAL_MEDIA;
+
+	if (IsDirectoryAtVirtualTransition(Path) == TRUE)
+		return TRANSITION_POINT_MEDIA;
+
+	if (DirectoryExists(Path) == TRUE)
+		return PHSYCIAL_MEDIA;
+
+	return NUMBER_OF_DIRECTORY_TYPES;
+}
+
+static BOOL IsBeginningPathVolume(char* Path, char Volume)
+{
+	if (*Path++ == Volume)
+	{
+		if (*Path == ':' || *Path == '\\' || *Path == '/')
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
 UINT32 VirtualDirectoryGetNumberOfDirectories(VIRTUAL_DIRECTORY* Directory)
 {
 	if (Directory == NULL)
@@ -106,6 +150,16 @@ BOOL IsDirectoryVirtual(const char* FullFilePath)
 	}
 
 	return FALSE;
+}
+
+BOOL IsDirectoryAtVirtualTransition(const char* FullFilePath)
+{
+	char TempDirectory[8];
+
+	// make the virtual directory root path
+	Shell_sprintf(TempDirectory, "%c:/" DEV_FOLDER_NAME, gCurrentWorkingDirectory[0]);
+
+	return (BOOL)(memcmp(FullFilePath, TempDirectory, strlen(TempDirectory)) == 0);
 }
 
 VIRTUAL_DIRECTORY *GenerateRootVirtualDirectory(void)
@@ -311,7 +365,7 @@ SHELL_RESULT VirtualDirectoryGetPath(VIRTUAL_DIRECTORY* DirectoryToGetPath, char
 VIRTUAL_DIRECTORY* FollowVirtualDirectory(char* Buffer, VIRTUAL_DIRECTORY* RootDir, VIRTUAL_DIRECTORY* CurrentDir, BOOL *Outcome)
 {
 	VIRTUAL_DIRECTORY* WorkingDirectory;
-	char TempBuffer[SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES + 1];
+	char TempBuffer[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 
 	if (Buffer == NULL)
 		return NULL;
