@@ -13,6 +13,8 @@ typedef enum
 	NUMBER_OF_DIRECTORY_TYPES
 }DIRECTORY_TYPE;
 
+char* GetFullDirectoryPath(char* CurrentDirectory, char* NewPath, char RootVolume);
+
 BOOL IsDirectoryVirtual(const char* FullFilePath);
 
 BOOL IsDirectoryAtVirtualTransition(const char* FullFilePath);

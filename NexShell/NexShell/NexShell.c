@@ -1104,7 +1104,7 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 						TempResult = f_chdir(gCurrentWorkingDirectory);
 
 						// if we didn't get a main error, output it, otherwise output the result of f_chdir()
-						if (Result != SHELL_SUCCESS)
+						if (Result == SHELL_SUCCESS)
 							Result = TempResult;
 					}
 				}

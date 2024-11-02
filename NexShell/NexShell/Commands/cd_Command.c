@@ -84,8 +84,6 @@ SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 					}
 				}
 			}
-
-			//char TempPath = CurrentWorkingDirectory;
 		
 			if(WorkingDirectory == NULL)
 			{

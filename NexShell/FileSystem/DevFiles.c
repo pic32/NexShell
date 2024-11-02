@@ -9,7 +9,7 @@ const BYTE gNullFileDescription[] = { "Is a black hole for data written to it" }
 
 static SHELL_RESULT ZeroReadFileData(GENERIC_BUFFER* OutputStream)
 {
-	BYTE Data = '0';
+	BYTE Data = 0;
 
 	if (GenericBufferWrite(OutputStream, 1, &Data) != 1)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;

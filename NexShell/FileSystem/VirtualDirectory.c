@@ -2,6 +2,7 @@
 #include <ctype.h>
 
 #include "VirtualDirectory.h"
+#include "VirtualFile.h"
 
 extern char gCurrentWorkingDirectory[];
 
@@ -59,6 +60,9 @@ BOOL DirectoryExists(char* DirectoryPath)
 
 DIRECTORY_TYPE GetDirectoryType(char *Path)
 {
+	if (Path == NULL)
+		return NUMBER_OF_DIRECTORY_TYPES;
+
 	if (IsDirectoryVirtual(Path) == TRUE)
 		return VIRTUAL_MEDIA;
 
@@ -133,6 +137,34 @@ VIRTUAL_DIRECTORY* VirtualDirectoryNameExists(VIRTUAL_DIRECTORY* Directory, char
 	}
 
 	return NULL;
+}
+
+char *GetFullDirectoryPath(char* CurrentDirectory, char* NewPath, char RootVolume)
+{
+	// did they start with an absolute path?
+	if (*NewPath == '/')
+	{
+		CurrentDirectory[0] = RootVolume;
+		CurrentDirectory[1] = ':';
+
+		// they did, just copy and return it
+		strcpy(&CurrentDirectory[2], NewPath);
+	}
+	else
+	{
+		// they did not start with an absolute path
+
+		if (CurrentDirectory[strlen(CurrentDirectory) - 1] != '/')
+			strcat(CurrentDirectory, "/");
+
+		// now append whatever it is that they have
+		strcat(CurrentDirectory, NewPath);
+	}
+
+	if (CurrentDirectory[strlen(CurrentDirectory) - 1] != '/')
+		strcat(CurrentDirectory, "/");
+
+	return CurrentDirectory;
 }
 
 BOOL IsDirectoryVirtual(const char* FullFilePath)

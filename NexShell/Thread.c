@@ -124,7 +124,10 @@ DWORD WINAPI ThreadFunc(void* data)
 // this is the callback that the shell calls to send data out
 UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes)
 {
-	printf("%s", DataBuffer);
+	UINT32 i;
+
+	for(i = 0; i < DataBuffersSizeInBytes; i++)
+		printf("%c", DataBuffer[i]);
 
 	return DataBuffersSizeInBytes;
 }

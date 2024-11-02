@@ -367,21 +367,33 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 
 	while (NumberOfArgs--)
 	{
-		// are we virtual
+		// get the current directory
 		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
-		strcat(CurrentWorkingDirectory, "/");
-		strcat(CurrentWorkingDirectory, Args[ArgsProcessed]);
+		// now get the full path, but this may include some .. which are resolved on the fly
+		GetFullDirectoryPath(CurrentWorkingDirectory, Args[ArgsProcessed], NexShellGetRootDriveVolume());
 
 		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
 		{
 			VIRTUAL_FILE *File;
+			char* TempPath = CurrentWorkingDirectory;
+
+			// iterate to the root area of the path
+			while (*TempPath != '/')
+				TempPath++;
+
+			TempPath++;
+
+			while (*TempPath != '/')
+				TempPath++;
+
+			TempPath++;
 
 			// find the file
-			File = VirtualShellGetWorkingFile(Args[ArgsProcessed], &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory);
+			File = VirtualShellGetWorkingFile(TempPath, &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory);
 
 			// did we find it?
 			if (File == NULL)

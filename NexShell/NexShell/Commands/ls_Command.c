@@ -274,16 +274,12 @@ SHELL_RESULT VirtuallsExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 	SHELL_RESULT Result;
 	VIRTUAL_DIRECTORY *LocalWorkingDirectory;
 	BOOL Outcome;
-	char* ModifiedDirectory = Args[0];
-
-	// go beyond the root volume
-	ModifiedDirectory += 3;
 
 	// what is the directory
 	LocalWorkingDirectory = FollowVirtualDirectory(Args[0], &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory, &Outcome);
 
 	// is it valid?
-	if (LocalWorkingDirectory == NULL || Outcome == FALSE)
+	if (LocalWorkingDirectory == NULL)
 	{
 		if (NumberOfArgs != 0)
 			return SHELL_INVALID_INPUT_PARAMETER;
@@ -336,44 +332,40 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 	do
 	{
 		// get our next working directory
-		if (Args[ArgIndex] == 0)
-		{
-			// our working directory is the current one
-			WorkingDirectoryPath = CurrentWorkingDirectory;
+		// get the current directory
+		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
-			// since it is current, add /
-			strcat(CurrentWorkingDirectory, "/");
-		}
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		if (Args[ArgIndex] == NULL)
+			WorkingDirectoryPath = "./";
 		else
-		{
-			if (strlen(Args[ArgIndex]) == 0)
-			{
-				// our working directory is the current one
-				WorkingDirectoryPath = CurrentWorkingDirectory;
-			}
-			else
-			{
-				// change it to the one the user specified
-				Result = f_chdir(Args[ArgIndex]);
+			WorkingDirectoryPath = Args[ArgIndex];
 
-				if (Result != SHELL_SUCCESS)
-					return Result;
-
-				WorkingDirectoryPath = Args[ArgIndex];
-
-				ArgIndex++;
-			}
-		}
+		// now get the full path, but this may include some .. which are resolved on the fly
+		GetFullDirectoryPath(CurrentWorkingDirectory, WorkingDirectoryPath, NexShellGetRootDriveVolume());
 		
-		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
+		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE || IsDirectoryAtVirtualTransition(CurrentWorkingDirectory) == TRUE)
 		{
-			Args[0] = CurrentWorkingDirectory;
+			char* TempPath = CurrentWorkingDirectory;
 
-			return VirtuallsExecuteMethod(Args, NumberOfArgs, OutputStream);
+			// iterate to the root area of the path
+			while (*TempPath != '/')
+				TempPath++;
+
+			TempPath++;
+
+			while (*TempPath != '/')
+				TempPath++;
+
+			TempPath++;
+
+			return VirtuallsExecuteMethod(&TempPath, NumberOfArgs, OutputStream);
 		}
 
 		// open the directory
-		Result = f_opendir(&Directory, "./");
+		Result = f_opendir(&Directory, CurrentWorkingDirectory);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
@@ -383,14 +375,8 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
-
-		// output the files
-		Result = OutputVirtualFiles(WorkingDirectoryPath, OutputStream);
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
 	} 
-	while (ArgIndex < NumberOfArgs);
+	while (++ArgIndex < NumberOfArgs);
 
 	return SHELL_SUCCESS;
 }
