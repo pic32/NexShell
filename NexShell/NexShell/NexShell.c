@@ -8,7 +8,6 @@
 
 #include "NexShell.h"
 #include "NexShellConfig.h"
-#include "VirtualDirectory.h"
 #include "VirtualFile.h"
 #include "DevFiles.h"
 

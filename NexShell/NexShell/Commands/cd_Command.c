@@ -3,15 +3,11 @@
 #include "NexShellConfig.h"
 
 #include "cd_Command.h"
-#include "VirtualDirectory.h"
 
 extern char gCurrentWorkingDirectory[];
-extern VIRTUAL_DIRECTORY* gCurrentWorkingVirtualDirectory;
-extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
 
 #if (EXTENDED_CD_SUPPORT == 1)
 	char gPriorDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-	VIRTUAL_DIRECTORY* gPriorVirtualDirectory = NULL;
 
 	SHELL_RESULT cdInit(void)
 	{
@@ -24,29 +20,6 @@ extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
 		return SHELL_SUCCESS;
 	}
 #endif // end of #if (EXTENDED_CD_SUPPORT == 1)
-
-SHELL_RESULT VirtualcdExecuteMethod(char *Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
-{
-	BOOL Outcome;
-	VIRTUAL_DIRECTORY* Directory;
-	SHELL_RESULT Result;
-
-	Directory = FollowVirtualDirectory(Args, &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory, &Outcome);
-
-	if (Directory == NULL || Outcome == FALSE)
-		return SHELL_INVALID_DIRECTORY_NAME;
-
-	Result = VirtualDirectoryGetPath(Directory, Args);
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	#if (EXTENDED_CD_SUPPORT == 1)
-		strcpy(gPriorDirectory, gCurrentWorkingDirectory);
-	#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
-
-	strcpy(gCurrentWorkingDirectory, Args);
-}
 
 SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
@@ -120,13 +93,6 @@ SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 			return Result;
 
 		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
-		{
-			Args[0] = CurrentWorkingDirectory;
-
-			return VirtualcdExecuteMethod(CurrentWorkingDirectory, NumberOfArgs, OutputStream);
-		}
 
 		if (Result != SHELL_SUCCESS)
 			return Result;

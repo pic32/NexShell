@@ -2,7 +2,6 @@
 #include <ctype.h>
 
 #include "NexShell.h"
-#include "VirtualDirectory.h"
 #include "VirtualFile.h"
 #include "cat_Command.h"
 

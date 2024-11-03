@@ -1,5 +1,4 @@
 #include "DevFiles.h"
-#include "VirtualDirectory.h"
 #include "VirtualFile.h"
 
 VIRTUAL_FILE gZeroFile, gNullFile, gRandomFile;

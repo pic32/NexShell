@@ -2,13 +2,11 @@
 
 #include "NexShellConfig.h"
 #include "NexShell.h"
+#include "VirtualFile.h"
 #include "ff.h"
 #include "ls_Command.h"
-#include "VirtualDirectory.h"
 
 extern char gCurrentWorkingDirectory[];
-extern VIRTUAL_DIRECTORY* gCurrentWorkingVirtualDirectory;
-extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
 
 static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* OutputStream)
 {
@@ -171,7 +169,6 @@ static SHELL_RESULT OutputRelativeDirectories(GENERIC_BUFFER* OutuputStream)
 
 static SHELL_RESULT OutputDirectoryContents(DIR *Directory, GENERIC_BUFFER* OutputStream)
 {
-	UINT32 Size, i;
 	SHELL_RESULT Result;
 	FILINFO FileInfo;
 
@@ -214,100 +211,24 @@ static SHELL_RESULT OutputDirectoryContents(DIR *Directory, GENERIC_BUFFER* Outp
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputVirtualFiles(char *Path, GENERIC_BUFFER* OutputStream)
-{
-	return SHELL_SUCCESS;
-}
-
-static SHELL_RESULT OutputVirtualDirectoryDirectories(VIRTUAL_DIRECTORY* LocalWorkingDirectory, GENERIC_BUFFER* OutputStream)
-{
-	VIRTUAL_DIRECTORY* Directory;
-	UINT32 Size, i;
-	SHELL_RESULT Result;
-
-	// now output all the directories present
-	Size = VirtualDirectoryGetNumberOfDirectories(LocalWorkingDirectory);
-
-	for (i = 1; i <= Size; i++)
-	{
-		Directory = VirtualDirectoryGetDirectory(LocalWorkingDirectory, i);
-
-		Result = OutputDirectoryInfo(Directory->DirectoryName, OutputStream
-
-			#if (USE_DIRECTORY_DESCRIPTION == 1)
-				, Directory->DirectoryDescription
-			#endif // end of #ifdef USE_DIRECTORY_DESCRIPTION
-
-		);
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
-	}
-
-	return SHELL_SUCCESS;
-}
-
-static SHELL_RESULT OutputVirtualDirectoryFiles(VIRTUAL_DIRECTORY* LocalWorkingDirectory, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, GENERIC_BUFFER* OutputStream)
 {
 	UINT32 Size, i;
 	VIRTUAL_FILE* File;
 	SHELL_RESULT Result;
 
 	// now output all the file present
-	Size = VirtualDirectoryGetNumberOfFiles(LocalWorkingDirectory);
+	Size = LinkedListGetSize(VirtualFileList);
 
 	for (i = 1; i <= Size; i++)
 	{
-		File = VirtualDirectoryGetFile(LocalWorkingDirectory, i);
+		File = LinkedListGetData(VirtualFileList, i);
 
 		Result = OutputFileInfo(File->FileName, TRUE, (BOOL)(File->ReadFileData != NULL), (BOOL)(File->WriteFileData != NULL), (BOOL)(File->ExecuteFile != NULL), File->FileDescription, File->FileHelp, OutputStream);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
 	}
-
-	return SHELL_SUCCESS;
-}
-
-SHELL_RESULT VirtuallsExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
-{
-	SHELL_RESULT Result;
-	VIRTUAL_DIRECTORY *LocalWorkingDirectory;
-	BOOL Outcome;
-
-	// what is the directory
-	LocalWorkingDirectory = FollowVirtualDirectory(Args[0], &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory, &Outcome);
-
-	// is it valid?
-	if (LocalWorkingDirectory == NULL)
-	{
-		if (NumberOfArgs != 0)
-			return SHELL_INVALID_INPUT_PARAMETER;
-
-		// we are just 1, and need to output the current directory
-		LocalWorkingDirectory = gCurrentWorkingVirtualDirectory;
-	}
-
-	// first output the current and upper directory shorthand symbols "." and ".." if we're not in root
-	if (LocalWorkingDirectory != &gRootVirtualDirectory)
-	{
-		Result = OutputRelativeDirectories(OutputStream);
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
-	}
-
-	// output the directories
-	Result = OutputVirtualDirectoryDirectories(LocalWorkingDirectory, OutputStream);
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	// output the files
-	Result = OutputVirtualDirectoryFiles(LocalWorkingDirectory, OutputStream);
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
 
 	return SHELL_SUCCESS;
 }
@@ -345,24 +266,6 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 
 		// now get the full path, but this may include some .. which are resolved on the fly
 		GetFullDirectoryPath(CurrentWorkingDirectory, WorkingDirectoryPath, NexShellGetRootDriveVolume());
-		
-		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE || IsDirectoryAtVirtualTransition(CurrentWorkingDirectory) == TRUE)
-		{
-			char* TempPath = CurrentWorkingDirectory;
-
-			// iterate to the root area of the path
-			while (*TempPath != '/')
-				TempPath++;
-
-			TempPath++;
-
-			while (*TempPath != '/')
-				TempPath++;
-
-			TempPath++;
-
-			return VirtuallsExecuteMethod(&TempPath, NumberOfArgs, OutputStream);
-		}
 
 		// open the directory
 		Result = f_opendir(&Directory, CurrentWorkingDirectory);

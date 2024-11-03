@@ -2,11 +2,27 @@
 	#define VIRTUAL_FILE_H
 
 #include "NexShell.h"
-#include "VirtualObjects.h"
+
+typedef struct
+{
+	SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER* OutputBuffer);
+
+	SHELL_RESULT(*WriteFileData)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputBuffer);
+
+	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputBuffer);
+
+	char* FileName;
+
+	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
+		char* FileDescription;
+	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
+
+	#if (USE_VIRTUAL_FILE_HELP == 1)
+		char* FileHelp;
+	#endif // end of #if (USE_FILE_HELP == 1)
+}VIRTUAL_FILE;
 
 VIRTUAL_FILE* VirtualFileNameExists(VIRTUAL_DIRECTORY* Directory, char* FileNameToFind);
-
-VIRTUAL_FILE* VirtualShellGetWorkingFile(char* Buffer, VIRTUAL_DIRECTORY* RootDir, VIRTUAL_DIRECTORY* CurrentDir);
 
 SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToInitialize,
 

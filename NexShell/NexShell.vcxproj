@@ -157,7 +157,6 @@
     <ClCompile Include="FileSystem\ff.c" />
     <ClCompile Include="FileSystem\ffsystem.c" />
     <ClCompile Include="FileSystem\ffunicode.c" />
-    <ClCompile Include="FileSystem\VirtualDirectory.c" />
     <ClCompile Include="FileSystem\VirtualFile.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="NexShell\Commands\cat_Command.c" />
@@ -180,7 +179,6 @@
     <ClInclude Include="FileSystem\diskio.h" />
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />
-    <ClInclude Include="FileSystem\VirtualDirectory.h" />
     <ClInclude Include="FileSystem\VirtualFile.h" />
     <ClInclude Include="FileSystem\VirtualObjects.h" />
     <ClInclude Include="NexShell\Commands\cat_Command.h" />

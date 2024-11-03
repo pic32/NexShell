@@ -17,8 +17,6 @@ typedef struct
 	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
 
 	char *FileName;
-	char *FileLocation;
-	char *FileData;
 
 	#if (USE_FILE_DESCRIPTION == 1)
 		char *FileDescription;

@@ -3,7 +3,6 @@
 
 #include "NexShell.h"
 #include "VirtualObjects.h"
-#include "VirtualDirectory.h"
 
 // this is our root directory
 extern VIRTUAL_DIRECTORY *gCurrentWorkingVirtualDirectory;
@@ -36,7 +35,7 @@ static BOOL VirtualFileNameIsValid(char* Buffer)
 	}
 }
 
-VIRTUAL_FILE* VirtualFileNameExists(VIRTUAL_DIRECTORY* Directory, char* FileNameToFind)
+VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST *FileList, char* FileNameToFind)
 {
 	UINT32 i, Size;
 
@@ -143,7 +142,7 @@ VIRTUAL_FILE* VirtualShellGetWorkingFile(char *Buffer, VIRTUAL_DIRECTORY*RootDir
 	}
 }
 
-SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToInitialize, char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *)
+SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *)
 
 	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
 		, char* FileDescription
@@ -159,9 +158,6 @@ SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToIni
 	BOOL Outcome;
 
 	// check all incoming parameters
-	if (ParentDirectory == NULL)
-		return SHELL_INVALID_INPUT_PARAMETER;
-
 	if (NewFileToInitialize == NULL)
 		return SHELL_INVALID_INPUT_PARAMETER;
 
@@ -171,22 +167,6 @@ SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToIni
 	// now, is the name valid?
 	if (VirtualFileNameIsValid(FileName) == FALSE)
 		return SHELL_INVALID_DIRECTORY_NAME;
-
-	// so we know the characters in the name are valid
-	// does the name already exist?
-	ParentDirectoryNode = FollowVirtualDirectory(ParentDirectory, &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory, &Outcome);
-
-	// was it valid?
-	if (Outcome == FALSE)
-		return SHELL_INVALID_DIRECTORY_NAME;
-
-	// does it already exist in the parent directory as a directory or file?
-	if (VirtualDirectoryNameExists(ParentDirectoryNode, FileName) != NULL)
-		return SHELL_VIRTUAL_DIRECTORY_NAME_ALREADY_EXISTS;
-
-	// does the file already exist?
-	if (VirtualFileNameExists(ParentDirectoryNode, FileName) != NULL)
-		return SHELL_VIRTUAL_FILENAME_ALREADY_EXISTS;
 
 	// set the name
 	NewFileToInitialize->FileName = FileName;
