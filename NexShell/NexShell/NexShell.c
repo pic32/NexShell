@@ -220,6 +220,9 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 
 	gEscapeSequence = 0;
 
+	// initialize the virtual file list section
+	VirtualFileInit();
+
 	// now create the default dev files
 	Result = CreateDevFiles();
 

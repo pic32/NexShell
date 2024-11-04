@@ -32,7 +32,17 @@ SHELL_RESULT CreateDevFiles(void)
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
+	Result = VirtualFileAddToVirtualFileSystem(&gZeroFile, "\dev");
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
+
 	Result = CreateVirtualFile(&gNullFile, "null", NULL, NullWriteFileData, NULL, gNullFileDescription, NULL);
+
+	if (Result != SHELL_SUCCESS)
+		return Result;
+
+	Result = VirtualFileAddToVirtualFileSystem(&gNullFile, "\dev");
 
 	if (Result != SHELL_SUCCESS)
 		return Result;

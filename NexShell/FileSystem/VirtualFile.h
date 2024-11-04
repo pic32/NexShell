@@ -23,6 +23,18 @@ typedef struct
 	#endif // end of #if (USE_FILE_HELP == 1)
 }VIRTUAL_FILE;
 
+typedef struct
+{
+	LINKED_LIST VirtualFileList;
+	char* DirectoryName;
+}VIRTUAL_FILE_DIRECTORY;
+
+LINKED_LIST* GetVirtualFileList(char* Directory);
+
+SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE* VirtualFile, char* DirectoryPath);
+
+SHELL_RESULT VirtualFileInit(void);
+
 VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind);
 
 SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize,
