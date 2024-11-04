@@ -191,9 +191,6 @@
     <ClInclude Include="FileSystem\VirtualFile.h">
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\VirtualObjects.h">
-      <Filter>Header Files\FileSystem</Filter>
-    </ClInclude>
     <ClInclude Include="FileSystem\DevFiles.h">
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>

@@ -264,9 +264,6 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		else
 			WorkingDirectoryPath = Args[ArgIndex];
 
-		// now get the full path, but this may include some .. which are resolved on the fly
-		GetFullDirectoryPath(CurrentWorkingDirectory, WorkingDirectoryPath, NexShellGetRootDriveVolume());
-
 		// open the directory
 		Result = f_opendir(&Directory, CurrentWorkingDirectory);
 

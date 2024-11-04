@@ -326,11 +326,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 	return btf;
 }
 
-extern VIRTUAL_DIRECTORY* gCurrentWorkingVirtualDirectory;
-
-// this is our root directory
-extern VIRTUAL_DIRECTORY gRootVirtualDirectory;
-
 SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	UINT DataRead;
@@ -366,84 +361,44 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 
 	while (NumberOfArgs--)
 	{
+		FIL File;
+
 		// get the current directory
 		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
-		// now get the full path, but this may include some .. which are resolved on the fly
-		GetFullDirectoryPath(CurrentWorkingDirectory, Args[ArgsProcessed], NexShellGetRootDriveVolume());
+		Result = f_open(&File, Args[ArgsProcessed], FA_OPEN_EXISTING | FA_READ);
 
-		if (IsDirectoryVirtual(CurrentWorkingDirectory) == TRUE)
+		// did we find it?
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		// we did, now start reading the contents
+		while (Result == SHELL_SUCCESS && !f_eof(&File))
 		{
-			VIRTUAL_FILE *File;
-			char* TempPath = CurrentWorkingDirectory;
+			// forward more data
+			Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
 
-			// iterate to the root area of the path
-			while (*TempPath != '/')
-				TempPath++;
-
-			TempPath++;
-
-			while (*TempPath != '/')
-				TempPath++;
-
-			TempPath++;
-
-			// find the file
-			File = VirtualShellGetWorkingFile(TempPath, &gRootVirtualDirectory, gCurrentWorkingVirtualDirectory);
-
-			// did we find it?
-			if (File == NULL)
-				return SHELL_FILE_NOT_FOUND;
-
-			if (File->ReadFileData == NULL)
-				return SHELL_FILE_NOT_READABLE;
-
-			Result = File->ReadFileData(OutputStream);
-
+			// did we read ok?
 			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-		}
-		else
-		{
-			FIL File;
-
-			Result = f_open(&File, Args[ArgsProcessed], FA_OPEN_EXISTING | FA_READ);
-
-			// did we find it?
-			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			// we did, now start reading the contents
-			while (Result == SHELL_SUCCESS && !f_eof(&File))
 			{
-				// forward more data
-				Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
+				f_close(&File);
 
-				// did we read ok?
-				if (Result != SHELL_SUCCESS)
-				{
-					f_close(&File);
-
-					return Result;
-				}
-			}
-
-			// output a new line
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
-			Result = f_close(&File);
-
-			// did it close?
-			if (Result != SHELL_SUCCESS)
 				return Result;
+			}
 		}
+
+		// output a new line
+		if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		Result = f_close(&File);
+
+		// did it close?
+		if (Result != SHELL_SUCCESS)
+			return Result;
 
 		ArgsProcessed++;
 

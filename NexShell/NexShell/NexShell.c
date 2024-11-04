@@ -57,9 +57,6 @@ UINT32 gEscapeSequence;
 // this is our main file system object
 FATFS gFatFs;
 
-// this is our pointer to a virtual directory portion
-VIRTUAL_DIRECTORY *gVirtualDirectory;
-
 // this is the current directory that the shell is working from, we add 1 for null, and 2 for the drive letter and :
 BYTE gCurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1 + 2];
 
@@ -222,8 +219,6 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	SHELL_RESULT Result;
 
 	gEscapeSequence = 0;
-
-	gVirtualDirectory = GenerateRootVirtualDirectory();
 
 	// now create the default dev files
 	Result = CreateDevFiles();
@@ -1094,18 +1089,6 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 
 					// now go ahead and process the command
 					Result = NexShellProcessCommand(TempBuffer, OutputStream);
-
-					// always attemp to do this afterwards
-					// this way each command doesn't need to remember to do it.
-					// we only do this though if it is not a virtual directory
-					if (IsDirectoryVirtual(gCurrentWorkingDirectory) == FALSE)
-					{
-						TempResult = f_chdir(gCurrentWorkingDirectory);
-
-						// if we didn't get a main error, output it, otherwise output the result of f_chdir()
-						if (Result == SHELL_SUCCESS)
-							Result = TempResult;
-					}
 				}
 				else
 				{

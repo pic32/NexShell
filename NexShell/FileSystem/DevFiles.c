@@ -27,12 +27,12 @@ SHELL_RESULT CreateDevFiles(void)
 	SHELL_RESULT Result;
 
 	// now create the default dev files
-	Result = CreateVirtualFile("", &gZeroFile, "zero", ZeroReadFileData, NULL, NULL, gZeroFileDescription, NULL);
+	Result = CreateVirtualFile(&gZeroFile, "zero", ZeroReadFileData, NULL, NULL, gZeroFileDescription, NULL);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	Result = CreateVirtualFile("", &gNullFile, "null", NULL, NullWriteFileData, NULL, gNullFileDescription, NULL);
+	Result = CreateVirtualFile(&gNullFile, "null", NULL, NullWriteFileData, NULL, gNullFileDescription, NULL);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;

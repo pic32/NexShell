@@ -180,7 +180,6 @@
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />
     <ClInclude Include="FileSystem\VirtualFile.h" />
-    <ClInclude Include="FileSystem\VirtualObjects.h" />
     <ClInclude Include="NexShell\Commands\cat_Command.h" />
     <ClInclude Include="NexShell\Commands\cd_Command.h" />
     <ClInclude Include="NexShell\Commands\clear_Command.h" />

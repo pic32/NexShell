@@ -2,6 +2,7 @@
 	#define NEXSHELL_FILE_H
 
 #include "NexShell.h"
+#include "ff.h"
 
 typedef enum
 {
@@ -9,6 +10,18 @@ typedef enum
 	SHELL_FILE_VIRTUAL,
 	NUMBER_OF_SHELL_FILES
 }SHELL_FILE_TYPE;
+
+typedef enum
+{
+	FILE_MODE_OPEN_EXISTING = 0x00,
+	FILE_MODE_READ			= 0x01,
+	FILE_MODE_WRITE			= 0x02,
+	FILE_MODE_CREATE_NEW	= 0x04,
+	FILE_MODE_CREATE_ALWAYS	= 0x08,
+	FILE_MODE_OPEN_ALWAYS	= 0x10,
+	FILE_MODE_OPEN_APPEND	= 0x30,
+	FILE_MODE_VIRTUAL       = 0x40
+}FILE_MODE;
 
 typedef struct
 {

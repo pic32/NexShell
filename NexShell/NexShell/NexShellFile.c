@@ -47,7 +47,7 @@ extern char gCurrentWorkingDirectory[];
 	}
 #endif // end of #if (USING_USER_VIRTUAL_FILES == 1)
 
-SHELL_RESULT NexShellFileOpen(char* FilePath, SHELL_FILE* File, BYTE OperatingMode)
+SHELL_RESULT NexShellFileOpen(char* FilePath, SHELL_FILE* File, FILE_MODE OperatingMode)
 {
 	// we don't know if this is virtual or on disk
 	FIL DiskFile;

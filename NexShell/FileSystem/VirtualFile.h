@@ -2,6 +2,7 @@
 	#define VIRTUAL_FILE_H
 
 #include "NexShell.h"
+#include "LinkedList.h"
 
 typedef struct
 {
@@ -22,9 +23,9 @@ typedef struct
 	#endif // end of #if (USE_FILE_HELP == 1)
 }VIRTUAL_FILE;
 
-VIRTUAL_FILE* VirtualFileNameExists(VIRTUAL_DIRECTORY* Directory, char* FileNameToFind);
+VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind);
 
-SHELL_RESULT CreateVirtualFile(char* ParentDirectory, VIRTUAL_FILE* NewFileToInitialize,
+SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize,
 
 	char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *),
 
