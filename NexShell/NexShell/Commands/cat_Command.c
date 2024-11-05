@@ -333,7 +333,6 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	UINT32 ArgsProcessed;
 	READ_INFO ReadInfo;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-	char* DirectoryPtr;
 	VIRTUAL_FILE* VirtualFile;
 
 	if (NumberOfArgs == 0)
@@ -364,56 +363,46 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	while (NumberOfArgs--)
 	{
 		FIL File;
+		char* FileName;
 
-		// copy in the path so we can modify it
-		strcpy(CurrentWorkingDirectory, Args[ArgsProcessed]);
+		// get the potential file name beginning
+		FileName = strrchr(Args[ArgsProcessed], '/');
 
-		// now point to the end and try to find the /
+		if (FileName != NULL)
 		{
-			DirectoryPtr = &CurrentWorkingDirectory[strlen(CurrentWorkingDirectory) - 1];
-			BOOL FileNameFound = FALSE;
+			// so it is not just a filename, but also has a path
+			FileName++;
 
-			do
-			{
-				if (*DirectoryPtr == '/')
-				{
-					*DirectoryPtr = 0;
+			// copy in the path so we can modify it
+			strcpy(CurrentWorkingDirectory, Args[ArgsProcessed]);
 
-					FileNameFound = TRUE;
+			// knock out the / in the string
+			*(char*)strrchr(CurrentWorkingDirectory, '/') = 0;
 
-					break;
-				}
-			} 
-			while (DirectoryPtr-- != CurrentWorkingDirectory);
+			// set the directory
+			Result = f_chdir(CurrentWorkingDirectory);
 
-			if (FileNameFound == TRUE)
-			{
-				// set the directory
-				Result = f_chdir(CurrentWorkingDirectory);
-
-				if (Result != SHELL_SUCCESS)
-					return Result;
-			}
-			else
-			{
-				// we didn't find the name, so the user argument is just a file name
-				// for the local directory
-				DirectoryPtr = Args[ArgsProcessed];
-
-				// now get the current working directory
-				// get the current directory
-				Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-				if (Result != SHELL_SUCCESS)
-					return Result;
-			}
+			if (Result != SHELL_SUCCESS)
+				return Result;
+		}
+		else
+		{
+			FileName = Args[ArgsProcessed];
 		}
 
+		// now get the current working directory
+		// get the current directory
+		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
 		// now is the current directory request virtual?
-		VirtualFile = GetVirtualFile(CurrentWorkingDirectory, DirectoryPtr);
+		VirtualFile = GetVirtualFile(CurrentWorkingDirectory, FileName);
 
 		if (VirtualFile == NULL)
 		{
+			// open the file on disk
 			Result = f_open(&File, Args[ArgsProcessed], FA_OPEN_EXISTING | FA_READ);
 
 			// did we find it?

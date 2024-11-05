@@ -66,46 +66,46 @@ BYTE gRootDirectoryDrive;
 // these are all the errors to stringed from the SHELL_RESULT data type
 const char* gNexShellError[] = {
 	"success",
-	"fs disk error",
-	"fs int error",
-	"fs not ready",
-	"fs no file",
-	"fs no path",
-	"fs invalid name",
-	"fs denied",
-	"fs exist",
-	"fs invalid object",
-	"fs write protected",
-	"fs invalid drive",
-	"fs vol not enabled",
-	"fs no fs",
-	"fs mkfs abort",
-	"fs timeout",
-	"fs locked",
-	"fs not enough core",
-	"fs too many open files",
-	"fs invalid param",
-	"shell invalid input parameter",
-	"shell invalid input",
-	"shell argument overflow",
-	"shell invalid char found",
-	"shell insufficient args for command",
-	"shell invalid argument",
-	"shell file not found",
-	"shell file not executable",
-	"shell file not readable",
-	"shell file not writable",
-	"shell history buffer fail",
-	"shell invalid number of bytes transferred",
-	"shell generic buffer create fail",
-	"shell generic buffer write fail",
-	"shell generic buffer read fail",
-	"shell linked list create fail",
-	"shell linked list operation fail",
-	"shell malloc fail",
-	"shell invalid virtual directory name",
-	"shell virtual directory name already exists",
-	"shell virtual filename already exsits"
+	"fs: disk error",
+	"fs: int error",
+	"fs: not ready",
+	"fs: no file",
+	"fs: no path",
+	"fs: invalid name",
+	"fs: denied",
+	"fs: exist",
+	"fs: invalid object",
+	"fs: write protected",
+	"fs: invalid drive",
+	"fs: vol not enabled",
+	"fs: no fs",
+	"fs: mkfs abort",
+	"fs: timeout",
+	"fs: locked",
+	"fs: not enough core",
+	"fs: too many open files",
+	"fs: invalid param",
+	"shell: invalid input parameter",
+	"shell: invalid input",
+	"shell: argument overflow",
+	"shell: invalid char found",
+	"shell: insufficient args for command",
+	"shell: invalid argument",
+	"shell: file not found",
+	"shell: file not executable",
+	"shell: file not readable",
+	"shell: file not writable",
+	"shell: history buffer fail",
+	"shell: invalid number of bytes transferred",
+	"shell: generic buffer create fail",
+	"shell: generic buffer write fail",
+	"shell: generic buffer read fail",
+	"shell: linked list create fail",
+	"shell: linked list operation fail",
+	"shell: malloc fail",
+	"shell: invalid virtual directory name",
+	"shell: virtual directory name already exists",
+	"shell: virtual filename already exsits"
 };
 
 #if (USE_SHELL_COMMAND_HISTORY == 1)
@@ -830,7 +830,13 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 			else
 			{
 				if (gHistoryIndex != 0)
+				{
 					gHistoryIndex++;
+				}
+				else
+				{
+					return SHELL_SUCCESS;
+				}
 			}
 		}
 
@@ -845,16 +851,12 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), SHELL_CLEAR_REMAINING_LINE_COMMAND) != (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND))
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		// now read the data from the list
-		DataFromHistoryBuffer = LinkedListGetData(&gHistoryList, gHistoryIndex);
-
-		// did we get the data?
-		if (DataFromHistoryBuffer == NULL)
-			return SHELL_LINKED_LIST_OPERATION_FAILURE;
-
 		// always clear this out
 		if (GenericBufferFlush(InputStream) == FALSE)
 			return SHELL_LINKED_LIST_OPERATION_FAILURE;
+
+		// now read the data from the list
+		DataFromHistoryBuffer = LinkedListGetData(&gHistoryList, gHistoryIndex);
 
 		if (DataFromHistoryBuffer != NULL)
 		{
@@ -1092,6 +1094,12 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 
 					// now go ahead and process the command
 					Result = NexShellProcessCommand(TempBuffer, OutputStream);
+
+					TempResult = f_chdir(gCurrentWorkingDirectory);
+
+					// if we didn't get a main error, output it, otherwise output the result of f_chdir()
+					if (Result == SHELL_SUCCESS)
+						Result = TempResult;
 				}
 				else
 				{

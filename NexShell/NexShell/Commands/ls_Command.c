@@ -258,21 +258,20 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
+		// get the current directory
+		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
 		// open the directory
-		Result = f_opendir(&Directory, WorkingDirectoryPath);
+		Result = f_opendir(&Directory, CurrentWorkingDirectory);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
 		// output the directories
 		Result = OutputDirectoryContents(&Directory, OutputStream);
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
-
-		// get our next working directory
-		// get the current directory
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
