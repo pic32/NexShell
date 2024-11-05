@@ -23,87 +23,67 @@ extern char gCurrentWorkingDirectory[];
 
 SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
+	SHELL_RESULT Result;
+	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
+	char* WorkingDirectory = NULL;
+
 	if (NumberOfArgs == 0)
 		return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
 
-	// now we check if it is virtual, if it is, it is a different process
-	{
-		SHELL_RESULT Result;
-		char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-		char* WorkingDirectory = NULL;
-
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
-
-		#if (EXTENDED_CD_SUPPORT == 1)
-			if (strlen(Args[0]) == 1)
+	#if (EXTENDED_CD_SUPPORT == 1)
+		if (strlen(Args[0]) == 1)
+		{
+			if (*Args[0] == '-')
 			{
-				if (*Args[0] == '-')
-				{
-					WorkingDirectory = gPriorDirectory;
-				}
-				else
-				{
-					// is it the home directory?
-					if (*Args[0] == SHELL_HOME_DIRECTORY_CHARACTER)
-					{
-						WorkingDirectory = SHELL_HOME_DIRECTORY;
-
-						strcpy(CurrentWorkingDirectory, WorkingDirectory);
-
-						WorkingDirectory = CurrentWorkingDirectory;
-					}
-				}
+				WorkingDirectory = gPriorDirectory;
 			}
-		
-			if(WorkingDirectory == NULL)
+			else
 			{
-				WorkingDirectory = Args[0];
+				// is it the home directory?
+				if (*Args[0] == SHELL_HOME_DIRECTORY_CHARACTER)
+				{
+					WorkingDirectory = SHELL_HOME_DIRECTORY;
 
-				// is it relative?
-				if (WorkingDirectory[0] == '.')
-				{
-					// it is relative
-					strcat(CurrentWorkingDirectory, "/");
-					strcat(CurrentWorkingDirectory, WorkingDirectory);
-				}
-				else
-				{
-					// it is absolute
 					strcpy(CurrentWorkingDirectory, WorkingDirectory);
+
+					WorkingDirectory = CurrentWorkingDirectory;
 				}
-
-				WorkingDirectory = CurrentWorkingDirectory;
+				else
+				{
+					WorkingDirectory = Args[0];
+				}
 			}
-		#else
+		}
+		else
+		{
 			WorkingDirectory = Args[0];
+		}
+	#else
+		WorkingDirectory = Args[0];
 
-			strcat(CurrentWorkingDirectory, "/");
-			strcat(CurrentWorkingDirectory, WorkingDirectory);
+		strcat(CurrentWorkingDirectory, "/");
+		strcat(CurrentWorkingDirectory, WorkingDirectory);
 
-			WorkingDirectory = CurrentWorkingDirectory;
-		#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
+		WorkingDirectory = CurrentWorkingDirectory;
+	#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 
-		// change it to the one the user specified
-		Result = f_chdir(WorkingDirectory);
+	// change it to the one the user specified
+	Result = f_chdir(WorkingDirectory);
 
-		if (Result != SHELL_SUCCESS)
-			return Result;
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
-		if (Result != SHELL_SUCCESS)
-			return Result;
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
-		#if (EXTENDED_CD_SUPPORT == 1)
-			strcpy(gPriorDirectory, gCurrentWorkingDirectory);
-		#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
+	#if (EXTENDED_CD_SUPPORT == 1)
+		strcpy(gPriorDirectory, gCurrentWorkingDirectory);
+	#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 
-		// Now copy it over to the global one
-		strcpy(gCurrentWorkingDirectory, CurrentWorkingDirectory);
+	// Now copy it over to the global one
+	strcpy(gCurrentWorkingDirectory, CurrentWorkingDirectory);
 
-		return SHELL_SUCCESS;
-	}
+	return SHELL_SUCCESS;
 }

@@ -217,6 +217,9 @@ static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, GENERIC_
 	VIRTUAL_FILE* File;
 	SHELL_RESULT Result;
 
+	if (VirtualFileList == NULL)
+		return SHELL_SUCCESS;
+
 	// now output all the file present
 	Size = LinkedListGetSize(VirtualFileList);
 
@@ -243,15 +246,30 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 
 	ArgIndex = 0;
 
-	// Args[0] holds the directory that we will be getting the list files of
-
-	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
 	do
 	{
+		if (Args[ArgIndex] == NULL)
+			WorkingDirectoryPath = "./";
+		else
+			WorkingDirectoryPath = Args[ArgIndex];
+
+		Result = f_chdir(WorkingDirectoryPath);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		// open the directory
+		Result = f_opendir(&Directory, WorkingDirectoryPath);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		// output the directories
+		Result = OutputDirectoryContents(&Directory, OutputStream);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
 		// get our next working directory
 		// get the current directory
 		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
@@ -259,19 +277,8 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 		if (Result != SHELL_SUCCESS)
 			return Result;
 
-		if (Args[ArgIndex] == NULL)
-			WorkingDirectoryPath = "./";
-		else
-			WorkingDirectoryPath = Args[ArgIndex];
-
-		// open the directory
-		Result = f_opendir(&Directory, CurrentWorkingDirectory);
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
-
-		// output the directories
-		Result = OutputDirectoryContents(&Directory, OutputStream);
+		// output the virtual files
+		Result = OutputVirtualFileList(GetVirtualFileList(CurrentWorkingDirectory), OutputStream);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;

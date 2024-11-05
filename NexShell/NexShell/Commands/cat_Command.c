@@ -1,4 +1,4 @@
-#include <string.h>
+ #include <string.h>
 #include <ctype.h>
 
 #include "NexShell.h"
@@ -333,6 +333,8 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	UINT32 ArgsProcessed;
 	READ_INFO ReadInfo;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
+	char* DirectoryPtr;
+	VIRTUAL_FILE* VirtualFile;
 
 	if (NumberOfArgs == 0)
 		return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
@@ -363,42 +365,101 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	{
 		FIL File;
 
-		// get the current directory
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+		// copy in the path so we can modify it
+		strcpy(CurrentWorkingDirectory, Args[ArgsProcessed]);
 
-		if (Result != SHELL_SUCCESS)
-			return Result;
-
-		Result = f_open(&File, Args[ArgsProcessed], FA_OPEN_EXISTING | FA_READ);
-
-		// did we find it?
-		if (Result != SHELL_SUCCESS)
-			return Result;
-
-		// we did, now start reading the contents
-		while (Result == SHELL_SUCCESS && !f_eof(&File))
+		// now point to the end and try to find the /
 		{
-			// forward more data
-			Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
+			DirectoryPtr = &CurrentWorkingDirectory[strlen(CurrentWorkingDirectory) - 1];
+			BOOL FileNameFound = FALSE;
 
-			// did we read ok?
-			if (Result != SHELL_SUCCESS)
+			do
 			{
-				f_close(&File);
+				if (*DirectoryPtr == '/')
+				{
+					*DirectoryPtr = 0;
 
-				return Result;
+					FileNameFound = TRUE;
+
+					break;
+				}
+			} 
+			while (DirectoryPtr-- != CurrentWorkingDirectory);
+
+			if (FileNameFound == TRUE)
+			{
+				// set the directory
+				Result = f_chdir(CurrentWorkingDirectory);
+
+				if (Result != SHELL_SUCCESS)
+					return Result;
+			}
+			else
+			{
+				// we didn't find the name, so the user argument is just a file name
+				// for the local directory
+				DirectoryPtr = Args[ArgsProcessed];
+
+				// now get the current working directory
+				// get the current directory
+				Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+
+				if (Result != SHELL_SUCCESS)
+					return Result;
 			}
 		}
 
-		// output a new line
+		// now is the current directory request virtual?
+		VirtualFile = GetVirtualFile(CurrentWorkingDirectory, DirectoryPtr);
+
+		if (VirtualFile == NULL)
+		{
+			Result = f_open(&File, Args[ArgsProcessed], FA_OPEN_EXISTING | FA_READ);
+
+			// did we find it?
+			if (Result != SHELL_SUCCESS)
+				return Result;
+
+			// we did, now start reading the contents
+			while (Result == SHELL_SUCCESS && !f_eof(&File))
+			{
+				// forward more data
+				Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
+
+				// did we read ok?
+				if (Result != SHELL_SUCCESS)
+				{
+					f_close(&File);
+
+					return Result;
+				}
+			}
+
+			// output a new line
+			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			Result = f_close(&File);
+
+			// did it close?
+			if (Result != SHELL_SUCCESS)
+				return Result;
+		}
+		else
+		{
+			// we're virtual
+
+			if (VirtualFile->ReadFileData == NULL)
+				return SHELL_FILE_NOT_READABLE;
+
+			Result = VirtualFile->ReadFileData(OutputStream);
+
+			if (Result != SHELL_SUCCESS)
+				return Result;
+		}
+
 		if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
-		Result = f_close(&File);
-
-		// did it close?
-		if (Result != SHELL_SUCCESS)
-			return Result;
 
 		ArgsProcessed++;
 

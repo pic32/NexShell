@@ -224,7 +224,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	VirtualFileInit();
 
 	// now create the default dev files
-	Result = CreateDevFiles();
+	Result = CreateDevFiles(CurrentDrive);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;

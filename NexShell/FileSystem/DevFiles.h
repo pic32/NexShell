@@ -3,6 +3,6 @@
 
 #include "NexShell.h"
 
-SHELL_RESULT CreateDevFiles(void);
+SHELL_RESULT CreateDevFiles(char RootVolume);
 
 #endif // end of #ifndef DEV_FILES_H

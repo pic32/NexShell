@@ -37,6 +37,8 @@ SHELL_RESULT VirtualFileInit(void);
 
 VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind);
 
+VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
+
 SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize,
 
 	char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *),

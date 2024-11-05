@@ -79,6 +79,17 @@ static INT32 UserVirtualFileDirectoryCompareTo(const void *Data1, const void *Da
 	return strcmp(Directory->DirectoryName, Data2);
 }
 
+static INT32 UserVirtualFileCompareTo(const void* Data1, const void* Data2)
+{
+	VIRTUAL_FILE *File;
+
+	// get a handle on the data stored in here
+	File = (VIRTUAL_FILE*)Data1;
+
+	// Data2 is what the user passed in
+	return strcmp(File->FileName, Data2);
+}
+
 SHELL_RESULT VirtualFileInit(void)
 {
 	if (CreateLinkedList(&gUserVirtualFilesDirectories, UserVirtualFileDirectoryCompareTo, NULL) == FALSE)
@@ -96,12 +107,12 @@ LINKED_LIST* GetVirtualFileList(char* Directory)
 
 	// did we find it?
 	if (Index == 0)
-		return SHELL_LINKED_LIST_OPERATION_FAILURE;
+		return NULL;
 
 	FileList = LinkedListGetData(&gUserVirtualFilesDirectories, Index);
 
 	if (FileList == NULL)
-		return SHELL_LINKED_LIST_OPERATION_FAILURE;
+		return NULL;
 
 	return &FileList->VirtualFileList;
 }
@@ -136,7 +147,7 @@ SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE *VirtualFile, char *
 		if (Directory == NULL)
 			return SHELL_MALLOC_FAILURE;
 
-		if (CreateLinkedList(&Directory->VirtualFileList, NULL, NULL) == NULL)
+		if (CreateLinkedList(&Directory->VirtualFileList, UserVirtualFileCompareTo, NULL) == NULL)
 			return SHELL_LINKED_LIST_CREATE_FAILURE;
 
 		// allocate room for the directory struct
@@ -226,4 +237,26 @@ SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, char *FileName
 	NewFileToInitialize->ExecuteFile = ExecuteFile;
 
 	return SHELL_SUCCESS;
+}
+
+VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename)
+{
+	VIRTUAL_FILE* VirtualFile;
+	UINT32 Index;
+	LINKED_LIST* VirtualFileList;
+
+	if (Directory == NULL || Filename == NULL)
+		return NULL;
+
+	VirtualFileList = GetVirtualFileList(Directory);
+
+	Index = LinkedListContains(VirtualFileList, Filename, 0, 0);
+
+	if (Index == 0)
+		return NULL;
+
+	// get the actual file
+	VirtualFile = LinkedListGetData(VirtualFileList, Index);
+
+	return VirtualFile;
 }

@@ -22,9 +22,12 @@ static SHELL_RESULT NullWriteFileData(char* Args[], UINT32 NumberOfArgs, GENERIC
 	return SHELL_SUCCESS;
 }
 
-SHELL_RESULT CreateDevFiles(void)
+SHELL_RESULT CreateDevFiles(char RootVolume)
 {
 	SHELL_RESULT Result;
+	char TempBuffer[16];
+
+	Shell_sprintf(TempBuffer, "%c:/" DEV_FOLDER_NAME, RootVolume);
 
 	// now create the default dev files
 	Result = CreateVirtualFile(&gZeroFile, "zero", ZeroReadFileData, NULL, NULL, gZeroFileDescription, NULL);
@@ -32,7 +35,7 @@ SHELL_RESULT CreateDevFiles(void)
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	Result = VirtualFileAddToVirtualFileSystem(&gZeroFile, "\dev");
+	Result = VirtualFileAddToVirtualFileSystem(&gZeroFile, TempBuffer);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;
@@ -42,7 +45,7 @@ SHELL_RESULT CreateDevFiles(void)
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	Result = VirtualFileAddToVirtualFileSystem(&gNullFile, "\dev");
+	Result = VirtualFileAddToVirtualFileSystem(&gNullFile, TempBuffer);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;
