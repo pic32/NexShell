@@ -1,11 +1,11 @@
-#ifndef CAT_COMMAND_H
-	#define CAT_COMMAND_H
+#ifndef DATE_COMMAND_H
+	#define DATE_COMMAND_H
 
 #include "NexShell.h"
 
-#define CAT_HELP_TEXT \
+#define DATE_HELP_TEXT \
 \
-"Usage: " CAT_COMMAND_NAME " [-EnsTv] [file]" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
+"Usage: " DATE_COMMAND_NAME " [OPTION]... [+FORMAT]" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB "Read contents of a file." SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
@@ -24,13 +24,6 @@ SHELL_TAB SHELL_TAB CAT_COMMAND_NAME " /a-folder/file-to-get-the-text-of" SHELL_
 SHELL_TAB SHELL_TAB CAT_COMMAND_NAME " -EnT ../a-folder/file-to-get-the-text-of another-file-to-read" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
-typedef struct
-{
-	READ_OPTIONS ReadOptions;
-	UINT32 LineNumber;
-	UINT32 NumberOfEmptyLines;
-}READ_INFO;
+SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
 
-SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
-
-#endif // end of CAT_COMMAND_H
+#endif // end of DATE_COMMAND_H

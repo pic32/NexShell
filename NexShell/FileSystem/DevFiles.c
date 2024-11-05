@@ -44,6 +44,25 @@
 	}
 #endif // end of #if(USE_DEV_RANDOM_VIRTUAL_FILE == 1)
 
+#if(USE_DEV_RTC_VIRTUAL_FILE == 1)
+	#include "NexShellTime.h"
+
+	VIRTUAL_FILE grtc0File;
+	const BYTE grtc0FileDescription[] = { "Provides access to the RTCC" };
+
+	static SHELL_RESULT rtc0ReadFileData(GENERIC_BUFFER* OutputStream)
+	{
+		PACKED_DATE_TIME CurrentTime;
+
+		CurrentTime.Value = get_fattime();
+
+		if (GenericBufferWrite(OutputStream, sizeof(CurrentTime), &CurrentTime) != sizeof(CurrentTime))
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		return SHELL_SUCCESS;
+	}
+#endif // end of #if(USE_DEV_RTC_VIRTUAL_FILE == 1)
+
 SHELL_RESULT CreateDevFiles(char RootVolume)
 {
 	SHELL_RESULT Result;
@@ -87,6 +106,18 @@ SHELL_RESULT CreateDevFiles(char RootVolume)
 		if (Result != SHELL_SUCCESS)
 			return Result;
 	#endif // end of #if(USE_DEV_RANDOM_VIRTUAL_FILE == 1)
+
+	#if(USE_DEV_RTC_VIRTUAL_FILE == 1)
+		Result = CreateVirtualFile(&grtc0File, RTC_0_FILENAME, rtc0ReadFileData, NULL, NULL, grtc0FileDescription, NULL);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+
+		Result = VirtualFileAddToVirtualFileSystem(&grtc0File, TempBuffer);
+
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	#endif // end of #if(USE_DEV_RTC_VIRTUAL_FILE == 1)
 
 	return SHELL_SUCCESS;
 }

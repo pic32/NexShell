@@ -15,6 +15,10 @@
 	#include "clear_Command.h"
 #endif // end of #if (USE_CLEAR_COMMAND == 1)
 
+#if (USE_DATE_COMMAND == 1)
+	#include "date_Command.h"
+#endif // end of #if (USE_DATE_COMMAND == 1)
+
 #if (USE_HELP_COMMAND == 1)
 	#include "help_Command.h"
 #endif // end of #if (USE_HELP_COMMAND == 1)
@@ -44,6 +48,10 @@ static COMMAND_INFO gCommandList[] =
 	#if (USE_CLEAR_COMMAND == 1)
 		{CLEAR_COMMAND_NAME, clearCommandExecuteMethod, "Clears the screen", CLEAR_HELP_TEXT},
 	#endif // end of #if (USE_CLEAR_COMMAND == 1)
+
+	#if (USE_DATE_COMMAND == 1)
+		{DATE_COMMAND_NAME, dateCommandExecuteMethod, "Display the current time in the given FORMAT, or set the system date", DATE_HELP_TEXT},
+	#endif // end of #if (USE_DATE_COMMAND == 1)
 
 	#if (USE_ECHO_COMMAND == 1)
 		{ECHO_COMMAND_NAME, echoCommandExecuteMethod, "Writes data to a file", ECHO_HELP_TEXT},

@@ -129,6 +129,7 @@ typedef union
 #define CAT_COMMAND_NAME										"cat"
 #define CD_COMMAND_NAME											"cd"
 #define CLEAR_COMMAND_NAME										"clear"
+#define DATE_COMMAND_NAME										"date"
 #define ECHO_COMMAND_NAME										"echo"
 #define HELP_COMMAND_NAME										"help"
 #define HEXDUMP_COMMAND_NAME									"hexdump"

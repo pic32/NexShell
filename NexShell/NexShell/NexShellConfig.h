@@ -139,11 +139,13 @@
 #define USE_DEV_ZERO_VIRTUAL_FILE									1
 #define USE_DEV_NULL_VIRTUAL_FILE									1
 #define USE_DEV_RANDOM_VIRTUAL_FILE									1
+#define USE_DEV_RTC_VIRTUAL_FILE									1
 
 // use these to enable each command
 #define USE_CAT_COMMAND												1
 #define USE_CD_COMMAND												1
 #define USE_CLEAR_COMMAND											1
+#define USE_DATE_COMMAND											1
 #define USE_ECHO_COMMAND											0
 #define USE_HELP_COMMAND											1
 #define USE_LS_COMMAND												1

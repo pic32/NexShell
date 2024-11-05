@@ -123,6 +123,9 @@
     <ClCompile Include="NexShell\Commands\NexShellCommands.c">
       <Filter>Source Files\NexShell\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="NexShell\Commands\date_Command.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="NexShell\Commands\NexShellCommands.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\date_Command.h">
       <Filter>Header Files\NexShell\Commands</Filter>
     </ClInclude>
   </ItemGroup>

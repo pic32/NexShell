@@ -2,6 +2,7 @@
 	#define NEXSHELL_TIME_H
 
 #include "GenericTypeDefs.h"
+#include "ff.h"
 
 typedef union
 {
@@ -16,7 +17,15 @@ typedef union
 		unsigned int Month : 4; // 1 - 12
 		unsigned int Year : 6; // MSB (year since 1980, so 1981 is 1)
 	}BITS;
+
+	struct
+	{
+		UINT16 Time;
+		UINT16 Date;
+	}DATE_TIME;
 }PACKED_DATE_TIME;
+
+DWORD get_fattime(void);
 
 BYTE GetNexShellFileInfoSeconds(UINT16 Time);
 
