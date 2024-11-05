@@ -13,14 +13,8 @@ typedef struct
 	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputBuffer);
 
 	char* FileName;
-
-	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
-		char* FileDescription;
-	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
-
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		char* FileHelp;
-	#endif // end of #if (USE_FILE_HELP == 1)
+	char* FileDescription;
+	char* FileHelp;
 }VIRTUAL_FILE;
 
 typedef struct
@@ -39,28 +33,6 @@ VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind)
 
 VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
 
-SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize,
-
-	char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *),
-
-
-	SHELL_RESULT(*WriteFileData)(char*[], UINT32, GENERIC_BUFFER *),
-
-
-	SHELL_RESULT(*ExecuteFile)(char*[], UINT32, GENERIC_BUFFER *)
-
-	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
-		, char* FileDescription
-	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
-
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		, char* FileHelp
-	#endif // end of #if (USE_FILE_HELP == 1)
-
-);
-
-SHELL_RESULT VirtualShellProcessOutgoingData(char* Data, GENERIC_BUFFER* Buffer, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER* Buffer));
-
-SHELL_RESULT VirtualShellWriteTasks(GENERIC_BUFFER* GenericBuffer);
+SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char*[], UINT32, GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char*[], UINT32, GENERIC_BUFFER *), const char* FileDescription, const char* FileHelp);
 
 #endif // end of #ifndef VIRTUAL_FILE_H

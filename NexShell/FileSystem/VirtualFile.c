@@ -129,7 +129,7 @@ SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE *VirtualFile, char *
 		return SHELL_INVALID_ARGUMENT;
 
 	// do we have a valid directory name?
-	Size = strlen(DirectoryPath);
+	Size = (UINT32)strlen(DirectoryPath);
 
 	for (i = 0; i < Size; i++)
 	{
@@ -151,7 +151,7 @@ SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE *VirtualFile, char *
 			return SHELL_LINKED_LIST_CREATE_FAILURE;
 
 		// allocate room for the directory struct
-		Directory->DirectoryName = NexShellMalloc(strlen(Directory) + 1);
+		Directory->DirectoryName = NexShellMalloc(strlen(DirectoryPath) + 1);
 
 		// did we get the space?
 		if (Directory->DirectoryName == NULL)
@@ -193,17 +193,7 @@ SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE *VirtualFile, char *
 	return SHELL_SUCCESS;
 }
 
-SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *)
-
-	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
-		, char* FileDescription
-	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
-
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		, char* FileHelp
-	#endif // end of #if (USE_FILE_HELP == 1)
-
-)
+SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *), const char* FileDescription, const char* FileHelp)
 {
 	// check all incoming parameters
 	if (NewFileToInitialize == NULL)
@@ -217,20 +207,16 @@ SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, char *FileName
 		return SHELL_INVALID_DIRECTORY_NAME;
 
 	// set the name
-	NewFileToInitialize->FileName = FileName;
+	NewFileToInitialize->FileName = (char*)FileName;
 
 	// it was valid, initialize it
 
 
 	// add the description if present
-	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
-		NewFileToInitialize->FileDescription = FileDescription;
-	#endif // end of #if (USE_FILE_DESCRIPTION == 1)
+	NewFileToInitialize->FileDescription = (char*)FileDescription;
 
-		// add the description if present
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		NewFileToInitialize->FileHelp = FileHelp;
-	#endif // end of #if (USE_FILE_HELP == 1)
+	// add the description if present
+	NewFileToInitialize->FileHelp = (char*)FileHelp;
 
 	NewFileToInitialize->ReadFileData = ReadFileData;
 	NewFileToInitialize->WriteFileData = WriteFileData;

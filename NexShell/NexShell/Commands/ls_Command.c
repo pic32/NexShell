@@ -58,34 +58,34 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 
 static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
 {
-		#if (USE_VIRTUAL_FILE_HELP == 1)
-			char FileAttributes[6];
-		#else
-			char FileAttributes[5];
-		#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
+	#if (USE_VIRTUAL_FILE_HELP == 1)
+		char FileAttributes[6];
+	#else
+		char FileAttributes[5];
+	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
 
-		// clear it out first
-		memset(FileAttributes, 0, sizeof(FileAttributes));
+	// clear it out first
+	memset(FileAttributes, 0, sizeof(FileAttributes));
 
-		if (Virtual == TRUE)
-			FileAttributes[0] = 'v';
-		else
-			FileAttributes[0] = '-';
+	if (Virtual == TRUE)
+		FileAttributes[0] = 'v';
+	else
+		FileAttributes[0] = '-';
 
-		if (Read == TRUE)
-			FileAttributes[1] = 'r';
-		else
-			FileAttributes[1] = '-';
+	if (Read == TRUE)
+		FileAttributes[1] = 'r';
+	else
+		FileAttributes[1] = '-';
 
-		if (Write == TRUE)
-			FileAttributes[2] = 'w';
-		else
-			FileAttributes[2] = '-';
+	if (Write == TRUE)
+		FileAttributes[2] = 'w';
+	else
+		FileAttributes[2] = '-';
 
-		if (Execute  == TRUE)
-			FileAttributes[3] = 'x';
-		else
-			FileAttributes[3] = '-';
+	if (Execute  == TRUE)
+		FileAttributes[3] = 'x';
+	else
+		FileAttributes[3] = '-';
 
 	#if (USE_VIRTUAL_FILE_HELP == 1)
 		if (Help != NULL)

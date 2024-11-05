@@ -165,6 +165,7 @@
     <ClCompile Include="NexShell\Commands\echo_Command.c" />
     <ClCompile Include="NexShell\Commands\help_Command.c" />
     <ClCompile Include="NexShell\Commands\ls_Command.c" />
+    <ClCompile Include="NexShell\Commands\NexShellCommands.c" />
     <ClCompile Include="NexShell\Commands\pwd_Command.c" />
     <ClCompile Include="NexShell\Commands\shutdown_Command.c" />
     <ClCompile Include="NexShell\NexShell.c" />
@@ -186,6 +187,7 @@
     <ClInclude Include="NexShell\Commands\echo_Command.h" />
     <ClInclude Include="NexShell\Commands\help_Command.h" />
     <ClInclude Include="NexShell\Commands\ls_Command.h" />
+    <ClInclude Include="NexShell\Commands\NexShellCommands.h" />
     <ClInclude Include="NexShell\Commands\pwd_Command.h" />
     <ClInclude Include="NexShell\Commands\shutdown_Command.h" />
     <ClInclude Include="NexShell\NexShell.h" />

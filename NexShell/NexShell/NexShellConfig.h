@@ -113,9 +113,6 @@
 // if colors aren't used then the USE_SHELL_COLOR should be set to zero
 #define USE_SHELL_COLOR												1
 
-// enable this to make virtual files in something other than the DEV_FOLDER_NAME directory
-#define USING_USER_VIRTUAL_FILES									1
-
 // These are all the colors of the prompt and other text
 #if (USE_SHELL_COLOR == 1)
 	#define SHELL_PROJECT_NAME_TEXT_COLOR							SHELL_FONT_COLOR_BRIGHT_CYAN
@@ -136,9 +133,12 @@
 #endif // end of #if (USE_SHELL_COLOR == 1)
 
 #define SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY					16
+#define USE_USER_COMMANDS											1
 
-#define USE_VIRTUAL_FILE_DESCRIPTION								1
-#define USE_VIRTUAL_FILE_HELP										1
+// these are virtual files that can be turned on and off in dev folder
+#define USE_DEV_ZERO_VIRTUAL_FILE									1
+#define USE_DEV_NULL_VIRTUAL_FILE									1
+#define USE_DEV_RANDOM_VIRTUAL_FILE									1
 
 // use these to enable each command
 #define USE_CAT_COMMAND												1

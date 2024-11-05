@@ -15,7 +15,7 @@ SHELL_RESULT pwdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	Result = NexShellProcessOutgoingData(CurrentWorkingDirectory, OutputStream, strlen(CurrentWorkingDirectory), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
+	Result = NexShellProcessOutgoingData(CurrentWorkingDirectory, OutputStream, (UINT32)strlen(CurrentWorkingDirectory), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;

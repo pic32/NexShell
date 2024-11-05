@@ -120,6 +120,9 @@
     <ClCompile Include="FileSystem\DevFiles.c">
       <Filter>Source Files\FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="NexShell\Commands\NexShellCommands.c">
+      <Filter>Source Files\NexShell\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\DevFiles.h">
       <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\Commands\NexShellCommands.h">
+      <Filter>Header Files\NexShell\Commands</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

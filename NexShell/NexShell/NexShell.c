@@ -10,34 +10,13 @@
 #include "NexShellConfig.h"
 #include "VirtualFile.h"
 #include "DevFiles.h"
-
-#if (USE_CAT_COMMAND == 1)
-	#include "cat_Command.h"
-#endif // end of #if (USE_CAT_COMMAND == 1)
+#include "NexShellCommands.h"
 
 #if (USE_CD_COMMAND == 1)
-	#include "cd_Command.h"
+	#if (EXTENDED_CD_SUPPORT == 1)
+		#include "cd_Command.h"
+	#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 #endif // end of #if (USE_CD_COMMAND == 1)
-
-#if (USE_CLEAR_COMMAND == 1)
-	#include "clear_Command.h"
-#endif // end of #if (USE_CLEAR_COMMAND == 1)
-
-#if (USE_HELP_COMMAND == 1)
-	#include "help_Command.h"
-#endif // end of #if (USE_HELP_COMMAND == 1)
-
-#if (USE_LS_COMMAND == 1)
-	#include "ls_Command.h"
-#endif // end of #if (USE_LS_COMMAND == 1)
-
-#if (USE_PWD_COMMAND == 1)
-	#include "pwd_Command.h"
-#endif // end of #if (USE_PWD_COMMAND == 1)
-
-#if (USE_SHUTDOWN_COMMAND == 1)
-	#include "shutdown_Command.h"
-#endif // end of #if (USE_SHUTDOWN_COMMAND == 1)
 
 #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 	BOOL gConsoleEcho;
@@ -105,7 +84,8 @@ const char* gNexShellError[] = {
 	"shell: malloc fail",
 	"shell: invalid virtual directory name",
 	"shell: virtual directory name already exists",
-	"shell: virtual filename already exsits"
+	"shell: virtual filename already exsits",
+	"shell: command already exists"
 };
 
 #if (USE_SHELL_COMMAND_HISTORY == 1)
@@ -115,43 +95,6 @@ const char* gNexShellError[] = {
 
 UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes);
 UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes);
-
-COMMAND_INFO gCommandList[] = 
-{
-	#if (USE_CAT_COMMAND == 1)
-		{CAT_COMMAND_NAME, catCommandExecuteMethod, "Reads the contents of a file", CAT_HELP_TEXT},
-	#endif // end of #if (USE_CAT_COMMAND == 1)
-
-	#if (USE_CD_COMMAND == 1)
-		{CD_COMMAND_NAME, cdCommandExecuteMethod, "Changes the current directory", CD_HELP_TEXT},
-	#endif // end of #if (USE_CD_COMMAND == 1)
-
-	#if (USE_CLEAR_COMMAND == 1)
-		{CLEAR_COMMAND_NAME, clearCommandExecuteMethod, "Clears the screen", CLEAR_HELP_TEXT},
-	#endif // end of #if (USE_CLEAR_COMMAND == 1)
-
-	#if (USE_ECHO_COMMAND == 1)
-		{ECHO_COMMAND_NAME, echoCommandExecuteMethod, "Writes data to a file", ECHO_HELP_TEXT},
-	#endif // end of #if (USE_ECHO_COMMAND == 1)
-
-	#if (USE_HELP_COMMAND == 1)
-		{HELP_COMMAND_NAME, helpCommandExecuteMethod, "Gets detailed help information on files", HELP_HELP_TEXT},
-	#endif // end of #if (USE_HELP_COMMAND == 1)
-
-	#if (USE_LS_COMMAND == 1)
-		{LS_COMMAND_NAME, lsCommandExecuteMethod, "List the contents of a directory", LS_HELP_TEXT},
-	#endif // end of #if (USE_LS_COMMAND == 1)
-
-	#if (USE_PWD_COMMAND == 1)
-		{PWD_COMMAND_NAME, pwdCommandExecuteMethod, "Outputs the current full directory", PWD_HELP_TEXT},
-	#endif // end of #if (USE_PWD_COMMAND == 1)
-
-	#if (USE_SHUTDOWN_COMMAND == 1)
-		{SHUTDOWN_COMMAND_NAME, shutdownCommandExecuteMethod, "Bring the system down", SHUTDOWN_HELP_TEXT},
-	#endif // end of #if (USE_SHUTDOWN_COMMAND == 1)
-
-	{NULL, NULL, NULL, NULL}
-};
 
 static SHELL_RESULT OutputPrompt(char *CurrentDirectory, GENERIC_BUFFER *OutputStream)
 {
@@ -221,7 +164,11 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	gEscapeSequence = 0;
 
 	// initialize the virtual file list section
-	VirtualFileInit();
+	Result = VirtualFileInit();
+
+	// did it work?
+	if (Result != SHELL_SUCCESS)
+		return Result;
 
 	// now create the default dev files
 	Result = CreateDevFiles(CurrentDrive);
@@ -231,9 +178,21 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 
 	#if (USE_CD_COMMAND == 1)
 		#if (EXTENDED_CD_SUPPORT == 1)
-			cdInit();
+			Result = cdInit();
+
+			// did it work?
+			if (Result != SHELL_SUCCESS)
+				return Result;
 		#endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 	#endif // end of #if (USE_CD_COMMAND == 1)
+
+	#if (USE_USER_COMMANDS == 1)
+		Result = InitNexShellCommands();
+
+		// did it work?
+		if (Result != SHELL_SUCCESS)
+			return Result;
+	#endif // end of #if (USE_USER_COMMANDS == 1)
 
 	// initialize our input and output streams
 	if (CreateGenericBuffer(&gStandardOutputStream, SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES, gOutputStreamBuffer) == NULL)
@@ -484,38 +443,6 @@ static char* ParseArgument(char** Buffer)
 	return StartOfString;
 }
 
-static BOOL FileExists(const char *FullFilePath)
-{
-	FIL File;
-
-	if (f_open(&File, FullFilePath, FA_OPEN_ALWAYS) == SHELL_FILE_SUCCESS)
-	{
-		f_close(&File);
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-static char* GetNextCharInStream(char* Buffer)
-{
-	if (*Buffer == 0)
-		return NULL;
-
-	if (*Buffer++ == '\\')
-	{
-		if (*Buffer == 0)
-			return NULL;
-
-		Buffer++;
-
-		return Buffer;
-	}
-
-	return Buffer;
-}
-
 static BOOL UserCommandIsValid(char* Buffer)
 {
 	if ((BOOL)isprint((int)*Buffer) == FALSE)
@@ -693,7 +620,6 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 {
 	UINT32 argc;
 	UINT32 WorkingIndex;
-	SHELL_RESULT Result;
 	GENERIC_BUFFER* StreamPtr;
 
 	// we add 2 for the potential location and command name
@@ -749,13 +675,13 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 
 			WorkingIndex = 0;
 
-			for (i = 0; i < (sizeof(gCommandList) / sizeof(COMMAND_INFO)) - 1; i++)
+			for (i = 0; i < GetNumberOfNextShellNativeCommands(); i++)
 			{
 				// compare it to a file
-				if (strcmp(gCommandList[i].CommandName, argv[0]) == 0)
+				if (strcmp(GetNativeCommandInfo(i)->CommandName, argv[0]) == 0)
 				{
 					// we found a winner
-					return gCommandList[i].ExecuteFile(&argv[1], argc - 1, StreamPtr);
+					return GetNativeCommandInfo(i)->ExecuteFile(&argv[1], argc - 1, StreamPtr);
 				}
 			}
 

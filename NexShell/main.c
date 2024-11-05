@@ -1,8 +1,8 @@
-// NexShell.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 #include <stdio.h>
+#include <string.h>
 
 #include "NexShell.h"
+#include "NexShellCommands.h"
 
 SHELL_RESULT gShellResult;
 
@@ -14,8 +14,16 @@ void ShellPowerDownCallback(void)
 void StartThread(void);
 
 FIL gFile;
-const char gTestTest[] = "This is some test text!\r\n\r\n\r\n\r\nHopefully it works.\r\n\t\t\r\n";
+const char gTestTest[] = "This is to test the help file text.\r\nMaybe this works.\r\n\tMaybe not...\r\n";
+const char gHelpText[] = "R:/help.txt";
+const char gADescription[] = "A description to test with";
+const char gACommandName[] = "Test_Command";
 UINT gBytesWritten;
+
+SHELL_RESULT CommandExecuteFile(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER *OutputStream)
+{
+	return SHELL_SUCCESS;
+}
 
 int main()
 {
@@ -31,7 +39,7 @@ int main()
 		exit(0);
 	}
 
-	gShellResult = f_open(&gFile, "R:\\Test-a-very-long-file-name.txt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+	gShellResult = f_open(&gFile, "R:/Test-a-very-long-file-name.txt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
 
 	if (gShellResult != SHELL_SUCCESS)
 	{
@@ -42,7 +50,7 @@ int main()
 
 	gShellResult = f_close(&gFile);
 
-	gShellResult = f_open(&gFile, "R:\\File.txt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+	gShellResult = f_open(&gFile, gHelpText, FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
 
 	if (gShellResult != SHELL_SUCCESS)
 	{
@@ -95,6 +103,16 @@ int main()
 	if (gShellResult != SHELL_SUCCESS)
 	{
 		printf("f_mkdir() Failed\r\n");
+
+		exit(0);
+	}
+
+	gShellResult = AddUserCommand(gACommandName, gADescription, gHelpText, CommandExecuteFile);
+
+	// did it work?
+	if (gShellResult != SHELL_SUCCESS)
+	{
+		printf("AddUserCommand() Failed\r\n");
 
 		exit(0);
 	}
