@@ -6,6 +6,49 @@
 #include "DevFiles.h"
 #include "NexShellTime.h"
 
+const char* gMonth[] =
+{
+	"Jan",
+	"Feb",
+	"Mar",
+	"Apr",
+	"May",
+	"Jun",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Oct",
+	"Nov",
+	"Dec"
+};
+
+const char* gWeekday[] =
+{
+	"Sat",
+	"Sun",
+	"Mon",
+	"Tue",
+	"Wed",
+	"Thu",
+	"Fri"
+};
+
+int CalculateDayOfWeek(int day, int month, int year)
+{
+	if (month < 3) 
+	{
+		month += 12;
+		year -= 1;
+	}
+
+	int k = year % 100;
+	int j = year / 100;
+
+	int DayOfWeek = (day + 13 * (month + 1) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
+
+	return DayOfWeek;
+}
+
 SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	SHELL_RESULT Result;
@@ -37,7 +80,25 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 		return SHELL_GENERIC_BUFFER_READ_FAILURE;
 
 	// now to string it into the buffer
-	Shell_sprintf(Filename, "Year: %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE "Month: %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE "Day: %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE "Hour : %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE "Minute : %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE "Second : %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE, GetNexShellFileInfoYear(CurrentDateTime.DATE_TIME.Date), GetNexShellFileInfoMonth(CurrentDateTime.DATE_TIME.Date), GetNexShellFileInfoDay(CurrentDateTime.DATE_TIME.Date), GetNexShellFileInfoHours(CurrentDateTime.DATE_TIME.Time), GetNexShellFileInfoMinutes(CurrentDateTime.DATE_TIME.Time), GetNexShellFileInfoSeconds(CurrentDateTime.DATE_TIME.Time));
+	if (NumberOfArgs == 0)
+	{
+		// just output the current date and time
+		Shell_sprintf(Filename, "%s %s % 2i %02i:%02i:%02i %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE, 
+			gWeekday[CalculateDayOfWeek(GetNexShellFileInfoDay(CurrentDateTime.DATE_TIME.Date), 
+			GetNexShellFileInfoMonth(CurrentDateTime.DATE_TIME.Date), 
+			GetNexShellFileInfoYear(CurrentDateTime.DATE_TIME.Date))], 
+			gMonth[GetNexShellFileInfoMonth(CurrentDateTime.DATE_TIME.Date) - 1], 
+			GetNexShellFileInfoDay(CurrentDateTime.DATE_TIME.Date),
+			GetNexShellFileInfoHours(CurrentDateTime.DATE_TIME.Time), 
+			GetNexShellFileInfoMinutes(CurrentDateTime.DATE_TIME.Time), 
+			GetNexShellFileInfoSeconds(CurrentDateTime.DATE_TIME.Time), 
+			GetNexShellFileInfoYear(CurrentDateTime.DATE_TIME.Date));
+	}
+	else
+	{
+		// they supplied arguments
+
+	}
 
 	if(GenericBufferWrite(OutputStream, strlen(Filename), Filename) != strlen(Filename))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
