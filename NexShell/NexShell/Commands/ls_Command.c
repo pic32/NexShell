@@ -5,6 +5,7 @@
 #include "VirtualFile.h"
 #include "ff.h"
 #include "ls_Command.h"
+#include "NexShellTime.h"
 
 static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* OutputStream)
 {
@@ -45,7 +46,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputFileInfo(char *FileName, UINT16 Time, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
 {
 	char FileAttributes[6];
 
@@ -81,6 +82,16 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+	if (Time != 0)
+	{
+		BYTE Buffer[32];
+
+		sprintf(Buffer, " %02i:%02i:%02i ", GetNexShellFileInfoHours(Time), GetNexShellFileInfoMinutes(Time), GetNexShellFileInfoSeconds(Time));
+
+		if (GenericBufferWrite(OutputStream, strlen(Buffer), Buffer) != strlen(Buffer))
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+	}
 
 	if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 	{
@@ -180,7 +191,7 @@ static SHELL_RESULT OutputDirectoryContents(DIR *Directory, GENERIC_BUFFER* Outp
 		else
 		{
 			// it was a file
-			Result = OutputFileInfo(FileInfo.fname, FALSE, TRUE, !(FileInfo.fattrib & AM_RDO), FALSE, NULL, NULL, OutputStream);
+			Result = OutputFileInfo(FileInfo.fname, FileInfo.ftime, FALSE, TRUE, !(FileInfo.fattrib & AM_RDO), FALSE, NULL, NULL, OutputStream);
 
 			if (Result != SHELL_SUCCESS)
 				return Result;
@@ -206,7 +217,7 @@ static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, GENERIC_
 	{
 		File = LinkedListGetData(VirtualFileList, i);
 
-		Result = OutputFileInfo(File->FileName, TRUE, (BOOL)(File->ReadFileData != NULL), (BOOL)(File->WriteFileData != NULL), (BOOL)(File->ExecuteFile != NULL), File->FileDescription, File->FileHelp, OutputStream);
+		Result = OutputFileInfo(File->FileName, 0, TRUE, (BOOL)(File->ReadFileData != NULL), (BOOL)(File->WriteFileData != NULL), (BOOL)(File->ExecuteFile != NULL), File->FileDescription, File->FileHelp, OutputStream);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
