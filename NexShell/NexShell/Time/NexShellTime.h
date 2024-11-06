@@ -4,6 +4,19 @@
 #include "GenericTypeDefs.h"
 #include "ff.h"
 
+typedef struct 
+{
+	int tm_sec;   // seconds after the minute - [0, 60] including leap second
+	int tm_min;   // minutes after the hour - [0, 59]
+	int tm_hour;  // hours since midnight - [0, 23]
+	int tm_mday;  // day of the month - [1, 31]
+	int tm_mon;   // months since January - [0, 11]
+	int tm_year;  // years since 1900
+	int tm_wday;  // days since Sunday - [0, 6]
+	int tm_yday;  // days since January 1 - [0, 365]
+	int tm_isdst; // daylight savings time flag
+}rtc_time;
+
 typedef union
 {
 	UINT32 Value;
@@ -39,4 +52,4 @@ BYTE GetNexShellFileInfoMonth(UINT16 Date);
 
 UINT16 GetNexShellFileInfoYear(UINT16 Date);
 
-#endif // end of NEXSHELL_TIME_H
+#endif // end of #ifndef NEXSHELL_TIME_H

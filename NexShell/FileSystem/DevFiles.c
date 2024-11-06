@@ -2,6 +2,7 @@
 
 #include "DevFiles.h"
 #include "VirtualFile.h"
+#include "ioctl.h"
 
 #if (USE_DEV_ZERO_VIRTUAL_FILE == 1)
 	VIRTUAL_FILE gZeroFile;
@@ -52,11 +53,12 @@
 
 	static SHELL_RESULT rtc0ReadFileData(GENERIC_BUFFER* OutputStream)
 	{
-		PACKED_DATE_TIME CurrentTime;
+		rtc_time TimeInfo;
 
-		CurrentTime.Value = get_fattime();
+		if (ioctl(GET_DATE_TIME_CMD, &TimeInfo) != 0)
+			return 0;
 
-		if (GenericBufferWrite(OutputStream, sizeof(CurrentTime), &CurrentTime) != sizeof(CurrentTime))
+		if (GenericBufferWrite(OutputStream, sizeof(rtc_time), &TimeInfo) != sizeof(rtc_time))
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

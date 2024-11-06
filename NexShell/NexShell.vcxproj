@@ -169,6 +169,7 @@
     <ClCompile Include="NexShell\Commands\NexShellCommands.c" />
     <ClCompile Include="NexShell\Commands\pwd_Command.c" />
     <ClCompile Include="NexShell\Commands\shutdown_Command.c" />
+    <ClCompile Include="NexShell\ioctl.c" />
     <ClCompile Include="NexShell\NexShell.c" />
     <ClCompile Include="NexShell\NexShellFile.c" />
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
@@ -192,6 +193,7 @@
     <ClInclude Include="NexShell\Commands\NexShellCommands.h" />
     <ClInclude Include="NexShell\Commands\pwd_Command.h" />
     <ClInclude Include="NexShell\Commands\shutdown_Command.h" />
+    <ClInclude Include="NexShell\ioctl.h" />
     <ClInclude Include="NexShell\NexShell.h" />
     <ClInclude Include="NexShell\NexShellConfig.h" />
     <ClInclude Include="NexShell\NexShellFile.h" />

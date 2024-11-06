@@ -54,16 +54,17 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 	SHELL_RESULT Result;
 	GENERIC_BUFFER Stream;
 	VIRTUAL_FILE* rtc0VirtualFile;
-	BYTE Buffer[16];
+	BYTE Buffer[64];
 	BYTE Filename[SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES];
-	PACKED_DATE_TIME CurrentDateTime;
+	rtc_time CurrentDateTime;
 
+	// create a temporary buffer for communicating with the rtc0 file
 	if (CreateGenericBuffer(&Stream, sizeof(Buffer), Buffer) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
 	Shell_sprintf(Filename, "%c:/" DEV_FOLDER_NAME, NexShellGetRootDriveVolume());
 
-	// now read the date time
+	// now get a handle on the file
 	rtc0VirtualFile = GetVirtualFile(Filename, RTC_0_FILENAME);
 
 	// did we get it?
@@ -76,7 +77,8 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	if (GenericBufferRead(&Stream, sizeof(PACKED_DATE_TIME), (BYTE*)&CurrentDateTime, sizeof(CurrentDateTime), FALSE) != sizeof(PACKED_DATE_TIME))
+	// read our answer from the ioctl inside the file read
+	if (GenericBufferRead(&Stream, sizeof(rtc_time), (BYTE*)&CurrentDateTime, sizeof(CurrentDateTime), FALSE) != sizeof(rtc_time))
 		return SHELL_GENERIC_BUFFER_READ_FAILURE;
 
 	// now to string it into the buffer
@@ -84,15 +86,13 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 	{
 		// just output the current date and time
 		Shell_sprintf(Filename, "%s %s % 2i %02i:%02i:%02i %i" SHELL_DEFAULT_END_OF_LINE_SEQUENCE, 
-			gWeekday[CalculateDayOfWeek(GetNexShellFileInfoDay(CurrentDateTime.DATE_TIME.Date), 
-			GetNexShellFileInfoMonth(CurrentDateTime.DATE_TIME.Date), 
-			GetNexShellFileInfoYear(CurrentDateTime.DATE_TIME.Date))], 
-			gMonth[GetNexShellFileInfoMonth(CurrentDateTime.DATE_TIME.Date) - 1], 
-			GetNexShellFileInfoDay(CurrentDateTime.DATE_TIME.Date),
-			GetNexShellFileInfoHours(CurrentDateTime.DATE_TIME.Time), 
-			GetNexShellFileInfoMinutes(CurrentDateTime.DATE_TIME.Time), 
-			GetNexShellFileInfoSeconds(CurrentDateTime.DATE_TIME.Time), 
-			GetNexShellFileInfoYear(CurrentDateTime.DATE_TIME.Date));
+			gWeekday[CalculateDayOfWeek(CurrentDateTime.tm_mday, CurrentDateTime.tm_mon + 1, CurrentDateTime.tm_year + 1900)],
+			gMonth[CurrentDateTime.tm_mon],
+			CurrentDateTime.tm_mday,
+			CurrentDateTime.tm_hour,
+			CurrentDateTime.tm_min,
+			CurrentDateTime.tm_sec,
+			CurrentDateTime.tm_year + 1900);
 	}
 	else
 	{
@@ -100,6 +100,7 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 
 	}
 
+	// write our answer out the stream they passed in
 	if(GenericBufferWrite(OutputStream, strlen(Filename), Filename) != strlen(Filename))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
