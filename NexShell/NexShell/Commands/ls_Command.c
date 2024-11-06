@@ -24,6 +24,13 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
+	BYTE Buffer[32];
+
+	sprintf(Buffer, "          ");
+
+	if (GenericBufferWrite(OutputStream, strlen(Buffer), Buffer) != strlen(Buffer))
+		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
 	if (strlen(DirectoryName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 	{
 		// display a poriton
