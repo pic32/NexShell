@@ -6,15 +6,9 @@
 #include "ff.h"
 #include "ls_Command.h"
 
-extern char gCurrentWorkingDirectory[];
-
 static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* OutputStream)
 {
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		char FileAttributes[6];
-	#else
-		char FileAttributes[5];
-	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
+	char FileAttributes[6];
 
 	// clear it out first
 	memset(FileAttributes, 0, sizeof(FileAttributes));
@@ -23,13 +17,8 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 	FileAttributes[1] = '-';
 	FileAttributes[2] = '-';
 	FileAttributes[3] = '-';
-
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		FileAttributes[4] = '-';
-		FileAttributes[5] = ' ';
-	#else
-		FileAttributes[4] = ' ';
-	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
+	FileAttributes[4] = '-';
+	FileAttributes[5] = ' ';
 
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -58,11 +47,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, GENERIC_BUFFER* Out
 
 static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
 {
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		char FileAttributes[6];
-	#else
-		char FileAttributes[5];
-	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
+	char FileAttributes[6];
 
 	// clear it out first
 	memset(FileAttributes, 0, sizeof(FileAttributes));
@@ -87,16 +72,12 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 	else
 		FileAttributes[3] = '-';
 
-	#if (USE_VIRTUAL_FILE_HELP == 1)
-		if (Help != NULL)
-			FileAttributes[4] = 'h';
-		else
-			FileAttributes[4] = '-';
+	if (Help != NULL)
+		FileAttributes[4] = 'h';
+	else
+		FileAttributes[4] = '-';
 
-		FileAttributes[5] = ' ';
-	#else
-		FileAttributes[4] = ' ';
-	#endif // end of #if (USE_VIRTUAL_FILE_HELP == 1)
+	FileAttributes[5] = ' ';
 
 	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -117,31 +98,29 @@ static SHELL_RESULT OutputFileInfo(char *FileName, BOOL Virtual, BOOL Read, BOOL
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
-	#if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
-		if (Description != NULL)
+	if (Description != NULL)
+	{
+		if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 		{
-			if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
-			{
-				// this is the max space, add one space for the description seperation
-				if (GenericBufferWrite(OutputStream, 1, " ") != 1)
-					return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-			}
-			else
-			{
-				UINT32 i;
-
-				for (i = 0; i < SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY - (UINT32)strlen(FileName) + 3; i++)
-					if (GenericBufferWrite(OutputStream, 1, " ") != 1)
-						return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-			}
-
-			if (GenericBufferWrite(OutputStream, 2, " -") != 2)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
-			if (GenericBufferWrite(OutputStream, (UINT32)strlen(Description), Description) != (UINT32)strlen(Description))
+			// this is the max space, add one space for the description seperation
+			if (GenericBufferWrite(OutputStream, 1, " ") != 1)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
-	#endif // end of #if (USE_VIRTUAL_FILE_DESCRIPTION == 1)
+		else
+		{
+			UINT32 i;
+
+			for (i = 0; i < SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY - (UINT32)strlen(FileName) + 3; i++)
+				if (GenericBufferWrite(OutputStream, 1, " ") != 1)
+					return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+		}
+
+		if (GenericBufferWrite(OutputStream, 2, " -") != 2)
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Description), Description) != (UINT32)strlen(Description))
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+	}
 
 	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
