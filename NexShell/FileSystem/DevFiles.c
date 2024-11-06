@@ -47,18 +47,32 @@
 
 #if(USE_DEV_RTC_VIRTUAL_FILE == 1)
 	#include "NexShellTime.h"
+	#include <time.h>
 
 	VIRTUAL_FILE grtc0File;
 	const BYTE grtc0FileDescription[] = { "Provides access to the RTCC" };
 
 	static SHELL_RESULT rtc0ReadFileData(GENERIC_BUFFER* OutputStream)
 	{
-		rtc_time TimeInfo;
+		time_t RawTime;
+		struct tm* TimeInfo;
+		rtc_time CurrentTime;
 
-		if (ioctl(GET_DATE_TIME_CMD, &TimeInfo) != 0)
-			return 0;
+		time(&RawTime);
 
-		if (GenericBufferWrite(OutputStream, sizeof(rtc_time), &TimeInfo) != sizeof(rtc_time))
+		TimeInfo = localtime(&RawTime);
+		
+		CurrentTime.tm_sec = TimeInfo->tm_sec;
+		CurrentTime.tm_min = TimeInfo->tm_min;
+		CurrentTime.tm_hour = TimeInfo->tm_hour;
+		CurrentTime.tm_wday = TimeInfo->tm_wday;
+		CurrentTime.tm_mday = TimeInfo->tm_mday;
+		CurrentTime.tm_mon = TimeInfo->tm_mon;
+		CurrentTime.tm_year = TimeInfo->tm_year;
+		CurrentTime.tm_isdst = TimeInfo->tm_isdst;
+		CurrentTime.tm_yday = TimeInfo->tm_yday;
+
+		if (GenericBufferWrite(OutputStream, sizeof(rtc_time), &CurrentTime) != sizeof(rtc_time))
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

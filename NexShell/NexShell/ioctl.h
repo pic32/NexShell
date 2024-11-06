@@ -39,6 +39,6 @@
 #define GET_DATE_TIME_CMD			0
 #define SET_DATE_TIME_CMD			1
 
-long ioctl(unsigned int cmd, void *arg);
+long ioctl(char* File, unsigned int cmd, void *arg);
 
 #endif // end of #ifndef IOCTL_H

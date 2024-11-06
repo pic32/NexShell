@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "ioctl.h"
 #include "date_Command.h"
 #include "VirtualFile.h"
 #include "DevFiles.h"
@@ -52,34 +53,13 @@ int CalculateDayOfWeek(int day, int month, int year)
 SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	SHELL_RESULT Result;
-	GENERIC_BUFFER Stream;
-	VIRTUAL_FILE* rtc0VirtualFile;
-	BYTE Buffer[64];
-	BYTE Filename[SIZE_OF_SHELL_STACK_BUFFER_IN_BYTES];
+	BYTE Filename[32];
 	rtc_time CurrentDateTime;
 
-	// create a temporary buffer for communicating with the rtc0 file
-	if (CreateGenericBuffer(&Stream, sizeof(Buffer), Buffer) == NULL)
-		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
+	Shell_sprintf(Filename, "%c:/" DEV_FOLDER_NAME "/" RTC_0_FILENAME, NexShellGetRootDriveVolume());
 
-	Shell_sprintf(Filename, "%c:/" DEV_FOLDER_NAME, NexShellGetRootDriveVolume());
-
-	// now get a handle on the file
-	rtc0VirtualFile = GetVirtualFile(Filename, RTC_0_FILENAME);
-
-	// did we get it?
-	if (rtc0VirtualFile == NULL)
-		return SHELL_FILE_NOT_FOUND;
-
-	// now get the current time
-	Result = rtc0VirtualFile->ReadFileData(&Stream);
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	// read our answer from the ioctl inside the file read
-	if (GenericBufferRead(&Stream, sizeof(rtc_time), (BYTE*)&CurrentDateTime, sizeof(CurrentDateTime), FALSE) != sizeof(rtc_time))
-		return SHELL_GENERIC_BUFFER_READ_FAILURE;
+	if (ioctl(Filename, GET_DATE_TIME_CMD, (void*)&CurrentDateTime) != 0)
+		return SHELL_IO_CTL_FAILED;
 
 	// now to string it into the buffer
 	if (NumberOfArgs == 0)

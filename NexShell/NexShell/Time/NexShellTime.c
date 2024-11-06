@@ -3,6 +3,8 @@
 #include "NexShellTime.h"
 #include "ff.h"
 #include "ioctl.h"
+#include "NexShell.h"
+#include "DevFiles.h"
 
 /*
 	Current local time shall be returned as bit-fields packed into a DWORD value. The bit fields are as follows:
@@ -29,8 +31,11 @@ DWORD get_fattime(void)
 {
 	PACKED_DATE_TIME DateTime;
 	rtc_time TimeInfo;
+	BYTE Filename[32];
 
-	if (ioctl(GET_DATE_TIME_CMD, &TimeInfo) != 0)
+	Shell_sprintf(Filename, "%c:/" DEV_FOLDER_NAME "/" RTC_0_FILENAME, NexShellGetRootDriveVolume());
+
+	if (ioctl(Filename, GET_DATE_TIME_CMD, (void*)&TimeInfo) != 0)
 		return 0;
 
 	DateTime.Value = 0;
