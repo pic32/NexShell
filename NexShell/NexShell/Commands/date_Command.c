@@ -206,7 +206,50 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 							// hour (01..12)
 							case 'I':
 							{
-								
+								BYTE Hour;
+
+								switch (CurrentDateTime.tm_hour)
+								{
+									case 0:
+									{
+										Hour = 12;
+
+										break;
+									}
+
+									case 1:
+									case 2:
+									case 3:
+									case 4:
+									case 5:
+									case 6:
+									case 7:
+									case 8:
+									case 9:
+									case 10:
+									case 11:
+									{
+										Hour = CurrentDateTime.tm_hour;
+
+										break;
+									}
+
+									case 12:
+									{
+										Hour = 12;
+
+										break;
+									}
+
+									default:
+									{
+										Hour = CurrentDateTime.tm_hour - 12;
+
+										break;
+									}
+								}
+
+								Shell_sprintf(TempBuffer, "%02i", Hour);
 
 								break;
 							}
@@ -230,7 +273,50 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 							// hour ( 1..12)
 							case 'l':
 							{
-								
+								BYTE Hour;
+
+								switch (CurrentDateTime.tm_hour)
+								{
+									case 0:
+									{
+										Hour = 12;
+
+										break;
+									}
+
+									case 1:
+									case 2:
+									case 3:
+									case 4:
+									case 5:
+									case 6:
+									case 7:
+									case 8:
+									case 9:
+									case 10:
+									case 11:
+									{
+										Hour = CurrentDateTime.tm_hour;
+
+										break;
+									}
+
+									case 12:
+									{
+										Hour = 12;
+
+										break;
+									}
+
+									default:
+									{
+										Hour = CurrentDateTime.tm_hour - 12;
+
+										break;
+									}
+								}
+
+								Shell_sprintf(TempBuffer, "%i", Hour);
 
 								break;
 							}
@@ -254,15 +340,27 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 							// a newline
 							case 'n':
 							{
-								Shell_sprintf(TempBuffer, SHELL_DEFAULT_END_OF_LINE_SEQUENCE);
+								strcat(TempBuffer, "\n");
 
 								break;
 							}
 
-							// nanoseconds (000000000..999999999)
+							// %N nanoseconds (000000000..999999999)
+							// %s seconds since 1970 - 01 - 01 00 : 00 : 00 UTC
+							// %U week number of year, with Sunday as first day of week(00..53)
+							// %V ISO week number, with Monday as first day of week(01..53)
+							// %W week number of year, with Monday as first day of week(00..53)
+							// %z + hhmm numeric timezone(e.g., -0400)
+							// %Z alphabetic time zone abbreviation(e.g., EDT)
 							case 'N':
+							case 's':
+							case 'U':
+							case 'V':
+							case 'W':
+							case 'z':
+							case 'Z':
 							{
-								Shell_sprintf(TempBuffer, "%N unsupported");
+								Shell_sprintf(TempBuffer, "unsupported");
 
 								break;
 							}
@@ -299,66 +397,158 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 								break;
 							}
 
-#if 0
-								% r
-								locale's 12-hour clock time (e.g., 11:11:04 PM)
-								% R
-								24 - hour hour and minute; same as% H:% M
-								% s
-								seconds since 1970 - 01 - 01 00 : 00 : 00 UTC
-								% S
-								second(00..60)
-								% t
-								a tab
-								% T
-								time; same as% H:% M : % S
-								% u
-								day of week(1..7); 1 is Monday
-								% U
-								week number of year, with Sunday as first day of week(00..53)
-								% V
-								ISO week number, with Monday as first day of week(01..53)
-								% w
-								day of week(0..6); 0 is Sunday
-								% W
-								week number of year, with Monday as first day of week(00..53)
-								% x
-								locale's date representation (e.g., 12/31/99)
-								% X
-								locale's time representation (e.g., 23:13:48)
-								% y
-								last two digits of year(00..99)
-								% Y
-								year
-								% z
-								+ hhmm numeric timezone(e.g., -0400)
-								% :z
-								+ hh : mm numeric timezone(e.g., -04:00)
-								% ::z
-								+ hh : mm : ss numeric time zone(e.g., -04:00 : 00)
-								% :: : z
-								numeric time zone with : to necessary precision(e.g., -04, +05:30)
-								% Z
-								alphabetic time zone abbreviation(e.g., EDT)
-								By default, date pads numeric fields with zeroes.The following optional flags may follow '%' :
+							// locale's 12-hour clock time (e.g., 11:11:04 PM)
+							case 'r':
+							{
+								int Hour;
+								char* AM_PM;
 
-								-
-								(hyphen) do not pad the field
-								_
-								(underscore) pad with spaces
-								(zero) pad with zeros
-								^
-								use upper case if possible
-#
-								use opposite case if possible
-								After any flags comes an optional field width, as a decimal number; then an optional modifier, which is either E to use the locale's alternate representations if available, or O to use the locale's alternate numeric symbols if available.
+								switch (CurrentDateTime.tm_hour)
+								{
+									case 0:
+									{
+										AM_PM = "AM";
 
-								Date String
-								The --date = STRING is a mostly free format human readable date string such as "Sun, 29 Feb 2004 16:21:42 -0800" or "2004-02-29 16:21:42" or even "next Thursday".A date string may contain items indicating calendar date, time of day, time zone, day of week, relative time, relative date, and numbers.An empty string indicates the beginning of the day.The date string format is more complex than is easily documented here but is fully described in the info documentation.
-								Environment
-								TZ
-								Specifies the timezone, unless overridden by command line parameters.If neither is specified, the setting from / etc / localtime is used.
-#endif
+										Hour = 12;
+
+										break;
+									}
+
+									case 1:
+									case 2:
+									case 3:
+									case 4:
+									case 5:
+									case 6:
+									case 7:
+									case 8:
+									case 9:
+									case 10:
+									case 11:
+									{
+										Hour = CurrentDateTime.tm_hour;
+
+										AM_PM = "AM";
+
+										break;
+									}
+
+									case 12:
+									{
+										Hour = 12;
+
+										AM_PM = "PM";
+
+										break;
+									}
+
+									default:
+									{
+										Hour = CurrentDateTime.tm_hour - 12;
+
+										AM_PM = "PM";
+
+										break;
+									}
+								}
+
+								// 12-hour clock time (e.g., 11:11:04 PM)
+								Shell_sprintf(TempBuffer, "%i:%02i:%02i %s", Hour, CurrentDateTime.tm_min, CurrentDateTime.tm_sec, AM_PM);
+
+								break;
+							}
+
+							// 24 - hour hour and minute; same as %H:%M
+							case 'R':
+							{
+								Shell_sprintf(TempBuffer, "%02i:%02i", CurrentDateTime.tm_hour, CurrentDateTime.tm_min);
+
+								break;
+							}
+
+							// second(00..60)
+							case 'S':
+							{
+								Shell_sprintf(TempBuffer, "%02i", CurrentDateTime.tm_sec);
+
+								break;
+							}
+
+							// a tab
+							case 't':
+							{
+								strcpy(TempBuffer, "\t");
+
+								break;
+							}
+
+							// time; same as time; same as %H:%M:%S
+							case 'T':
+							{
+								Shell_sprintf(TempBuffer, "%02i:%02i:%02i", CurrentDateTime.tm_hour, CurrentDateTime.tm_min, CurrentDateTime.tm_sec);
+
+								break;
+							}
+
+							// day of week(1..7); 1 is Monday
+							case 'u':
+							{
+								if (CurrentDateTime.tm_wday == 0)
+								{
+									strcpy(TempBuffer, "7");
+								}
+								else
+								{
+									char Day[2];
+
+									Day[0] = '0' + CurrentDateTime.tm_wday;
+									Day[1] = 0;
+
+									strcpy(TempBuffer, Day);
+								}
+
+								break;
+							}
+
+							// day of week(0..6); 0 is Sunday
+							case 'w':
+							{
+								TempBuffer[0] = '0' + CurrentDateTime.tm_wday;
+
+								break;
+							}
+
+							// locale's date representation (e.g., 12/31/99)
+							case 'x':
+							{
+								Shell_sprintf(TempBuffer, "%02i:%02i:%02i", CurrentDateTime.tm_mon + 1, CurrentDateTime.tm_mday, CurrentDateTime.tm_year + 1900 - 2000);
+
+								break;
+							}
+
+							// locale's time representation (e.g., 23:13:48)
+							case 'X':
+							{
+								Shell_sprintf(TempBuffer, "%02i:%02i:%02i", CurrentDateTime.tm_hour, CurrentDateTime.tm_min, CurrentDateTime.tm_sec);
+
+								break;
+							}
+
+							// last two digits of year(00..99)
+							case 'y':
+							{
+								Shell_sprintf(TempBuffer, "%i", CurrentDateTime.tm_year + 1900 - 2000);
+
+								break;
+							}
+
+							// last two digits of year(00..99)
+							case 'Y':
+							{
+								Shell_sprintf(TempBuffer, "%i", CurrentDateTime.tm_year + 1900);
+
+								break;
+							}
 
 							default:
 							{
