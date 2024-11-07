@@ -38,6 +38,9 @@
 
 #define GET_DATE_TIME_CMD			0
 #define SET_DATE_TIME_CMD			1
+#define SYSTEM_SHUTDOWN_SLEEP		2
+#define SYSTEM_SHUTDOWN_RESET		3
+#define SYSTEM_SHUTDOWN_POWER_OFF	4
 
 long ioctl(char* File, unsigned int cmd, void *arg);
 

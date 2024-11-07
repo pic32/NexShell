@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "shutdown_Command.h"
+#include "ioctl.h"
 
 void ShellPowerDownCallback(void);
 
@@ -9,7 +10,11 @@ SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GEN
 	char *Options;
 
 	if (NumberOfArgs == 0)
+	{
+		ShellPowerDownCallback();
+
 		ShellPowerOff();
+	}
 
 	if (NumberOfArgs != 1)
 		return SHELL_INVALID_INPUT_PARAMETER;
@@ -29,7 +34,9 @@ SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GEN
 		{
 			ShellPowerDownCallback();
 
-			ShellPowerDownSleep();
+			// initiate the sleep
+			if (ioctl(NULL, SYSTEM_SHUTDOWN_SLEEP, NULL) != 0)
+				return SHELL_IO_CTL_FAILED;
 
 			// if we wake back up, return this value
 			return SHELL_SUCCESS;
@@ -39,14 +46,22 @@ SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GEN
 		{
 			ShellPowerDownCallback();
 
-			ShellPowerOff();
+			if (ioctl(NULL, SYSTEM_SHUTDOWN_POWER_OFF, NULL) != 0)
+				return SHELL_IO_CTL_FAILED;
+
+			// if we wake back up, return this value
+			return SHELL_SUCCESS;
 		}
 
 		case 'r':
 		{
 			ShellPowerDownCallback();
 
-			ShellPowerReset();
+			if (ioctl(NULL, SYSTEM_SHUTDOWN_RESET, NULL) != 0)
+				return SHELL_IO_CTL_FAILED;
+
+			// if we wake back up, return this value
+			return SHELL_SUCCESS;
 		}
 
 		default:

@@ -6,6 +6,65 @@
 #include "NexShell.h"
 #include "DevFiles.h"
 
+const char* gMonth[] =
+{
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December"
+};
+
+const char* gWeekday[] =
+{
+	"Saturday",
+	"Sunday",
+	"Monday",
+	"Tuesday",
+	"Wednesday",
+	"Thursday",
+	"Friday"
+};
+
+const char* MonthToString(BYTE Month)
+{
+	if (Month > 11)
+		return NULL;
+
+	return gMonth[Month];
+}
+
+const char* WeekdayToString(BYTE Weekday)
+{
+	if (Weekday > 6)
+		return NULL;
+
+	return gWeekday[Weekday];
+}
+
+int CalculateDayOfWeek(int day, int month, int year)
+{
+	if (month < 3)
+	{
+		month += 12;
+		year -= 1;
+	}
+
+	int k = year % 100;
+	int j = year / 100;
+
+	int DayOfWeek = (day + 13 * (month + 1) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
+
+	return DayOfWeek;
+}
+
 /*
 	Current local time shall be returned as bit-fields packed into a DWORD value. The bit fields are as follows:
 

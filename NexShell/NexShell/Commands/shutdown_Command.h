@@ -5,7 +5,7 @@
 
 #define SHUTDOWN_HELP_TEXT \
 \
-"Usage: " SHUTDOWN_COMMAND_NAME " [-HPr]"SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
+"Usage: " SHUTDOWN_COMMAND_NAME " [OPTION]..."SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB "Arranges for the system to be brought down in a safe way." SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
@@ -13,7 +13,6 @@ SHELL_TAB "Only one argument should be sent to the " SHUTDOWN_COMMAND_NAME " com
 SHELL_TAB "If no arguments are supplied it is equivalent to -P." SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB "Options:" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
-SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB SHELL_TAB"-H        requests that the system be halted after it has been brought down" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB SHELL_TAB"-P        requests that the system be powered off after it has been brought down" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB SHELL_TAB"-r        requests that the system be rebooted after it has been brought down" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \

@@ -585,6 +585,12 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 					(*Buffer)++;
 
 					// if we got a quote, leave
+					if (**Buffer == NULL)
+					{
+						return NUMBER_OF_SHELL_LOGICAL_OPERATORS;
+					}
+
+					// if we got a quote, leave
 					if (**Buffer == '\'')
 					{
 						(*Buffer)++;

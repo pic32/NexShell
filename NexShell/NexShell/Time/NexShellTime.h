@@ -38,6 +38,13 @@ typedef union
 	}DATE_TIME;
 }PACKED_DATE_TIME;
 
+
+const char* MonthToString(BYTE Month);
+
+const char* WeekdayToString(BYTE Weekday);
+
+int CalculateDayOfWeek(int day, int month, int year);
+
 DWORD get_fattime(void);
 
 BYTE GetNexShellFileInfoSeconds(UINT16 Time);
