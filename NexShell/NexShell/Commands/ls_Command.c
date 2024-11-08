@@ -305,6 +305,18 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 
 	ArgIndex = 0;
 
+	if (strlen(Args[0]) != 0)
+	{
+		// output help if they asked
+		if (strcmp(Args[0], "--help") == 0)
+		{
+			if (GenericBufferWrite(OutputStream, strlen(LS_HELP_TEXT), LS_HELP_TEXT) != strlen(LS_HELP_TEXT))
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			return SHELL_SUCCESS;
+		}
+	}
+
 	if (NumberOfArgs != 0)
 	{
 		if (strcmp(Args[ArgIndex], "-l") == 0)

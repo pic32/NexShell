@@ -121,6 +121,18 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 
 SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
+	// output help if they asked
+	if (NumberOfArgs != 0)
+	{
+		if (strcmp(Args[0], "--help") == 0)
+		{
+			if (GenericBufferWrite(OutputStream, strlen(HELP_HELP_TEXT), HELP_HELP_TEXT) != strlen(HELP_HELP_TEXT))
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			return SHELL_SUCCESS;
+		}
+	}
+
 	// if there are zero arguments just print out all the global 
 	// files that are available
 	switch (NumberOfArgs)

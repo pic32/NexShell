@@ -46,6 +46,8 @@ typedef struct
 	void *File; // this points to a FIL or a VIRTUAL_FILE
 }SHELL_FILE;
 
+BOOL FileExists(char* FullFilePath);
+
 SHELL_RESULT NexShellFileOpen(char *FilePath, SHELL_FILE *File, BYTE OperatingMode);
 
 SHELL_RESULT NexShellFileClose(SHELL_FILE *File);

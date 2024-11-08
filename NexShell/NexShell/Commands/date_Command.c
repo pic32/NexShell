@@ -7,12 +7,58 @@
 #include "DevFiles.h"
 #include "NexShellTime.h"
 
+BOOL ConvertFileSystemDateTimeToSystemDateTime(UINT16 Date, UINT16 Time, rtc_time *SystemDateTime)
+{
+	PACKED_DATE_TIME DateTime;
+
+	if (SystemDateTime == NULL)
+		return FALSE;
+
+	// clear it out first
+	memset(SystemDateTime, 0, sizeof(rtc_time));
+
+	// convert to the fs date time
+	DateTime.DATE_TIME.Date = Date;
+	DateTime.DATE_TIME.Time = Time;
+
+	if (Date != 0)
+	{
+		SystemDateTime->tm_mday = DateTime.BITS.Day;
+		SystemDateTime->tm_mon = DateTime.BITS.Month - 1;
+		SystemDateTime->tm_year = DateTime.BITS.Year + 1980 - 1900;
+
+		// get the week date mon, tues, etc.
+		SystemDateTime->tm_wday = CalculateDayOfWeek(SystemDateTime->tm_mday, SystemDateTime->tm_mon + 1, SystemDateTime->tm_year + 1900);
+	}
+
+	if (Time != 0)
+	{
+		SystemDateTime->tm_hour = DateTime.BITS.Hours;
+		SystemDateTime->tm_min = DateTime.BITS.Minutes;
+		SystemDateTime->tm_sec = DateTime.BITS.Seconds * 2;
+	}
+
+	return TRUE;
+}
+
 SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
 {
 	SHELL_RESULT Result;
 	UINT32 ArgumentIndex;
-	BYTE Filename[32];
+	BYTE Filename[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 	rtc_time CurrentDateTime;
+
+	if (NumberOfArgs != 0)
+	{
+		// output help if they asked
+		if (strcmp(Args[0], "--help") == 0)
+		{
+			if (GenericBufferWrite(OutputStream, strlen(DATE_HELP_TEXT), DATE_HELP_TEXT) != strlen(DATE_HELP_TEXT))
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			return SHELL_SUCCESS;
+		}
+	}
 
 	ArgumentIndex = 0;
 
@@ -43,20 +89,87 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 		// they supplied arguments
 		if (*Args[ArgumentIndex] == '-')
 		{
-			// it needs to be 
-			if(strlen(Args[ArgumentIndex]) != 2)
-				return SHELL_INVALID_INPUT_PARAMETER;
-
 			// they're supplying arguments
-			switch (Args[ArgumentIndex++][1])
+			switch (Args[ArgumentIndex][1])
 			{
 				case 'd':
 				{
+					// it needs to be 2 chars
+					if (strlen(Args[ArgumentIndex]) != 2)
+						return SHELL_INVALID_INPUT_PARAMETER;
+
+					break;
+				}
+
+				// what was passed in was a file system date time stamp
+				case 'f':
+				{
+					// it needs to be 2 chars
+					if (strlen(Args[ArgumentIndex]) != 2)
+						return SHELL_INVALID_INPUT_PARAMETER;
+
 					break;
 				}
 
 				case 'r':
 				{
+					// they want the date time of a file
+					char* FilenamePtr, *DirectoryPtr;
+					DIR Directory;
+					FILINFO Info;
+
+					// copy their path over since we are going to modify it
+					strcpy(Filename, Args[ArgumentIndex]);
+
+					// now look for the path
+					DirectoryPtr = Filename;
+
+					// skip the -r
+					DirectoryPtr += 2;
+
+					// now skip the whitespace
+					while (isspace((int)*DirectoryPtr) != 0 && *DirectoryPtr != 0)
+						DirectoryPtr++;
+
+					// did we get a valid string?
+					if (DirectoryPtr == 0)
+						return SHELL_INVALID_INPUT_PARAMETER;
+
+					// point to the beginning of the filename
+					FilenamePtr = strrchr(Filename, '/');
+
+					// did we get it?
+					if (FilenamePtr != NULL)
+					{
+						// null it out to get the directory isolated
+						*FilenamePtr++ = 0;
+					}
+
+					// maybe the just did a filename
+					if (FilenamePtr == NULL)
+					{
+						FilenamePtr = DirectoryPtr;
+						DirectoryPtr = "";
+					}
+
+					// now we know we have directory and filename
+					
+					// now look for the file
+					Result = f_findfirst(&Directory, &Info, DirectoryPtr, FilenamePtr);
+
+					if (Result != SHELL_SUCCESS)
+						return Result;
+
+					// get the date time info converted over
+					if (ConvertFileSystemDateTimeToSystemDateTime(Info.fdate, Info.ftime, &CurrentDateTime) == FALSE)
+						return SHELL_INVALID_ARGUMENT;
+
+					// now close the directory
+					Result = f_closedir(&Directory);
+
+					if (Result != SHELL_SUCCESS)
+						return Result;
+
 					break;
 				}
 
@@ -71,6 +184,8 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC
 					return SHELL_INVALID_INPUT_PARAMETER;
 				}
 			}
+
+			ArgumentIndex++;
 
 			NumberOfArgs--;
 		}

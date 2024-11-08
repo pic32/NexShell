@@ -7,8 +7,21 @@ SHELL_RESULT pwdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	SHELL_RESULT Result;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 
+	// output help if they asked
 	if (NumberOfArgs != 0)
-		return SHELL_INVALID_ARGUMENT;
+	{
+		if (strcmp(Args[0], "--help") == 0)
+		{
+			if (GenericBufferWrite(OutputStream, strlen(PWD_HELP_TEXT), PWD_HELP_TEXT) != strlen(PWD_HELP_TEXT))
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			return SHELL_SUCCESS;
+		}
+		else
+		{
+			return SHELL_INVALID_ARGUMENT;
+		}
+	}
 
 	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 

@@ -338,6 +338,15 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_
 	if (NumberOfArgs == 0)
 		return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
 
+	// output help if they asked
+	if (strcmp(Args[0], "--help") == 0)
+	{
+		if (GenericBufferWrite(OutputStream, strlen(CAT_HELP_TEXT), CAT_HELP_TEXT) != strlen(CAT_HELP_TEXT))
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		return SHELL_SUCCESS;
+	}
+
 	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
 
 	if (Result != SHELL_SUCCESS)

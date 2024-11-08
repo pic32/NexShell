@@ -15,6 +15,17 @@ SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GEN
 
 		ShellPowerOff();
 	}
+	else
+	{
+		// output help if they asked
+		if (strcmp(Args[0], "--help") == 0)
+		{
+			if (GenericBufferWrite(OutputStream, strlen(SHUTDOWN_HELP_TEXT), SHUTDOWN_HELP_TEXT) != strlen(SHUTDOWN_HELP_TEXT))
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+			return SHELL_SUCCESS;
+		}
+	}
 
 	if (NumberOfArgs != 1)
 		return SHELL_INVALID_INPUT_PARAMETER;

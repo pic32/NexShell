@@ -30,6 +30,15 @@ SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_B
 	if (NumberOfArgs == 0)
 		return SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE;
 
+	// output help if they asked
+	if (strcmp(Args[0], "--help") == 0)
+	{
+		if (GenericBufferWrite(OutputStream, strlen(CD_HELP_TEXT), CD_HELP_TEXT) != strlen(CD_HELP_TEXT))
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+		return SHELL_SUCCESS;
+	}
+
 	#if (EXTENDED_CD_SUPPORT == 1)
 		if (strlen(Args[0]) == 1)
 		{
