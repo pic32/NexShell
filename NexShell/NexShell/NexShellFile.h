@@ -25,9 +25,9 @@ typedef enum
 
 typedef struct
 {
-	SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER* OutputStream);
-	SHELL_RESULT(*WriteFileData)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
-	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+	SHELL_RESULT(*ReadFileData)(PIPE* OutputStream);
+	SHELL_RESULT(*WriteFileData)(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
+	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 	char *FileName;
 
@@ -52,9 +52,9 @@ SHELL_RESULT NexShellFileOpen(char *FilePath, SHELL_FILE *File, BYTE OperatingMo
 
 SHELL_RESULT NexShellFileClose(SHELL_FILE *File);
 
-SHELL_RESULT NexShellFileWrite(SHELL_FILE *File, char *Buffer, GENERIC_BUFFER *Stream, UINT32 BytesToWrite);
+SHELL_RESULT NexShellFileWrite(SHELL_FILE *File, char *Buffer, PIPE *Stream, UINT32 BytesToWrite);
 
-SHELL_RESULT NexShellFileRead(SHELL_FILE *File, char *Buffer, GENERIC_BUFFER *Stream, UINT32 BytesToRead);
+SHELL_RESULT NexShellFileRead(SHELL_FILE *File, char *Buffer, PIPE *Stream, UINT32 BytesToRead);
 
 SHELL_RESULT NexShellFileDelete(char *FilePath);
 

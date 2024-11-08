@@ -9,7 +9,7 @@
 
 #define INVALID_FILE_SIZE					0xFFFFFFFF
 
-static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UINT16 Date, UINT16 Time, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UINT16 Date, UINT16 Time, PIPE* OutputStream)
 {
 	char FileAttributes[6];
 
@@ -78,7 +78,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date, UINT16 Time, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date, UINT16 Time, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, PIPE* OutputStream)
 {
 	char FileAttributes[6];
 
@@ -191,7 +191,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputRelativeDirectories(GENERIC_BUFFER* OutuputStream)
+static SHELL_RESULT OutputRelativeDirectories(PIPE* OutuputStream)
 {
 	SHELL_RESULT Result;
 
@@ -209,7 +209,7 @@ static SHELL_RESULT OutputRelativeDirectories(GENERIC_BUFFER* OutuputStream)
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 	FILINFO FileInfo;
@@ -269,7 +269,7 @@ static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, GEN
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, PIPE* OutputStream)
 {
 	UINT32 Size, i;
 	VIRTUAL_FILE* File;
@@ -294,7 +294,7 @@ static SHELL_RESULT OutputVirtualFileList(LINKED_LIST *VirtualFileList, GENERIC_
 	return SHELL_SUCCESS;
 }
 
-SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {
 	UINT32 ArgIndex;
 	SHELL_RESULT Result;

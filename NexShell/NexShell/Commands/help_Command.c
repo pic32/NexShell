@@ -5,7 +5,7 @@
 #include "NexShellCommands.h"
 #include "LinkedList.h"
 
-static OutputCommandHelp(COMMAND_INFO* CommandInfo, GENERIC_BUFFER* OutputStream)
+static OutputCommandHelp(COMMAND_INFO* CommandInfo, PIPE* OutputStream)
 {
 	char SpaceBuffer[HELP_COMMAND_NAME_SIZE_IN_BYTES];
 
@@ -50,7 +50,7 @@ static UINT help_ForwardData(   /* Returns number of bytes sent or stream status
 		return 1;
 	}
 
-	Result = NexShellProcessOutgoingData(DataToWrite, (GENERIC_BUFFER*)OutputStream, strlen(DataToWrite), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
+	Result = NexShellProcessOutgoingData(DataToWrite, (PIPE*)OutputStream, strlen(DataToWrite), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
 
 	if (Result != SHELL_SUCCESS)
 		return 0;
@@ -58,7 +58,7 @@ static UINT help_ForwardData(   /* Returns number of bytes sent or stream status
 	return btf;
 }
 
-static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOnly, GENERIC_BUFFER* OutputStream)
+static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOnly, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 
@@ -119,7 +119,7 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 	return SHELL_SUCCESS;
 }
 
-SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {
 	// output help if they asked
 	if (NumberOfArgs != 0)

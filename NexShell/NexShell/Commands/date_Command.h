@@ -59,6 +59,6 @@ SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 BOOL ConvertFileSystemDateTimeToSystemDateTime(UINT16 Date, UINT16 Time, rtc_time* SystemDateTime);
 
-SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of DATE_COMMAND_H

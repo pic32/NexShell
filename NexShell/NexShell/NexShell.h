@@ -2,8 +2,8 @@
 	#define NEXSHELL_H
 
 #include "NexShellConfig.h"
-#include "GenericTypeDefs.h"
-#include "GenericBuffer.h"
+#include "GenericTypes.h"
+#include "Pipe.h"
 #include "ff.h"
 
 typedef enum
@@ -156,13 +156,13 @@ typedef union
 typedef struct
 {
 	char* CommandName;
-	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* Buffer);
+	SHELL_RESULT(*ExecuteFile)(char* Args[], UINT32 NumberOfArgs, PIPE* Buffer);
 	char* Description;
 	char* Help;
 }COMMAND_INFO;
 
-SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER* OutputStream));
-SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER* OutputStream);
+SHELL_RESULT NexShellProcessOutgoingData(char* Data, PIPE* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(PIPE* OutputStream));
+SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
 SHELL_RESULT NexShellInit(char CurrentDrive);
 char NexShellGetRootDriveVolume(void);
 

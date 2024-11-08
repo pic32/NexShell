@@ -193,7 +193,7 @@ SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE *VirtualFile, char *
 	return SHELL_SUCCESS;
 }
 
-SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *FileName, SHELL_RESULT(*ReadFileData)(GENERIC_BUFFER *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , GENERIC_BUFFER *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , GENERIC_BUFFER *), const char* FileDescription, const char* FileHelp)
+SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *FileName, SHELL_RESULT(*ReadFileData)(PIPE *), SHELL_RESULT(*WriteFileData)(char* [], UINT32 , PIPE *), SHELL_RESULT(*ExecuteFile)(char* [], UINT32 , PIPE *), const char* FileDescription, const char* FileHelp)
 {
 	// check all incoming parameters
 	if (NewFileToInitialize == NULL)

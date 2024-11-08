@@ -11,7 +11,7 @@ void ShellPowerDownCallback(void)
 	// this is called at power down
 }
 
-void StartThread(void);
+void StartThreads(void);
 
 FIL gFile;
 const char gTestTest[] = "This is to test the help file text.\r\nMaybe this works.\r\n\tMaybe not...\r\n";
@@ -20,7 +20,7 @@ const char gADescription[] = "A description to test with";
 const char gACommandName[] = "Test_Command";
 UINT gBytesWritten;
 
-SHELL_RESULT CommandExecuteFile(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER *OutputStream)
+SHELL_RESULT CommandExecuteFile(char* Args[], UINT32 NumberOfArgs, PIPE *OutputStream)
 {
 	return SHELL_SUCCESS;
 }
@@ -28,7 +28,7 @@ SHELL_RESULT CommandExecuteFile(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFE
 int main()
 {
 	// start up the thread that'll read in the data input
-	StartThread();
+	StartThreads();
 
 	gShellResult = NexShellInit('R');
 

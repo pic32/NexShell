@@ -41,7 +41,7 @@ BOOL ConvertFileSystemDateTimeToSystemDateTime(UINT16 Date, UINT16 Time, rtc_tim
 	return TRUE;
 }
 
-SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 	UINT32 ArgumentIndex;

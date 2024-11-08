@@ -1,7 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "GenericBuffer.h"
+#include "Pipe.h"
 #include "LinkedList.h"
 
 #include "ff.h"
@@ -23,7 +23,7 @@
 #endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 
 // these are the standard stream inputs and outputs
-GENERIC_BUFFER gStandardOutputStream, gStandardInputStream, gShellOperatorStream;
+PIPE gStandardOutputStream, gStandardInputStream, gShellOperatorStream;
 
 // these are the array buffers the gOutputStream and gInputStream use
 BYTE gOutputStreamBuffer[SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES];
@@ -97,7 +97,7 @@ const char* gNexShellError[] = {
 UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes);
 UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes);
 
-static SHELL_RESULT OutputPrompt(char *CurrentDirectory, GENERIC_BUFFER *OutputStream)
+static SHELL_RESULT OutputPrompt(char *CurrentDirectory, PIPE *OutputStream)
 {
 	#ifdef SHELL_PROMPT_LEADING_SEQUENCE
 		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE), SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE) != (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE))
@@ -323,8 +323,10 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	return OutputPrompt(GetLastDirectoryPresent(&gCurrentWorkingDirectory[2]), &gStandardOutputStream);
 }
 
-SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *OutputStream)
+SHELL_RESULT NexShellWriteTasks(PIPE *OutputStream)
 {
+	EnterCritical();
+
 	if (GenericBufferGetSize(OutputStream) != 0)
 	{
 		BYTE CharacterBuffer[SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES + 1];
@@ -340,13 +342,23 @@ SHELL_RESULT NexShellWriteTasks(GENERIC_BUFFER *OutputStream)
 		{
 			// did they write a valid amount?
 			if (BytesToTransfer > SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES || BytesToTransfer > OriginalBytesToTransfer)
+			{
+				ExitCritical();
+
 				return SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED;
+			}
 
 			// some or all was written, now read what thye wrote out of the buffer since it was a peek prior
-			if(GenericBufferRead(OutputStream, BytesToTransfer, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE) != BytesToTransfer)
+			if (GenericBufferRead(OutputStream, BytesToTransfer, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE) != BytesToTransfer)
+			{
+				ExitCritical();
+
 				return SHELL_GENERIC_BUFFER_READ_FAILURE;
+			}
 		}
 	}
+
+	ExitCritical();
 
 	return SHELL_SUCCESS;
 }
@@ -623,11 +635,11 @@ static SHELL_LOGICAL_OPERATOR GetShellExpression(char** Buffer)
 	return SHELL_NO_LOGICAL_OPERATOR;
 }
 
-static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputStream)
+static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 {
 	UINT32 argc;
 	UINT32 WorkingIndex;
-	GENERIC_BUFFER* StreamPtr;
+	PIPE* StreamPtr;
 
 	// we add 2 for the potential location and command name
 	// this way the command/file can get a full SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS
@@ -733,7 +745,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 		return LinkedListAdd(&gHistoryList, HistoryLine);
 	}
 
-	SHELL_RESULT UpdateHistory(BOOL Increment, GENERIC_BUFFER *InputStream, GENERIC_BUFFER *OutputStream)
+	SHELL_RESULT UpdateHistory(BOOL Increment, PIPE *InputStream, PIPE *OutputStream)
 	{
 		UINT32 i;
 		char* DataFromHistoryBuffer;
@@ -804,7 +816,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, GENERIC_BUFFER *OutputS
 	}
 #endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
 
-SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(GENERIC_BUFFER * OutputStream))
+SHELL_RESULT NexShellProcessOutgoingData(char* Data, PIPE* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(PIPE * OutputStream))
 {
 	SHELL_RESULT Result;
 	UINT32 DataWritten, NumberOfBytesToWrite;
@@ -848,7 +860,7 @@ SHELL_RESULT NexShellProcessOutgoingData(char* Data, GENERIC_BUFFER* OutputStrea
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 NumberOfBytes, GENERIC_BUFFER *InputStream, GENERIC_BUFFER *OutputStream)
+static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 NumberOfBytes, PIPE *InputStream, PIPE *OutputStream)
 {
 	while (NumberOfBytes != 0)
 	{
@@ -978,7 +990,7 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFER *OutputStream, char *CurrentWorkingDirectory)
+static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, char *CurrentWorkingDirectory)
 {
 	SHELL_RESULT Result;
 	BYTE CharacterBuffer[SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES + 1];
@@ -1071,9 +1083,14 @@ static SHELL_RESULT NexShellReadTasks(GENERIC_BUFFER *InputStream, GENERIC_BUFFE
 	return SHELL_SUCCESS;
 }
 
+unsigned long UserNexShellWriteTasks(void)
+{
+	return NexShellWriteTasks(&gStandardOutputStream);
+}
+
 SHELL_RESULT NexShellTasks(void)
 {
-	SHELL_RESULT WriteResult = NexShellWriteTasks(&gStandardOutputStream);
+	//SHELL_RESULT WriteResult = NexShellWriteTasks(&gStandardOutputStream);
 	SHELL_RESULT ReadResult = NexShellReadTasks(&gStandardInputStream, &gStandardOutputStream, gCurrentWorkingDirectory);
 
 	return SHELL_SUCCESS;

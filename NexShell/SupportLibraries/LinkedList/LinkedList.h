@@ -22,7 +22,7 @@
  *  \date   July 6, 2020
  */
 
-#include "GenericTypeDefs.h"
+#include "GenericTypes.h"
 #include "LinkedListObject.h"
 #include "LinkedListConfig.h"
 

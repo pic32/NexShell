@@ -1,7 +1,7 @@
 #ifndef NEXSHELL_TIME_H
 	#define NEXSHELL_TIME_H
 
-#include "GenericTypeDefs.h"
+#include "GenericTypes.h"
 #include "ff.h"
 
 typedef struct 

@@ -94,7 +94,7 @@ static COMMAND_INFO gCommandList[] =
 		return SHELL_SUCCESS;
 	}
 
-	SHELL_RESULT AddUserCommand(const char* CommandName, const char* Description, const char* HelpFile, SHELL_RESULT(*ExecuteFile)(char* [], UINT32, GENERIC_BUFFER*))
+	SHELL_RESULT AddUserCommand(const char* CommandName, const char* Description, const char* HelpFile, SHELL_RESULT(*ExecuteFile)(char* [], UINT32, PIPE*))
 	{
 		UINT32 i;
 		COMMAND_INFO* CommandInfo;

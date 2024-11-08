@@ -32,6 +32,6 @@ SHELL_TAB SHELL_TAB ECHO_COMMAND_NAME " -e \"\\r\\n Wrote a new line carriage re
 SHELL_TAB SHELL_TAB ECHO_COMMAND_NAME " -e \"\\x55 The hex value 0x55 (the letter U) was written to the file too\" > text_file" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
-SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of ECHO_COMMAND_H

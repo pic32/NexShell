@@ -1,7 +1,7 @@
 #ifndef NEXSHELL_COMMANDS_H
 	#define NEXSHELL_COMMANDS_H
 
-#include "GenericTypeDefs.h"
+#include "GenericTypes.h"
 #include "NexShell.h"
 
 SHELL_RESULT InitNexShellCommands(void);
@@ -14,6 +14,6 @@ COMMAND_INFO* GetUserCommandByName(char* CommandName);
 
 COMMAND_INFO* GetUserCommandByIndex(UINT32 Index);
 
-SHELL_RESULT AddUserCommand(const char* CommandName, const char* Description, const char* HelpFile, SHELL_RESULT(*ExecuteFile)(char* [], UINT32, GENERIC_BUFFER*));
+SHELL_RESULT AddUserCommand(const char* CommandName, const char* Description, const char* HelpFile, SHELL_RESULT(*ExecuteFile)(char* [], UINT32, PIPE*));
 
 #endif // end of #ifndef NEXSHELL_COMMANDS_H

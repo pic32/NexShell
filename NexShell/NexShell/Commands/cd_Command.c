@@ -21,7 +21,7 @@ extern char gCurrentWorkingDirectory[];
 	}
 #endif // end of #if (EXTENDED_CD_SUPPORT == 1)
 
-SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];

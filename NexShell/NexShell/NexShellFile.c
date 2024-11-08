@@ -23,12 +23,12 @@ SHELL_RESULT NexShellFileClose(SHELL_FILE* File)
 
 }
 
-SHELL_RESULT NexShellFileWrite(SHELL_FILE* File, char* Buffer, GENERIC_BUFFER* Stream, UINT32 BytesToWrite)
+SHELL_RESULT NexShellFileWrite(SHELL_FILE* File, char* Buffer, PIPE* Stream, UINT32 BytesToWrite)
 {
 
 }
 
-SHELL_RESULT NexShellFileRead(SHELL_FILE* File, char* Buffer, GENERIC_BUFFER* Stream, UINT32 BytesToRead)
+SHELL_RESULT NexShellFileRead(SHELL_FILE* File, char* Buffer, PIPE* Stream, UINT32 BytesToRead)
 {
 
 }

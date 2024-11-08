@@ -41,6 +41,7 @@
 
 #include "GenericBufferConfig.h"
 #include "GenericBuffer.h"
+#include "CriticalSection.h"
 
 #if (GENERIC_BUFFER_USE_MALLOC == 1)
 	#include "stdlib.h"
@@ -166,11 +167,14 @@ UINT32 GenericBufferWrite(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, c
 	BytesWritten = (UINT32)0;
 	DataPtr = (BYTE*)DataToWrite;
 
+	EnterCritical();
+
 	/*
 		While the Buffer still has some space in it to write to, and we haven't
 		reached the number of bytes the user wanted us to write, go ahead and keep
 		on writing.
 	*/
+WriteBytes:
 	while(GenericBuffer->BufferSize < (UINT32)(GenericBuffer->BufferCapacity) && BytesWritten != (UINT32)NumberOfBytes)
 	{
 		BytesWritten++;
@@ -189,6 +193,17 @@ UINT32 GenericBufferWrite(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, c
 		if((UINT32)(GenericBuffer->CurrentWritePosition) == ((UINT32)(GenericBuffer->Buffer) + (UINT32)(GenericBuffer->BufferCapacity)))
 			GenericBuffer->CurrentWritePosition = (BYTE*)(GenericBuffer->Buffer);
 	}
+
+	if (BytesWritten != (UINT32)NumberOfBytes)
+	{
+		ExitCritical();
+		Sleep(1);
+		EnterCritical();
+
+		goto WriteBytes;
+	}
+
+	ExitCritical();
 
 	return (UINT32)BytesWritten;
 }
@@ -217,8 +232,11 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 		}
 	#endif // end of GENERIC_BUFFER_SAFE_MODE
 
+	EnterCritical();
 
 	BytesRead = (UINT32)BufferReadToUserBuffer(GenericBuffer, NumberOfBytes, DestinationBuffer);
+
+	ExitCritical();
 
 	if (NullTerminate == TRUE)
 		DestinationBuffer[BytesRead] = '\0';
@@ -256,6 +274,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 				return 0;
 		#endif // end of GENERIC_BUFFER_SAFE_MODE
 
+		EnterCritical();
+
 		/*
 			Copy the Buffer size and read pointers so we can set them
 			back to where they were before the read.
@@ -282,6 +302,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 		*/
 		GenericBuffer->BufferSize = (UINT32)BuffersSize;
 		GenericBuffer->CurrentReadPosition = (BYTE*)ReadPointerMarker;
+
+		ExitCritical();
 
 		if (NullTerminate == TRUE)
 			DestinationBuffer[BytesRead] = '\0';
@@ -372,6 +394,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 		if (SequenceSize > GenericBuffer->BufferSize)
 			return (BOOL)FALSE;
 
+		EnterCritical();
+
 		// we will start trying to find the sequence from the read position
 		BufferIndexer = GenericBuffer->CurrentReadPosition;
 
@@ -381,6 +405,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 			{
 				if (SequenceStartingIndex != (UINT32*)NULL)
 					*SequenceStartingIndex = i;
+
+				ExitCritical();
 
 				return TRUE;
 			}
@@ -394,6 +420,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 			if ((UINT32)BufferIndexer == ((UINT32)(GenericBuffer->Buffer) + (UINT32)(GenericBuffer->BufferCapacity)))
 				BufferIndexer = (BYTE*)(GenericBuffer->Buffer);
 		}
+
+		ExitCritical();
 
 		return FALSE;
 	}
@@ -438,9 +466,15 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 				return FALSE;
 		#endif // end of GENERIC_BUFFER_SAFE_MODE
 
+		EnterCritical();
+
 		// do we even have anything in here?
 		if (GenericBuffer->BufferSize == 0)
+		{
+			ExitCritical();
+
 			return FALSE;
+		}
 
 		// are we at the end of the buffer?
 		if (GenericBuffer->CurrentWritePosition == GenericBuffer->Buffer)
@@ -458,6 +492,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 		// now clear out the byte
 		*GenericBuffer->CurrentWritePosition = 0;
 	
+		ExitCritical();
+
 		return TRUE;
 	}
 #endif // end of USING_GENERIC_REMOVE_LAST_BYTE_WRITTEN_METHOD
@@ -470,6 +506,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 				return (BOOL)FALSE;
 		#endif // end of GENERIC_BUFFER_SAFE_MODE
 
+		EnterCritical();
+
 		/*
 			Just reset the read and write pointers to the beginning of the buffer
 			and set the size to zero.  Technically any data in the buffer is still
@@ -478,6 +516,8 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 		*/
 		GenericBuffer->CurrentReadPosition = GenericBuffer->CurrentWritePosition = (BYTE*)(GenericBuffer->Buffer);
 		GenericBuffer->BufferSize = (UINT32)0;
+
+		ExitCritical();
 
 		return (BOOL)TRUE;
 	}

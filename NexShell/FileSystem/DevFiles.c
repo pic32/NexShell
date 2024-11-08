@@ -3,16 +3,18 @@
 #include "DevFiles.h"
 #include "VirtualFile.h"
 #include "ioctl.h"
+#include "Pipe.h"
 
 #if (USE_DEV_ZERO_VIRTUAL_FILE == 1)
 	VIRTUAL_FILE gZeroFile;
 	const BYTE gZeroFileDescription[] = { "Contains an infinite sequence of zeros" };
 
-	static SHELL_RESULT ZeroReadFileData(GENERIC_BUFFER* OutputStream)
+	static SHELL_RESULT ZeroReadFileData(PIPE* OutputStream)
 	{
 		BYTE Data = 0;
+		UINT32 BytesWritten;
 
-		if (GenericBufferWrite(OutputStream, 1, &Data) != 1)
+		if (PipeWrite(OutputStream, 1, &Data) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;
@@ -23,7 +25,7 @@
 	VIRTUAL_FILE gNullFile;
 	const BYTE gNullFileDescription[] = { "Is a black hole for data written to it" };
 
-	static SHELL_RESULT NullWriteFileData(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream)
+	static SHELL_RESULT NullWriteFileData(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 	{
 		// do nothing but return success
 		return SHELL_SUCCESS;
@@ -34,7 +36,7 @@
 	VIRTUAL_FILE gRandomFile;
 	const BYTE gRandomFileDescription[] = { "Outputs a random number on each read" };
 
-	static SHELL_RESULT RandomReadFileData(GENERIC_BUFFER* OutputStream)
+	static SHELL_RESULT RandomReadFileData(PIPE* OutputStream)
 	{
 		UINT16 RandomNumber = rand();
 
@@ -52,7 +54,7 @@
 	VIRTUAL_FILE grtc0File;
 	const BYTE grtc0FileDescription[] = { "Provides access to the RTCC" };
 
-	static SHELL_RESULT rtc0ReadFileData(GENERIC_BUFFER* OutputStream)
+	static SHELL_RESULT rtc0ReadFileData(PIPE* OutputStream)
 	{
 		time_t RawTime;
 		struct tm* TimeInfo;

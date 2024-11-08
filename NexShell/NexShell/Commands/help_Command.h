@@ -22,6 +22,6 @@ SHELL_TAB SHELL_TAB HELP_COMMAND_NAME " /a-folder/file-to-get-help-about" SHELL_
 SHELL_TAB SHELL_TAB HELP_COMMAND_NAME " -d /a-folder/file-to-get-help-about another-help-file" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
-SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of HELP_COMMAND_H

@@ -37,7 +37,7 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 		case GET_DATE_TIME_CMD:
 		{
 			SHELL_RESULT Result;
-			GENERIC_BUFFER Stream;
+			PIPE Stream;
 			BYTE Buffer[sizeof(rtc_time)];
 			rtc_time *UserTime;
 

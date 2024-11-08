@@ -15,7 +15,7 @@
 
 */
 
-#include "GenericTypeDefs.h"
+#include "GenericTypes.h"
 #include "LinkedListConfig.h"
 
 /*

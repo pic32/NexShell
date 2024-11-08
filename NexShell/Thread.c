@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <windows.h>
 
-HANDLE gThread;
+#include "CriticalSection.h"
+
+HANDLE gThread, gShellWriteTasksThread;
 
 BYTE gDataRead = 0;
 
@@ -15,6 +17,19 @@ BYTE gDataRead = 0;
 #define RIGHT_ARROW_ASCII_VALUE									43
 #define LEFT_ARROW_ASCII_VALUE									44
 
+unsigned long UserNexShellWriteTasks(void);
+
+DWORD WINAPI ShellWriteTasksThreadCode(void* data)
+{
+	unsigned long WriteResult;
+
+	while (1)
+	{
+		WriteResult = UserNexShellWriteTasks();
+
+		//Sleep(1);
+	}
+}
 
 DWORD WINAPI ThreadFunc(void* data)
 {
@@ -156,7 +171,12 @@ UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInByt
 	}
 }
 
-void StartThread(void)
+DWORD WINAPI ShellWriteTasksThreadCode(void* data);
+
+void StartThreads(void)
 {
+	InitializeCriticalSection();
+
 	gThread = CreateThread(NULL, 0, ThreadFunc, NULL, 0, NULL);
+	gShellWriteTasksThread = CreateThread(NULL, 0, ShellWriteTasksThreadCode, NULL, 0, NULL);
 }

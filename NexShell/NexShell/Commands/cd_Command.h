@@ -22,6 +22,6 @@ SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 SHELL_RESULT cdInit(void);
 
-SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of #ifndef CD_COMMAND_H

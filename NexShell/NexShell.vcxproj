@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;.\NexShell\Commands;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;.\NexShell\Commands;.\OS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,6 +173,8 @@
     <ClCompile Include="NexShell\NexShell.c" />
     <ClCompile Include="NexShell\NexShellFile.c" />
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
+    <ClCompile Include="OS\CriticalSection.c" />
+    <ClCompile Include="OS\Pipe.c" />
     <ClCompile Include="SupportLibraries\GenericBuffer\GenericBuffer.c" />
     <ClCompile Include="SupportLibraries\LinkedList\LinkedList.c" />
     <ClCompile Include="Thread.c" />
@@ -198,10 +200,15 @@
     <ClInclude Include="NexShell\NexShellConfig.h" />
     <ClInclude Include="NexShell\NexShellFile.h" />
     <ClInclude Include="NexShell\Time\NexShellTime.h" />
+    <ClInclude Include="OS\CriticalSection.h" />
+    <ClInclude Include="OS\Kernel.h" />
+    <ClInclude Include="OS\Pipe.h" />
+    <ClInclude Include="OS\RTOSConfig.h" />
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBuffer.h" />
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferConfig.h" />
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferObject.h" />
     <ClInclude Include="SupportLibraries\GenericTypeDefs.h" />
+    <ClInclude Include="SupportLibraries\GenericTypes.h" />
     <ClInclude Include="SupportLibraries\LinkedList\LinkedList.h" />
     <ClInclude Include="SupportLibraries\LinkedList\LinkedListConfig.h" />
     <ClInclude Include="SupportLibraries\LinkedList\LinkedListObject.h" />

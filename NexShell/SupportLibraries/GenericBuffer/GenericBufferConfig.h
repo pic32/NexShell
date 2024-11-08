@@ -33,7 +33,7 @@
 *Set USING_GENERIC_BUFFER_CONTAINS_METHOD to 1 to enable the
 GenericBufferContains() method.
 */
-#define USING_GENERIC_BUFFER_CONTAINS_METHOD				0
+#define USING_GENERIC_BUFFER_CONTAINS_METHOD				1
 
 /**
  Set USING_GENERIC_BUFFER_CONTAINS_SEQUENCE_METHOD to 1 to 
@@ -45,7 +45,7 @@ GenericBufferContains() method.
  Set USING_GENERIC_BUFFER_SEEK_METHOD to 1 to enable the
  GenericBufferSeek() method.
 */
-#define USING_GENERIC_BUFFER_SEEK_METHOD					0
+#define USING_GENERIC_BUFFER_SEEK_METHOD					1
 
 /**
 Set USING_GENERIC_REMOVE_LAST_BYTE_WRITTEN_METHOD to 1 to enable
@@ -69,13 +69,13 @@ GenericBufferRemoveLastByteWritten() method.
 	*Set USING_GENERIC_BUFFER_GET_CAPACITY_METHOD to 1 to enable the
 	GenericBufferGetCapacity() method.
 */
-#define USING_GENERIC_BUFFER_GET_CAPACITY_METHOD			0
+#define USING_GENERIC_BUFFER_GET_CAPACITY_METHOD			1
 
 /**
 	*Set USING_GENERIC_BUFFER_DELETE_METHOD to 1 to enable the
 	GenericBufferDelete() method.
 */
-#define USING_GENERIC_BUFFER_DELETE_METHOD					0
+#define USING_GENERIC_BUFFER_DELETE_METHOD					1
 
 /**
 	*Set USING_GENERIC_BUFFER_GET_REMAINING_BYTES_METHOD to 1 to enable the

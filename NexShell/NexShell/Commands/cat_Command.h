@@ -30,6 +30,6 @@ typedef struct
 	UINT32 NumberOfEmptyLines;
 }READ_INFO;
 
-SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, GENERIC_BUFFER* OutputStream);
+SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of CAT_COMMAND_H

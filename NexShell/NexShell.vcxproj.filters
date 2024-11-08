@@ -55,6 +55,12 @@
     <Filter Include="Header Files\NexShell\Commands">
       <UniqueIdentifier>{cbd8aa0c-a6c9-4c97-934c-a0416371925f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\OS">
+      <UniqueIdentifier>{ef49b124-b51a-4cea-be90-c9167a7107a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OS">
+      <UniqueIdentifier>{9e5f1097-82cb-4ecf-abb9-7c7ce6c0332c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileSystem\diskio.c">
@@ -128,6 +134,12 @@
     </ClCompile>
     <ClCompile Include="NexShell\ioctl.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS\CriticalSection.c">
+      <Filter>Source Files\OS</Filter>
+    </ClCompile>
+    <ClCompile Include="OS\Pipe.c">
+      <Filter>Source Files\OS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +223,21 @@
     </ClInclude>
     <ClInclude Include="NexShell\ioctl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OS\CriticalSection.h">
+      <Filter>Header Files\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="OS\Pipe.h">
+      <Filter>Header Files\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="OS\RTOSConfig.h">
+      <Filter>Header Files\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="OS\Kernel.h">
+      <Filter>Header Files\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="SupportLibraries\GenericTypes.h">
+      <Filter>Header Files\Support-Libraries</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
