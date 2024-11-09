@@ -41,11 +41,6 @@ static BOOL OS_TryPipeWrite(PIPE *Pipe, BYTE **Data, UINT32 BytesToWrite, UINT32
 	// increment their write pointer
 	*Data += BytesWritten;
 
-	// since we potentially wrote something, add the blocked list for read to the 
-	// ready queue.
-	//if (BytesWritten != 0)
-		//return OS_AddTaskListToReadyQueue(&Pipe->PipeBlockedListHead);
-
 	return FALSE;
 }
 
@@ -60,11 +55,6 @@ static BOOL OS_TryPipeRead(PIPE *Pipe, BYTE **Data, UINT32 *TotalBytesRead, UINT
 
 	// now update their buffer size since data was read from it.
 	*BufferSize -= BytesRead;
-
-	// since we potentially wrote something, add the blocked list for read to the 
-	// ready queue.
-	//if (BytesRead != 0)
-		//return OS_AddTaskListToReadyQueue(&Pipe->PipeBlockedListHead);
 
 	return FALSE;
 }
@@ -108,26 +98,12 @@ PIPE *CreatePipe(PIPE *Pipe, BYTE *Buffer, UINT32 CapacityInBytes)
 		return (PIPE*)NULL;
 	}
 
-	// everything was created correctly, now initialize anything else
-	//InitializeDoubleLinkedListHead(&NewPipe->PipeBlockedListHead);
-
 	return NewPipe;
 }
 
-OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite								
-                                #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-									, INT32 TimeoutInTicks
-								#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-                                )
+OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWritten)
 {
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		BYTE OriginalTaskPriority;
-		UINT32 PriorBytesWritten;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-	BOOL HigherPriorityTask;
-	UINT32 BytesWritten = 0;
+	UINT32 BytesWrittenLocal = 0;
 
     #if (USING_CHECK_PIPE_PARAMETERS == 1)
         if (RAMAddressValid((OS_WORD)Pipe) == FALSE)
@@ -143,158 +119,56 @@ OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite
             return OS_INVALID_ARGUMENT;
     #endif // end of #if (USING_CHECK_PIPE_PARAMETERS == 1)
 
-	BytesWritten = 0;
-
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		PriorBytesWritten = 0;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
+	BytesWrittenLocal = 0;
 
 	EnterCritical();
 
     // proceed to write to the pipe
-	HigherPriorityTask = OS_TryPipeWrite(Pipe, &Data, BytesToWrite - BytesWritten, &BytesWritten);
+	OS_TryPipeWrite(Pipe, &Data, BytesToWrite - BytesWrittenLocal, &BytesWrittenLocal);
 
 	// this means do not wait for the PIPE to have space
-    #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-        if (TimeoutInTicks == 0 || *BytesWritten == BytesToWrite)
-    #else
-        if (BytesWritten == BytesToWrite)
-    #endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
+    if (BytesWrittenLocal == BytesToWrite)
 	{
 		// they do not want to wait for the data to be available
 		// we are free to leave now regardless of how many bytes were written
-
-		if (HigherPriorityTask == TRUE)
-			SurrenderCPU();
+		SurrenderCPU();
 
 		ExitCritical();
 
-		if (BytesWritten == BytesToWrite)
+		if(BytesWritten != NULL)
+			*BytesWritten = BytesWrittenLocal;
+
+		if (BytesWrittenLocal == BytesToWrite)
+		{
 			return OS_SUCCESS;
+		}
 
 		return OS_RESOURCE_INSUFFICIENT_SPACE;
 	}
 
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		//OriginalTaskPriority = gCurrentTask->TaskInfo.bits.Priority;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-	#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-		if (TimeoutInTicks > 0)
-		{
-			// we need a copy like this for the below while loop
-			//gCurrentTask->DelayInTicks = TimeoutInTicks;
-		}
-	#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
 	// otherwise, they either want to delay, or wait forever when the pipe is full
-	while (BytesToWrite != BytesWritten)
+	while (BytesToWrite != BytesWrittenLocal)
 	{
-		// add the task to the event list
-		//OS_PlaceTaskOnBlockedList(gCurrentTask, &Pipe->PipeBlockedListHead, &gCurrentTask->TaskNodeArray[PRIMARY_TASK_NODE], BLOCKED, TRUE);
-
-		#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-			if (TimeoutInTicks > 0)
-			{
-				// place on timer list, this isn't a hard time operation but it is better than nothing
-				//OS_AddTaskToDelayQueue(gCurrentTask, &gCurrentTask->TaskNodeArray[SECONDARY_TASK_NODE], gCurrentTask->DelayInTicks, FALSE);
-			}
-		#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-		#if (USING_PIPE_STARVATION_PROTECTION == 1)
-			if (PriorBytesWritten == *BytesWritten)
-				//if (gCurrentTask->TaskInfo.bits.Priority != OS_HIGHEST_TASK_PRIORITY)
-					//gCurrentTask->TaskInfo.bits.Priority++;
-		#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-        // increment the block count
-        #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-            Pipe->DeleteBlockCount++;
-            
-            #if(USING_DELETE_TASK == 1)
-                gCurrentTask->DeleteBlockCounter = &Pipe->DeleteBlockCount;
-            #endif // end of #if(USING_DELETE_TASK == 1)
-        #endif // end of #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-            
 		// give up the CPU until the pipe has some data read from it
 		SurrenderCPU();
-        
-        // decrement the block count
-        #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-            Pipe->DeleteBlockCount--;
-            
-            #if(USING_DELETE_TASK == 1)
-                gCurrentTask->DeleteBlockCounter = (UINT32*)NULL;
-            #endif // end of #if(USING_DELETE_TASK == 1)
-        #endif // end of #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-
-		#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-			if (gCurrentTask->DelayInTicks == TASK_TIMEOUT_DONE_VALUE)
-			{
-				gCurrentTask->DelayInTicks = 0;
-
-				#if (USING_PIPE_STARVATION_PROTECTION == 1)
-					// Did the TASK's priority get increased while blocked?
-					if (gCurrentTask->TaskInfo.bits.Priority != OriginalTaskPriority)
-					{
-						// The current task had it's priority increased while on the blocked list.
-						// Put the priority back to normal.
-						if (OS_ChangeTaskPriority(gCurrentTask, OriginalTaskPriority) == TRUE)
-							SurrenderCPU();
-					}
-				#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-				ExitCritical();
-
-				// we timed out
-				return OS_TASK_TIMEOUT;
-			}
-		#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-		#if (USING_PIPE_STARVATION_PROTECTION == 1)
-			PriorBytesWritten = *BytesWritten;
-		#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
 
 		// proceed to try and write to the PIPE
-		HigherPriorityTask = OS_TryPipeWrite(Pipe, &Data, BytesToWrite - BytesWritten, &BytesWritten);
+		OS_TryPipeWrite(Pipe, &Data, BytesToWrite - BytesWrittenLocal, &BytesWrittenLocal);
 	}
 
-	if (HigherPriorityTask == TRUE)
-		SurrenderCPU();
-
-	#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-		gCurrentTask->DelayInTicks = 0;
-	#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		// Did the TASK's priority get increased while blocked?
-		if (gCurrentTask->TaskInfo.bits.Priority != OriginalTaskPriority)
-		{
-			// The current task had it's priority increased while on the blocked list.
-			// Put the priority back to normal.
-			if (OS_ChangeTaskPriority(gCurrentTask, OriginalTaskPriority) == TRUE)
-				SurrenderCPU();
-		}
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
+	SurrenderCPU();
 
 	ExitCritical();
+
+	if (BytesWritten != NULL)
+		*BytesWritten = BytesWrittenLocal;
 
 	return OS_SUCCESS;
 }
 
-OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead								
-                                #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-									, INT32 TimeoutInTicks
-								#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-                                )
+OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead)
 {
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		BYTE OriginalTaskPriority;
-		UINT32 PriorBytesRead;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-	BOOL HigherPriorityTask;
+	UINT32 BytesReadLocal;
 
     #if (USING_CHECK_PIPE_PARAMETERS == 1)
         if (RAMAddressValid((OS_WORD)Pipe) == FALSE)
@@ -313,120 +187,45 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
             return OS_INVALID_ARGUMENT;
     #endif // end of #if (USING_CHECK_PIPE_PARAMETERS == 1)
 
-	*BytesRead = 0;
-
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		PriorBytesRead = *BytesRead;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
+	BytesReadLocal = 0;
 
 	EnterCritical();
     
 	// proceed to try and read from the PIPE
-	HigherPriorityTask = OS_TryPipeRead(Pipe, &Data, BytesRead, (BytesToRead - *BytesRead), &BufferSizeInBytes);
+	OS_TryPipeRead(Pipe, &Data, &BytesReadLocal, (BytesToRead - BytesReadLocal), &BufferSizeInBytes);
 
 	// this means do not wait for the PIPE to have space
-    #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-        if (TimeoutInTicks == 0 || *BytesRead == BytesToRead)
-    #else
-        if (*BytesRead == BytesToRead)
-    #endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
+    if (*BytesRead == BytesToRead)
 	{
-		if (HigherPriorityTask == TRUE)
-			SurrenderCPU();
+		SurrenderCPU();
 
 		// they do not want to wait for the data to be available
 		// we are free to leave now regardless of how many bytes were written
 		ExitCritical();
 
-		if (*BytesRead == BytesToRead)
+		if (BytesRead != NULL)
+			*BytesRead = BytesReadLocal;
+
+		if (BytesReadLocal == BytesToRead)
 			return OS_SUCCESS;
 
 		return OS_RESOURCE_INSUFFICIENT_DATA;
 	}
 
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		OriginalTaskPriority = gCurrentTask->TaskInfo.bits.Priority;
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-	#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-		if (TimeoutInTicks > 0)
-		{
-			// we need a copy like this for the below while loop
-			gCurrentTask->DelayInTicks = TimeoutInTicks;
-		}
-	#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
 	// otherwise, they either want to delay, or wait forever when the pipe is full
-	while (*BytesRead != BytesToRead)
+	while (BytesReadLocal != BytesToRead)
 	{
-		// add the task to the event list
-		//OS_PlaceTaskOnBlockedList(gCurrentTask, &Pipe->PipeBlockedListHead, &gCurrentTask->TaskNodeArray[PRIMARY_TASK_NODE], BLOCKED, TRUE);
-
-		#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-			if (TimeoutInTicks > 0)
-			{
-				// place on timer list, this isn't a hard time operation but it is better than nothing
-				//OS_AddTaskToDelayQueue(gCurrentTask, &gCurrentTask->TaskNodeArray[SECONDARY_TASK_NODE], gCurrentTask->DelayInTicks, FALSE);
-			}
-		#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-		#if (USING_PIPE_STARVATION_PROTECTION == 1)
-			if (PriorBytesRead == *BytesRead)
-				if (gCurrentTask->TaskInfo.bits.Priority != OS_HIGHEST_TASK_PRIORITY)
-					gCurrentTask->TaskInfo.bits.Priority++;
-		#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
 		// give up the CPU until the pipe has some data read from it
 		SurrenderCPU();
 
-		#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-			if (gCurrentTask->DelayInTicks == TASK_TIMEOUT_DONE_VALUE)
-			{
-				gCurrentTask->DelayInTicks = 0;
-
-				#if (USING_PIPE_STARVATION_PROTECTION == 1)
-					// Did the TASK's priority get increased while blocked?
-					if (gCurrentTask->TaskInfo.bits.Priority != OriginalTaskPriority)
-					{
-						// The current task had it's priority increased while on the blocked list.
-						// Put the priority back to normal.
-						if (OS_ChangeTaskPriority(gCurrentTask, OriginalTaskPriority) == TRUE)
-							SurrenderCPU();
-					}
-				#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
-				ExitCritical();
-
-				// we timed out
-				return OS_TASK_TIMEOUT;
-			}
-		#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-		#if (USING_PIPE_STARVATION_PROTECTION == 1)
-			PriorBytesRead = *BytesRead;
-		#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
-
 		// proceed to try and write to the PIPE
-		HigherPriorityTask = OS_TryPipeRead(Pipe, &Data, BytesRead, (BytesToRead - *BytesRead), &BufferSizeInBytes);
+		OS_TryPipeRead(Pipe, &Data, &BytesReadLocal, (BytesToRead - BytesReadLocal), &BufferSizeInBytes);
 	}
 
-	//if (HigherPriorityTask == TRUE)
-		SurrenderCPU();
+	SurrenderCPU();
 
-	#if (USING_TASK_DELAY_TICKS_METHOD == 1)
-		//gCurrentTask->DelayInTicks = 0;
-	#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-	#if (USING_PIPE_STARVATION_PROTECTION == 1)
-		// Did the TASK's priority get increased while blocked?
-		//if (gCurrentTask->TaskInfo.bits.Priority != OriginalTaskPriority)
-		{
-			// The current task had it's priority increased while on the blocked list.
-			// Put the priority back to normal.
-			//if (OS_ChangeTaskPriority(gCurrentTask, OriginalTaskPriority) == TRUE)
-				SurrenderCPU();
-		}
-	#endif // end of #if (USING_PIPE_STARVATION_PROTECTION == 1)
+	if (BytesRead != NULL)
+		*BytesRead = BytesReadLocal;
 
 	ExitCritical();
 

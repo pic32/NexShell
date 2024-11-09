@@ -48,15 +48,6 @@
 typedef struct
 {
 	GENERIC_BUFFER GenericBuffer;
-    
-    #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-        /*
-         * When this is non zero that means there are TASK's using this
-         * resource but are not blocked.  As such, the resource cannot
-         * be deleted until this counter becomes zero.
-         */
-        UINT32 DeleteBlockCount;
-    #endif // end of #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
 }PIPE;
 
 /*
@@ -142,13 +133,7 @@ PIPE *CreatePipe(PIPE *Pipe, BYTE *Buffer, UINT32 CapacityInBytes);
 	See Also:
 		- PipeRead(), PipeFlush()
 */
-OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite
-
-                                #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-									, INT32 TimeoutInTicks
-								#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-                                );
+OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWritten);
 /*
 	OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead, INT32 TimeoutInTicks)
 

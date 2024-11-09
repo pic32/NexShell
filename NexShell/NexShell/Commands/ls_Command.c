@@ -305,7 +305,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 
 	ArgIndex = 0;
 
-	if (strlen(Args[0]) != 0)
+	if (NumberOfArgs != 0)
 	{
 		// output help if they asked
 		if (strcmp(Args[0], "--help") == 0)
@@ -315,10 +315,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 
 			return SHELL_SUCCESS;
 		}
-	}
 
-	if (NumberOfArgs != 0)
-	{
 		if (strcmp(Args[ArgIndex], "-l") == 0)
 		{
 			LongFormat = TRUE;

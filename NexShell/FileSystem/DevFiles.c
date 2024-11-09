@@ -14,7 +14,7 @@
 		BYTE Data = 0;
 		UINT32 BytesWritten;
 
-		if (PipeWrite(OutputStream, 1, &Data) != OS_SUCCESS)
+		if (PipeWrite(OutputStream, 1, &Data, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;
