@@ -57,7 +57,7 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 				return -EIO;
 
 			// read our answer from the ioctl inside the file read
-			if (GenericBufferRead(&Stream, sizeof(rtc_time), (BYTE*)UserTime, sizeof(rtc_time), FALSE) != sizeof(rtc_time))
+			if (PipeRead(&Stream, (BYTE*)UserTime, sizeof(rtc_time), sizeof(rtc_time), NULL) != sizeof(rtc_time))
 				return -EIO;
 
 			return 0;

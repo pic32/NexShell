@@ -9,7 +9,7 @@ SHELL_RESULT clearCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* 
 	{
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (GenericBufferWrite(OutputStream, strlen(CLEAR_HELP_TEXT), CLEAR_HELP_TEXT) != strlen(CLEAR_HELP_TEXT))
+			if (PipeWrite(OutputStream, CLEAR_HELP_TEXT, (UINT32)strlen(CLEAR_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;
@@ -21,11 +21,11 @@ SHELL_RESULT clearCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* 
 	}
 	
 	// this clears the screen
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_CLEAR_SCREEN_COMMAND), SHELL_CLEAR_SCREEN_COMMAND) != (UINT32)strlen(SHELL_CLEAR_SCREEN_COMMAND))
+	if (PipeWrite(OutputStream, SHELL_CLEAR_SCREEN_COMMAND, (UINT32)strlen(SHELL_CLEAR_SCREEN_COMMAND), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	// this puts the cursor in the upper left hand corner of the screen
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_HOME_CURSOR_COMMAND), SHELL_HOME_CURSOR_COMMAND) != (UINT32)strlen(SHELL_HOME_CURSOR_COMMAND))
+	if (PipeWrite(OutputStream, SHELL_HOME_CURSOR_COMMAND, (UINT32)strlen(SHELL_HOME_CURSOR_COMMAND), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;

@@ -33,7 +33,7 @@ SHELL_RESULT cdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 	// output help if they asked
 	if (strcmp(Args[0], "--help") == 0)
 	{
-		if (GenericBufferWrite(OutputStream, strlen(CD_HELP_TEXT), CD_HELP_TEXT) != strlen(CD_HELP_TEXT))
+		if (PipeWrite(OutputStream, CD_HELP_TEXT, strlen(CD_HELP_TEXT), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

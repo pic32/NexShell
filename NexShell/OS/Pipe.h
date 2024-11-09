@@ -183,13 +183,7 @@ OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWr
 	See Also:
 		- PipeWrite(), PipePeek(), PipeFlush() 
 */
-OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead	
-
-                                #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-									, INT32 TimeoutInTicks
-								#endif // end of #if (USING_TASK_DELAY_TICKS_METHOD == 1)
-
-                                );
+OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead);
 
 /*
 	OS_RESULT PipeFlush(PIPE *Pipe)
@@ -304,7 +298,7 @@ UINT32 PipeContains(PIPE *Pipe, BYTE Value);
 	See Also:
 		- PipeContains(), PipeSeek()
 */
-OS_RESULT PipeContainsSequence(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize);
+OS_RESULT PipeContainsSequence(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize, UINT32 *BytesRead);
 
 /*
 	UINT32 PipeSeek(PIPE *Pipe, BYTE Value)
@@ -571,7 +565,7 @@ UINT32 PipeContainsFromISR(PIPE *Pipe, BYTE Value);
 	See Also:
 		- PipeContainsFromISR()
 */
-OS_RESULT PipeContainsSequenceFromISR(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize);
+OS_RESULT PipeContainsSequenceFromISR(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize, UINT32 *BytesRead);
 
 /*
 	OS_RESULT PipeSeekFromISR(PIPE *Pipe, BYTE Value, UINT32 *BytesDeep)

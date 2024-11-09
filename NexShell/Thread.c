@@ -27,7 +27,7 @@ DWORD WINAPI ShellWriteTasksThreadCode(void* data)
 	{
 		WriteResult = UserNexShellWriteTasks();
 
-		//Sleep(1);
+		Sleep(1);
 	}
 }
 

@@ -53,7 +53,7 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 		// output help if they asked
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (GenericBufferWrite(OutputStream, strlen(DATE_HELP_TEXT), DATE_HELP_TEXT) != strlen(DATE_HELP_TEXT))
+			if (PipeWrite(OutputStream, DATE_HELP_TEXT, (UINT32)strlen(DATE_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;
@@ -81,7 +81,7 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 			CurrentDateTime.tm_year + 1900);
 
 		// write our answer out the stream they passed in
-		if (GenericBufferWrite(OutputStream, strlen(Filename), Filename) != strlen(Filename))
+		if (PipeWrite(OutputStream, Filename, strlen(Filename), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 	else
@@ -672,19 +672,19 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 							}
 						}
 
-						if (GenericBufferWrite(OutputStream, (UINT32)strlen(TempBuffer), (BYTE*)TempBuffer) != (UINT32)strlen(TempBuffer))
+						if (PipeWrite(OutputStream, (BYTE*)TempBuffer, (UINT32)strlen(TempBuffer), NULL) != OS_SUCCESS)
 							return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 					}
 					else
 					{
-						if (GenericBufferWrite(OutputStream, 1, (BYTE*)Ptr) != 1)
+						if (PipeWrite(OutputStream, (BYTE*)Ptr, 1, NULL) != OS_SUCCESS)
 							return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 					}
 
 					Ptr++;
 				}
 
-				if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+				if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 					return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 			}
 		}

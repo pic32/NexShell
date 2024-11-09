@@ -14,7 +14,7 @@
 		BYTE Data = 0;
 		UINT32 BytesWritten;
 
-		if (PipeWrite(OutputStream, 1, &Data, NULL) != OS_SUCCESS)
+		if (PipeWrite(OutputStream, &Data, 1, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;
@@ -40,7 +40,7 @@
 	{
 		UINT16 RandomNumber = rand();
 
-		if (GenericBufferWrite(OutputStream, 2, &RandomNumber) != 2)
+		if (PipeWrite(OutputStream, &RandomNumber, 2, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;
@@ -74,7 +74,7 @@
 		CurrentTime.tm_isdst = TimeInfo->tm_isdst;
 		CurrentTime.tm_yday = TimeInfo->tm_yday;
 
-		if (GenericBufferWrite(OutputStream, sizeof(rtc_time), &CurrentTime) != sizeof(rtc_time))
+		if (PipeWrite(OutputStream, &CurrentTime, sizeof(rtc_time), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

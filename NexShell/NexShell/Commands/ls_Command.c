@@ -23,7 +23,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	FileAttributes[4] = '-';
 	FileAttributes[5] = ' ';
 
-	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
+	if (PipeWrite(OutputStream, FileAttributes, sizeof(FileAttributes), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	
 	if (FileSize != INVALID_FILE_SIZE)
@@ -32,7 +32,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 
 		Shell_sprintf(Buffer, "% 10i ", FileSize);
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -42,7 +42,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 
 		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellFileInfoDay(Date), GetNexShellFileInfoMonth(Date), GetNexShellFileInfoYear(Date))), MonthToString(GetNexShellFileInfoMonth(Date) - 1), GetNexShellFileInfoDay(Date), GetNexShellFileInfoYear(Date));
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -52,27 +52,27 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 
 		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellFileInfoHours(Time), GetNexShellFileInfoMinutes(Time), GetNexShellFileInfoSeconds(Time));
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
 	if (strlen(DirectoryName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 	{
 		// display a poriton
-		if (GenericBufferWrite(OutputStream, SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY, DirectoryName) != SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
+		if (PipeWrite(OutputStream, DirectoryName, SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		if (GenericBufferWrite(OutputStream, 3, "...") != 3)
+		if (PipeWrite(OutputStream, "...", 3, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 	else
 	{
 		// display them all
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(DirectoryName), DirectoryName) != (UINT32)strlen(DirectoryName))
+		if (PipeWrite(OutputStream, DirectoryName, (UINT32)strlen(DirectoryName), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
-	if (GenericBufferWrite(OutputStream, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, "/"  SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+	if (PipeWrite(OutputStream, "/"  SHELL_DEFAULT_END_OF_LINE_SEQUENCE, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -112,7 +112,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 
 	FileAttributes[5] = ' ';
 
-	if (GenericBufferWrite(OutputStream, sizeof(FileAttributes), FileAttributes) != sizeof(FileAttributes))
+	if (PipeWrite(OutputStream, FileAttributes, sizeof(FileAttributes), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	if (FileSize != INVALID_FILE_SIZE)
@@ -121,7 +121,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 
 		Shell_sprintf(Buffer, "% 10i ", FileSize);
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -131,7 +131,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 
 		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellFileInfoDay(Date), GetNexShellFileInfoMonth(Date), GetNexShellFileInfoYear(Date))), MonthToString(GetNexShellFileInfoMonth(Date) - 1), GetNexShellFileInfoDay(Date), GetNexShellFileInfoYear(Date));
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -141,23 +141,23 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 
 		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellFileInfoHours(Time), GetNexShellFileInfoMinutes(Time), GetNexShellFileInfoSeconds(Time));
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Buffer), Buffer) != (UINT32)strlen(Buffer))
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
 	if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 	{
 		// display a poriton
-		if (GenericBufferWrite(OutputStream, SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY, FileName) != SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
+		if (PipeWrite(OutputStream, FileName, SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		if (GenericBufferWrite(OutputStream, 3, "...") != 3)
+		if (PipeWrite(OutputStream, "...", 3, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 	else
 	{
 		// display them all
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(FileName), FileName) != (UINT32)strlen(FileName))
+		if (PipeWrite(OutputStream, FileName, (UINT32)strlen(FileName), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -166,7 +166,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 		if (strlen(FileName) > SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY)
 		{
 			// this is the max space, add one space for the description seperation
-			if (GenericBufferWrite(OutputStream, 1, " ") != 1)
+			if (PipeWrite(OutputStream, " ", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 		else
@@ -174,18 +174,18 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 			UINT32 i;
 
 			for (i = 0; i < SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY - (UINT32)strlen(FileName) + 3; i++)
-				if (GenericBufferWrite(OutputStream, 1, " ") != 1)
+				if (PipeWrite(OutputStream, " ", 1, NULL) != OS_SUCCESS)
 					return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 
-		if (GenericBufferWrite(OutputStream, 2, " -") != 2)
+		if (PipeWrite(OutputStream, " -", 2, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Description), Description) != (UINT32)strlen(Description))
+		if (PipeWrite(OutputStream, Description, (UINT32)strlen(Description), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
-	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -310,7 +310,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 		// output help if they asked
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (GenericBufferWrite(OutputStream, strlen(LS_HELP_TEXT), LS_HELP_TEXT) != strlen(LS_HELP_TEXT))
+			if (PipeWrite(OutputStream, LS_HELP_TEXT, strlen(LS_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;

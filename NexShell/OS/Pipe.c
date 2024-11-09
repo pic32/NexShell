@@ -195,7 +195,7 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
 	OS_TryPipeRead(Pipe, &Data, &BytesReadLocal, (BytesToRead - BytesReadLocal), &BufferSizeInBytes);
 
 	// this means do not wait for the PIPE to have space
-    if (*BytesRead == BytesToRead)
+    if (BytesReadLocal == BytesToRead)
 	{
 		SurrenderCPU();
 
@@ -278,13 +278,13 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
 #endif // end of #if (USING_PIPE_CONTAINS_METHOD == 1)
 
 #if (USING_PIPE_CONTAINS_SEQUENCE_METHOD == 1)
-	OS_RESULT PipeContainsSequence(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize)
+	OS_RESULT PipeContainsSequence(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize, UINT32 *BytesRead)
 	{
 		OS_RESULT Result;
 
 		EnterCritical();
 
-		Result = PipeContainsSequenceFromISR(Pipe, Sequence, SequenceSize);
+		Result = PipeContainsSequenceFromISR(Pipe, Sequence, SequenceSize, BytesRead);
 
 		ExitCritical();
 
@@ -351,21 +351,6 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
 		return ReturnValue;
 	}
 #endif // end of #if (USING_PIPE_GET_REMAINING_BYTES_METHOD == 1)
-
-#if (USING_PIPE_DELETE_METHOD == 1)
-	OS_RESULT PipeDelete(PIPE *Pipe, BOOL FreeBufferSpace)
-	{
-		OS_RESULT Result;
-
-		EnterCritical();
-
-		Result = PipeDeleteFromISR(Pipe, FreeBufferSpace);
-
-		ExitCritical();
-
-		return Result;
-	}
-#endif // end of #if (USING_PIPE_DELETE_METHOD == 1)
 
 OS_RESULT PipeWriteFromISR(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWritten, BOOL *HigherPriorityTask)
 {
@@ -466,6 +451,8 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
 #if (USING_PIPE_PEEK_FROM_ISR_METHOD == 1)
 	OS_RESULT PipePeekFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 BytesToRead, UINT32 *BytesRead)
 	{
+		UINT32 LocalBytesRead;
+
         #if (USING_CHECK_PIPE_PARAMETERS == 1)
             if (RAMAddressValid((OS_WORD)Pipe) == FALSE)
                 return OS_INVALID_ARGUMENT_ADDRESS;
@@ -473,25 +460,24 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
             if (RAMAddressValid((OS_WORD)Data) == FALSE)
                 return OS_INVALID_ARGUMENT_ADDRESS;
 
-            if (RAMAddressValid((OS_WORD)BytesRead) == FALSE)
-                return OS_INVALID_ARGUMENT_ADDRESS;
-
             if (BytesToRead == 0)
                 return OS_INVALID_ARGUMENT;
         #endif // end of #if (USING_CHECK_PIPE_PARAMETERS == 1)
 
-		*BytesRead = 0;
+		LocalBytesRead = 0;
 
 		// proceed to peek at the buffer
-		*BytesRead = GenericBufferPeek(&Pipe->GenericBuffer, 0, BytesToRead, Data, BufferSizeInBytes, FALSE);
+		LocalBytesRead = GenericBufferPeek(&Pipe->GenericBuffer, 0, BytesToRead, Data, BufferSizeInBytes, FALSE);
 
-		if (*BytesRead == BytesToRead)
+		if (BytesRead != NULL)
+			*BytesRead = LocalBytesRead;
+
+		if (LocalBytesRead != 0)
+		{
 			return OS_SUCCESS;
+		}
 
-		if (*BytesRead != 0)
-			return OS_RESOURCE_INSUFFICIENT_DATA;
-
-		return OS_RESOURCE_FULL;
+		return OS_RESOURCE_INSUFFICIENT_DATA;
 	}
 #endif // end of #if (USING_PIPE_PEEK_FROM_ISR_METHOD == 1)
 
@@ -508,7 +494,7 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
 #endif // end of #if (USING_PIPE_CONTAINS_FROM_ISR_METHOD == 1)
 
 #if (USING_PIPE_CONTAINS_SEQUENCE_FROM_ISR_METHOD == 1)
-	OS_RESULT PipeContainsSequenceFromISR(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize)
+	OS_RESULT PipeContainsSequenceFromISR(PIPE *Pipe, BYTE *Sequence, UINT32 SequenceSize, UINT32 *BytesRead)
 	{
         #if (USING_CHECK_PIPE_PARAMETERS == 1)
             if (RAMAddressValid((OS_WORD)Pipe) == FALSE)
@@ -521,7 +507,7 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
                 return OS_INVALID_ARGUMENT;
         #endif // end of #if (USING_CHECK_PIPE_PARAMETERS == 1)
 
-		if (GenericBufferContainsSequence(&Pipe->GenericBuffer, Sequence, SequenceSize, NULL) != TRUE)
+		if (GenericBufferContainsSequence(&Pipe->GenericBuffer, Sequence, SequenceSize, BytesRead) != TRUE)
 			return OS_INVALID_OBJECT_USED;
 
 		return OS_SUCCESS;
@@ -576,34 +562,3 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
 		return GenericBufferGetRemainingBytes(&Pipe->GenericBuffer);
 	}
 #endif // end of #if (USING_PIPE_GET_REMAINING_BYTES_FROM_ISR_METHOD == 1)
-
-#if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)
-	OS_RESULT PipeDeleteFromISR(PIPE *Pipe, BOOL FreeBufferSpace)
-	{
-		GENERIC_BUFFER *GenericBuffer;
-
-        #if (USING_CHECK_PIPE_PARAMETERS == 1)
-            // are we in the heap?
-            //if (AddressInHeap((OS_WORD)Pipe) == FALSE)
-                //return OS_RESOURCE_NOT_IN_OS_HEAP;
-        #endif // end of #if (USING_CHECK_PIPE_PARAMETERS == 1)
-        
-        // is anyone using it?
-        //if(Pipe->DeleteBlockCount != 0)
-            //return OS_RESOURCE_IN_USE;
-
-		// lets get a handle to the buffer first because we will
-		// be deleting the PIPE first to see if it was successful
-		GenericBuffer = &Pipe->GenericBuffer;
-
-        // now release the space back to the OS
-		free((void*)Pipe);
-			//return OS_RESOURCE_NOT_IN_OS_HEAP;
-
-		// the PIPE was in the heap, so lets try and free the GENERIC_BUFFER
-		if (GenericBufferDelete(GenericBuffer, FreeBufferSpace) == FALSE)
-			return OS_INVALID_OBJECT_USED;
-
-		return OS_SUCCESS;
-	}
-#endif // end of #if (USING_PIPE_DELETE_FROM_ISR_METHOD == 1)

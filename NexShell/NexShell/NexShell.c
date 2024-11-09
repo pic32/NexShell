@@ -100,44 +100,44 @@ UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInByt
 static SHELL_RESULT OutputPrompt(char *CurrentDirectory, PIPE *OutputStream)
 {
 	#ifdef SHELL_PROMPT_LEADING_SEQUENCE
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE), SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE) != (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE))
+		if (PipeWrite(OutputStream, SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_LEADING_SEQUENCE), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of SHELL_PROMPT_LEADING_SEQUENCE
 
 	#ifdef SHELL_USERNAME
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_USERNAME_TEXT_COLOR SHELL_USERNAME), SHELL_USERNAME_TEXT_COLOR SHELL_USERNAME) != (UINT32)strlen(SHELL_USERNAME_TEXT_COLOR SHELL_USERNAME))
+		if (PipeWrite(OutputStream, SHELL_USERNAME_TEXT_COLOR SHELL_USERNAME, (UINT32)strlen(SHELL_USERNAME_TEXT_COLOR SHELL_USERNAME), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of SHELL_USERNAME
 
 	#ifdef SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE), SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE) != (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE))
+		if (PipeWrite(OutputStream, SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE
 
 	#if (USE_SHELL_COLOR == 1)
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_DIRECTORY_TEXT_COLOR), SHELL_DIRECTORY_TEXT_COLOR) != (UINT32)strlen(SHELL_DIRECTORY_TEXT_COLOR))
+		if (PipeWrite(OutputStream, SHELL_DIRECTORY_TEXT_COLOR, (UINT32)strlen(SHELL_DIRECTORY_TEXT_COLOR), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of #if (USE_SHELL_COLOR == 1)
 
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(CurrentDirectory), (const BYTE*)CurrentDirectory) != (UINT32)strlen(CurrentDirectory))
+	if (PipeWrite(OutputStream, (const BYTE*)CurrentDirectory, (UINT32)strlen(CurrentDirectory), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	#ifdef SHELL_PROMPT_ENDING_SEQUENCE
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_ENDING_SEQUENCE), SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_ENDING_SEQUENCE) != (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_ENDING_SEQUENCE))
+		if (PipeWrite(OutputStream, SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_ENDING_SEQUENCE, (UINT32)strlen(SHELL_PROMPT_BRACKETS_TEXT_COLOR SHELL_PROMPT_ENDING_SEQUENCE), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of SHELL_PROMPT_ENDING_SEQUENCE
 
 	#ifdef SHELL_ATTENTION_CHARACTER
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_ATTENTION_CHARACTER_TEXT_COLOR SHELL_ATTENTION_CHARACTER), SHELL_ATTENTION_CHARACTER_TEXT_COLOR SHELL_ATTENTION_CHARACTER) != (UINT32)strlen(SHELL_ATTENTION_CHARACTER_TEXT_COLOR SHELL_ATTENTION_CHARACTER))
+		if (PipeWrite(OutputStream, SHELL_ATTENTION_CHARACTER_TEXT_COLOR SHELL_ATTENTION_CHARACTER, (UINT32)strlen(SHELL_ATTENTION_CHARACTER_TEXT_COLOR SHELL_ATTENTION_CHARACTER), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of SHELL_ATTENTION_CHARACTER
 
 	#if (USE_SHELL_COLOR == 1)
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR), SHELL_DEFAULT_TEXT_COLOR) != (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR))
+		if (PipeWrite(OutputStream, SHELL_DEFAULT_TEXT_COLOR, (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of #if (USE_SHELL_COLOR == 1)
 
-	if (GenericBufferWrite(OutputStream, 1, (const BYTE*)" ") != 1)
+	if (PipeWrite(OutputStream, (const BYTE*)" ", 1, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -232,40 +232,40 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	// now output the starting string, then the prompt
 	#if (SHELL_USE_PROJECT_NAME == 1)
 		#ifdef SHELL_PROJECT_NAME
-			if (GenericBufferWrite(&gStandardOutputStream, (UINT32)strlen(SHELL_PROJECT_NAME_TEXT_COLOR SHELL_PROJECT_NAME), SHELL_PROJECT_NAME_TEXT_COLOR SHELL_PROJECT_NAME) != (UINT32)strlen(SHELL_PROJECT_NAME_TEXT_COLOR SHELL_PROJECT_NAME))
+			if (PipeWrite(&gStandardOutputStream, SHELL_PROJECT_NAME_TEXT_COLOR SHELL_PROJECT_NAME, (UINT32)strlen(SHELL_PROJECT_NAME_TEXT_COLOR SHELL_PROJECT_NAME), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if (GenericBufferWrite(&gStandardOutputStream, 1, " ") != 1)
+			if (PipeWrite(&gStandardOutputStream, " ", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_PROJECT_NAME
 
 		#if (USE_SHELL_COLOR == 1)
-			if (GenericBufferWrite(&gStandardOutputStream, (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR), SHELL_DEFAULT_TEXT_COLOR) != (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR))
+			if (PipeWrite(&gStandardOutputStream, SHELL_DEFAULT_TEXT_COLOR, (UINT32)strlen(SHELL_DEFAULT_TEXT_COLOR), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of #if (USE_SHELL_COLOR == 1)
 
 		#ifdef SHELL_MAJOR_VERSION
-			if (GenericBufferWrite(&gStandardOutputStream, (UINT32)strlen(SHELL_MAJOR_VERSION), SHELL_MAJOR_VERSION) != (UINT32)strlen(SHELL_MAJOR_VERSION))
+			if (PipeWrite(&gStandardOutputStream, SHELL_MAJOR_VERSION, (UINT32)strlen(SHELL_MAJOR_VERSION), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if (GenericBufferWrite(&gStandardOutputStream, 1, (const BYTE*)".") != 1)
+			if (PipeWrite(&gStandardOutputStream, (const BYTE*)".", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_MAJOR_VERSION
 
 		#ifdef SHELL_MINOR_VERSION
-			if (GenericBufferWrite(&gStandardOutputStream, (UINT32)strlen(SHELL_MINOR_VERSION), SHELL_MINOR_VERSION) != (UINT32)strlen(SHELL_MINOR_VERSION))
+			if (PipeWrite(&gStandardOutputStream, SHELL_MINOR_VERSION, (UINT32)strlen(SHELL_MINOR_VERSION), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if (GenericBufferWrite(&gStandardOutputStream, 1, (const BYTE*)".") != 1)
+			if (PipeWrite(&gStandardOutputStream, (const BYTE*)".", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_MINOR_VERSION
 
 		#ifdef SHELL_TEST_VERSION
-			if (GenericBufferWrite(&gStandardOutputStream, (UINT32)strlen(SHELL_TEST_VERSION), SHELL_TEST_VERSION) != (UINT32)strlen(SHELL_TEST_VERSION))
+			if (PipeWrite(&gStandardOutputStream, SHELL_TEST_VERSION, (UINT32)strlen(SHELL_TEST_VERSION), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_TEST_VERSION
 
-		if (GenericBufferWrite(&gStandardOutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+		if (PipeWrite(&gStandardOutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of #if (SHELL_USE_PROJECT_NAME == 1)
 
@@ -325,14 +325,13 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 
 SHELL_RESULT NexShellWriteTasks(PIPE *OutputStream)
 {
-	EnterCritical();
-
-	if (GenericBufferGetSize(OutputStream) != 0)
+	if (PipeGetSize(OutputStream) != 0)
 	{
 		BYTE CharacterBuffer[SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES + 1];
 		UINT32 BytesToTransfer, OriginalBytesToTransfer;
 
-		OriginalBytesToTransfer = GenericBufferPeek(OutputStream, 0, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE);
+		if(PipePeek(OutputStream, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, &OriginalBytesToTransfer) != OS_SUCCESS)
+			return SHELL_GENERIC_BUFFER_READ_FAILURE;
 
 		// now null it out for the method that is about to send it
 		CharacterBuffer[OriginalBytesToTransfer] = 0;
@@ -343,22 +342,16 @@ SHELL_RESULT NexShellWriteTasks(PIPE *OutputStream)
 			// did they write a valid amount?
 			if (BytesToTransfer > SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES || BytesToTransfer > OriginalBytesToTransfer)
 			{
-				ExitCritical();
-
 				return SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED;
 			}
 
 			// some or all was written, now read what thye wrote out of the buffer since it was a peek prior
-			if (GenericBufferRead(OutputStream, BytesToTransfer, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, FALSE) != BytesToTransfer)
+			if (PipeRead(OutputStream, CharacterBuffer, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, BytesToTransfer, NULL) != OS_SUCCESS)
 			{
-				ExitCritical();
-
 				return SHELL_GENERIC_BUFFER_READ_FAILURE;
 			}
 		}
 	}
-
-	ExitCritical();
 
 	return SHELL_SUCCESS;
 }
@@ -797,7 +790,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		// always clear this out
-		if (GenericBufferFlush(InputStream) == FALSE)
+		if (PipeFlush(InputStream) == FALSE)
 			return SHELL_LINKED_LIST_OPERATION_FAILURE;
 
 		// now read the data from the list
@@ -878,19 +871,19 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 							#if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 								if (gConsoleEcho == TRUE)
 								{
-									if (GenericBufferWrite(&gOutputStream, (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND), SHELL_MOVE_CURSOR_LEFT_COMMAND) != (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND))
+									if (PipeWrite(&gOutputStream, SHELL_MOVE_CURSOR_LEFT_COMMAND, (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND), NULL) != OS_SUCCESS)
 										return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
 
-									if (GenericBufferWrite(&gOutputStream, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), SHELL_CLEAR_REMAINING_LINE_COMMAND) != (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND))
+									if (PipeWrite(&gOutputStream, SHELL_CLEAR_REMAINING_LINE_COMMAND, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), NULL) != OS_SUCCESS)
 										return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
 								}
 							#else
 								#if (SHELL_USE_CONSOLE_ECHO == ALWAYS_ON)
 									// always output the data in this configuration
-									if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_DELETE_COMMAND), SHELL_DELETE_COMMAND) != (UINT32)strlen(SHELL_DELETE_COMMAND))
+									if (PipeWrite(OutputStream, SHELL_DELETE_COMMAND, (UINT32)strlen(SHELL_DELETE_COMMAND), NULL) != OS_SUCCESS)
 										return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-									if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), SHELL_CLEAR_REMAINING_LINE_COMMAND) != (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND))
+									if (PipeWrite(OutputStream, SHELL_CLEAR_REMAINING_LINE_COMMAND, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), NULL) != OS_SUCCESS)
 										return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 								#endif // end of #if (SHELL_USE_CONSOLE_ECHO == ALWAYS_ON)
 							#endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
@@ -911,20 +904,20 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 						// we have data we can write to the input stream
 
 						// write the data to the input stream
-						if (GenericBufferWrite(InputStream, 1, IncomingData) != 1)
+						if (PipeWrite(InputStream, IncomingData, 1, NULL) != OS_SUCCESS)
 							return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 						// if echo is on, output the data
 						#if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
 							if (gConsoleEcho == TRUE)
 							{
-								if (GenericBufferWrite(&gOutputStream, 1, IncomingData) != 1)
+								if (PipeWrite(&gOutputStream, IncomingData, 1, NULL) != OS_SUCCESS)
 									return SHELL_OUTPUT_GENERIC_BUFFER_OVERFLOW;
 							}
 						#else
 							#if (SHELL_USE_CONSOLE_ECHO == ALWAYS_ON)
 								// always output the data in this configuration
-								if (GenericBufferWrite(OutputStream, 1, IncomingData) != 1)
+								if (PipeWrite(OutputStream, IncomingData, 1, NULL) != OS_SUCCESS)
 									return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 							#endif // end of #if (SHELL_USE_CONSOLE_ECHO == ALWAYS_ON)
 						#endif // end of #if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
@@ -1013,7 +1006,7 @@ static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, cha
 			return Result;
 	
 		// did we get an end of line sequence?
-		if (GenericBufferContainsSequence(InputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, &NumberOfBytesToRead) == TRUE)
+		if (PipeContainsSequence(InputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, &NumberOfBytesToRead) == OS_SUCCESS)
 		{
 			SHELL_RESULT Result;
 
@@ -1023,7 +1016,7 @@ static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, cha
 			NumberOfBytesToRead += SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES;
 
 			// read the data out and process the command
-			if (GenericBufferRead(InputStream, NumberOfBytesToRead, TempBuffer, sizeof(TempBuffer), TRUE) == NumberOfBytesToRead)
+			if (PipeRead(InputStream, TempBuffer, sizeof(TempBuffer), NumberOfBytesToRead, NULL) == OS_SUCCESS)
 			{
 				TempBuffer[NumberOfBytesToRead - SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES] = 0;
 
@@ -1063,14 +1056,14 @@ static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, cha
 				if (Result != SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER)
 				{
 					#if (USE_SHELL_COLOR == 1)
-						if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_ERROR_COLOR), SHELL_ERROR_COLOR) != (UINT32)strlen(SHELL_ERROR_COLOR))
+						if (PipeWrite(OutputStream, SHELL_ERROR_COLOR, (UINT32)strlen(SHELL_ERROR_COLOR), NULL) != OS_SUCCESS)
 							return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 					#endif // end of #if (USE_SHELL_COLOR == 1)
 
-					if(GenericBufferWrite(OutputStream, (UINT32)strlen(gNexShellError[Result]), gNexShellError[Result]) != (UINT32)strlen(gNexShellError[Result]))
+					if(PipeWrite(OutputStream, gNexShellError[Result], (UINT32)strlen(gNexShellError[Result]), NULL) != OS_SUCCESS)
 						return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-					if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+					if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 						return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 				}
 			}
