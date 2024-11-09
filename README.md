@@ -7,6 +7,6 @@ There will be an OS added and support for Unix style pipes so file/command outpu
 
 There will also be support for devices in the dev folder.
 
-First port will be unknown, right now it is just a VS 2022 RAM drive with some virtual files supported in dev (no I/O devices at this time).
+First port will be unknown (Probably one of the dev boards from SMT for the discovery kits), right now it is just a VS 2022 RAM drive with some virtual files supported in dev (no I/O devices at this time).
 
 This is still a work in progress with no official first release.
