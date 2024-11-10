@@ -129,10 +129,6 @@ OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWr
 	// this means do not wait for the PIPE to have space
     if (BytesWrittenLocal == BytesToWrite)
 	{
-		// they do not want to wait for the data to be available
-		// we are free to leave now regardless of how many bytes were written
-		SurrenderCPU();
-
 		ExitCritical();
 
 		if(BytesWritten != NULL)
@@ -155,8 +151,6 @@ OS_RESULT PipeWrite(PIPE *Pipe, BYTE *Data, UINT32 BytesToWrite, UINT32 *BytesWr
 		// proceed to try and write to the PIPE
 		OS_TryPipeWrite(Pipe, &Data, BytesToWrite - BytesWrittenLocal, &BytesWrittenLocal);
 	}
-
-	SurrenderCPU();
 
 	ExitCritical();
 
@@ -197,8 +191,6 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
 	// this means do not wait for the PIPE to have space
     if (BytesReadLocal == BytesToRead)
 	{
-		SurrenderCPU();
-
 		// they do not want to wait for the data to be available
 		// we are free to leave now regardless of how many bytes were written
 		ExitCritical();
@@ -221,8 +213,6 @@ OS_RESULT PipeRead(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT32 Byte
 		// proceed to try and write to the PIPE
 		OS_TryPipeRead(Pipe, &Data, &BytesReadLocal, (BytesToRead - BytesReadLocal), &BufferSizeInBytes);
 	}
-
-	SurrenderCPU();
 
 	if (BytesRead != NULL)
 		*BytesRead = BytesReadLocal;
@@ -438,12 +428,6 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
 		if (GenericBufferFlush(&Pipe->GenericBuffer) == FALSE)
 			return OS_INVALID_OBJECT_USED;
 
-		// if there was data in there, we will say that any blocking TASK should run
-		// assuming that they were trying to write.
-		//if (ClearBlockedList == TRUE)
-			//if (OS_AddTaskListToReadyQueue(&Pipe->PipeBlockedListHead) == TRUE)
-				SurrenderCPU();
-
 		return OS_SUCCESS;
 	}
 #endif // end of #if (USING_PIPE_FLUSH_FROM_ISR_METHOD == 1)
@@ -562,3 +546,19 @@ OS_RESULT PipeReadFromISR(PIPE *Pipe, BYTE *Data, UINT32 BufferSizeInBytes, UINT
 		return GenericBufferGetRemainingBytes(&Pipe->GenericBuffer);
 	}
 #endif // end of #if (USING_PIPE_GET_REMAINING_BYTES_FROM_ISR_METHOD == 1)
+
+OS_RESULT PipeRemoveLastByteWritten(PIPE* Pipe, BYTE *LastByte)
+{
+	BOOL Result;
+
+	EnterCritical();
+
+	Result = GenericBufferRemoveLastByteWritten(&Pipe->GenericBuffer, LastByte);
+
+	ExitCritical();
+
+	if (Result == TRUE)
+		return OS_SUCCESS;
+	else
+		return OS_RESOURCE_INVALID_ADDRESS;
+}

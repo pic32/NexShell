@@ -27,7 +27,7 @@ DWORD WINAPI ShellWriteTasksThreadCode(void* data)
 	{
 		WriteResult = UserNexShellWriteTasks();
 
-		Sleep(1);
+		Sleep(0);
 	}
 }
 
@@ -45,7 +45,7 @@ DWORD WINAPI ThreadFunc(void* data)
 		if (LocalData == 0xE0)
 		{
 			while (gDataRead != 0)
-				Sleep(50);
+				Sleep(0);
 
 			gDataRead = ESCAPE_ASCII_VALUE;
 
@@ -59,12 +59,12 @@ DWORD WINAPI ThreadFunc(void* data)
 				LocalData = 0x5B;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				gDataRead = LocalData;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				LocalData = UP_ARROW_ASCII_VALUE;
 
@@ -77,12 +77,12 @@ DWORD WINAPI ThreadFunc(void* data)
 				LocalData = 0x5B;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				gDataRead = LocalData;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				LocalData = LEFT_ARROW_ASCII_VALUE;
 
@@ -95,12 +95,12 @@ DWORD WINAPI ThreadFunc(void* data)
 				LocalData = 0x5B;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				gDataRead = LocalData;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				LocalData = RIGHT_ARROW_ASCII_VALUE;
 
@@ -113,12 +113,12 @@ DWORD WINAPI ThreadFunc(void* data)
 				LocalData = 0x5B;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				gDataRead = LocalData;
 
 				while (gDataRead != 0)
-					Sleep(50);
+					Sleep(0);
 
 				LocalData = DOWN_ARROW_ASCII_VALUE;
 
@@ -128,7 +128,7 @@ DWORD WINAPI ThreadFunc(void* data)
 		}
 
 		while (gDataRead != 0)
-			Sleep(50);
+			Sleep(0);
 
 		gDataRead = LocalData;
 	}

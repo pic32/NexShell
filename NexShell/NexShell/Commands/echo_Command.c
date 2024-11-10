@@ -227,7 +227,7 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	{
 		// yes, we're done
 		if(AppendNewLine == TRUE)
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;
@@ -247,11 +247,11 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	// is that all they specified
 	if (NumberOfArgs == 0)
 	{
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(Args[StringArguments]), Args[StringArguments]) != (UINT32)strlen(Args[StringArguments]))
+		if (PipeWrite(OutputStream, Args[StringArguments], (UINT32)strlen(Args[StringArguments]), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		if (AppendNewLine == TRUE)
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -276,7 +276,7 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	{
 		// this is an error
 		if (AppendNewLine == TRUE)
-			if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -300,7 +300,7 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 
 	// append the new line if they wanted it
 	if (AppendNewLine == TRUE)
-		if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+		if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return Result;

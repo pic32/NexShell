@@ -48,6 +48,6 @@ void ExitCritical(void)
 void SurrenderCPU(void)
 {
     ExitCritical();
-    Sleep(1);
+    Sleep(0);
     EnterCritical();
 }

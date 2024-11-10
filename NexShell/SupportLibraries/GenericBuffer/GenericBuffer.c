@@ -439,14 +439,10 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 				return FALSE;
 		#endif // end of GENERIC_BUFFER_SAFE_MODE
 
-		EnterCritical();
-
 		// do we even have anything in here?
 		if (GenericBuffer->BufferSize == 0)
 		{
-			ExitCritical();
-
-			return FALSE;
+			return TRUE;
 		}
 
 		// are we at the end of the buffer?
@@ -464,8 +460,6 @@ UINT32 GenericBufferRead(GENERIC_BUFFER *GenericBuffer, UINT32 NumberOfBytes, BY
 
 		// now clear out the byte
 		*GenericBuffer->CurrentWritePosition = 0;
-	
-		ExitCritical();
 
 		return TRUE;
 	}

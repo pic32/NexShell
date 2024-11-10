@@ -22,14 +22,14 @@ static OutputCommandHelp(COMMAND_INFO* CommandInfo, PIPE* OutputStream)
 	memcpy(SpaceBuffer, CommandInfo->CommandName, strlen(CommandInfo->CommandName));
 
 	// write the command name with spaces to the buffer
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(SpaceBuffer), SpaceBuffer) != (UINT32)strlen(SpaceBuffer))
+	if (PipeWrite(OutputStream, SpaceBuffer, (UINT32)strlen(SpaceBuffer), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	// now output the description
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(CommandInfo->Description), CommandInfo->Description) != (UINT32)strlen(CommandInfo->Description))
+	if (PipeWrite(OutputStream, CommandInfo->Description, (UINT32)strlen(CommandInfo->Description), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -42,17 +42,14 @@ static UINT help_ForwardData(   /* Returns number of bytes sent or stream status
 	void* Options
 )
 {
-	SHELL_RESULT Result;
-
 	// this is to find out if ready for transfer
 	if (btf == 0)
 	{
 		return 1;
 	}
 
-	Result = NexShellProcessOutgoingData(DataToWrite, (PIPE*)OutputStream, strlen(DataToWrite), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-	if (Result != SHELL_SUCCESS)
+	// write the description
+	if (PipeWrite((PIPE*)OutputStream, DataToWrite, (UINT32)btf, NULL) != OS_SUCCESS)
 		return 0;
 
 	return btf;
@@ -62,26 +59,28 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 {
 	SHELL_RESULT Result;
 
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(CommandInfo->CommandName), CommandInfo->CommandName) != (UINT32)strlen(CommandInfo->CommandName))
+	// write the command name
+	if (PipeWrite(OutputStream, CommandInfo->CommandName,(UINT32)strlen(CommandInfo->CommandName), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-	if (GenericBufferWrite(OutputStream, (UINT32)strlen(": "), ": ") != (UINT32)2)
+	if (PipeWrite(OutputStream, ": ", (UINT32)strlen(": "), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-	Result = NexShellProcessOutgoingData(CommandInfo->Description, OutputStream, (UINT32)strlen(CommandInfo->Description), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
+	// write the description
+	if (PipeWrite(OutputStream, CommandInfo->Description, (UINT32)strlen(CommandInfo->Description), NULL) != OS_SUCCESS)
+		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	// write out a new line
-	if (GenericBufferWrite(OutputStream, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_DEFAULT_END_OF_LINE_SEQUENCE) != SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES)
+	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	if (DescriptionOnly == FALSE)
 	{
 		FIL File;
 
-		if (f_open(&File, CommandInfo->Help, FA_OPEN_EXISTING | FA_READ) == SHELL_SUCCESS)
+		Result = f_open(&File, CommandInfo->Help, FA_OPEN_EXISTING | FA_READ);
+
+		if (Result == SHELL_SUCCESS)
 		{
 			// now we must read the data out and send it
 			UINT DataRead;
@@ -109,10 +108,9 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 		}
 		else
 		{
-			Result = NexShellProcessOutgoingData(CommandInfo->Help, OutputStream, (UINT32)strlen(CommandInfo->Help), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-			if (Result != SHELL_SUCCESS)
-				return Result;
+			// write the description
+			if (PipeWrite(OutputStream, CommandInfo->Help, (UINT32)strlen(CommandInfo->Help), NULL) != OS_SUCCESS)
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 	}
 
@@ -126,7 +124,7 @@ SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	{
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (GenericBufferWrite(OutputStream, strlen(HELP_HELP_TEXT), HELP_HELP_TEXT) != strlen(HELP_HELP_TEXT))
+			if (PipeWrite(OutputStream, HELP_HELP_TEXT, strlen(HELP_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;

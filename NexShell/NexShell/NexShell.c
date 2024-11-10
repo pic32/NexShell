@@ -779,14 +779,14 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 		}
 
 		// shift over to the beginning of the prompt
-		for (i = 0; i < GenericBufferGetSize(InputStream); i++)
+		for (i = 0; i < PipeGetSize(InputStream); i++)
 		{
-			if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND), SHELL_MOVE_CURSOR_LEFT_COMMAND) != (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND))
+			if (PipeWrite(OutputStream, SHELL_MOVE_CURSOR_LEFT_COMMAND, (UINT32)strlen(SHELL_MOVE_CURSOR_LEFT_COMMAND), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 
 		// now clear out the line
-		if (GenericBufferWrite(OutputStream, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), SHELL_CLEAR_REMAINING_LINE_COMMAND) != (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND))
+		if (PipeWrite(OutputStream, SHELL_CLEAR_REMAINING_LINE_COMMAND, (UINT32)strlen(SHELL_CLEAR_REMAINING_LINE_COMMAND), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		// always clear this out
@@ -798,10 +798,10 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 
 		if (DataFromHistoryBuffer != NULL)
 		{
-			if (GenericBufferWrite(OutputStream, (UINT32)strlen(DataFromHistoryBuffer), DataFromHistoryBuffer) != (UINT32)strlen(DataFromHistoryBuffer))
+			if (PipeWrite(OutputStream, DataFromHistoryBuffer, (UINT32)strlen(DataFromHistoryBuffer), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if(GenericBufferWrite(InputStream, (UINT32)strlen(DataFromHistoryBuffer), DataFromHistoryBuffer) != (UINT32)strlen(DataFromHistoryBuffer))
+			if(PipeWrite(InputStream, DataFromHistoryBuffer, (UINT32)strlen(DataFromHistoryBuffer), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 
@@ -865,7 +865,7 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 				{
 					case BACKSPACE_ASCII_VALUE:
 					{
-						if (GenericBufferRemoveLastByteWritten(InputStream, NULL) == TRUE)
+						if (PipeRemoveLastByteWritten(InputStream, NULL) == OS_SUCCESS)
 						{
 							// if echo is on, output the data
 							#if (SHELL_USE_CONSOLE_ECHO == RUNTIME_CONFIGURABLE)
