@@ -682,4 +682,6 @@ UINT32 PipeGetRemainingBytesFromISR(PIPE *Pipe);
 */
 OS_RESULT PipeDeleteFromISR(PIPE *Pipe, BOOL FreeBufferSpace);
 
+OS_RESULT PipeRemoveLastByteWritten(PIPE* Pipe, BYTE* LastByte);
+
 #endif // end of #ifndef PIPE_H
