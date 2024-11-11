@@ -41,7 +41,6 @@
 
 #include "GenericBufferConfig.h"
 #include "GenericBuffer.h"
-#include "CriticalSection.h"
 
 #if (GENERIC_BUFFER_USE_MALLOC == 1)
 	#include "stdlib.h"
