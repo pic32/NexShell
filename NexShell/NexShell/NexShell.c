@@ -790,7 +790,7 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		// always clear this out
-		if (PipeFlush(InputStream) == FALSE)
+		if (PipeFlush(InputStream) != OS_SUCCESS)
 			return SHELL_LINKED_LIST_OPERATION_FAILURE;
 
 		// now read the data from the list
