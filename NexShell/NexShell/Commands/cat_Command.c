@@ -79,9 +79,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
-			Result = NexShellProcessOutgoingData(LineNumberBuffer, (PIPE*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-			if (Result != SHELL_SUCCESS)
+			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 				return 0;
 		}
 
@@ -97,16 +95,15 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 		{
 			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
-			Result = NexShellProcessOutgoingData(LineNumberBuffer, (PIPE*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-			if (Result != SHELL_SUCCESS)
+			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 				return 0;
 		}
 	}
 
 	if (ReadInfo->ReadOptions.Value == 0)
 	{
-		Result = NexShellProcessOutgoingData(DataToWrite, (PIPE*)OutputStream, strlen(DataToWrite), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
+		if (PipeWrite((PIPE*)OutputStream, DataToWrite, strlen(DataToWrite), NULL) != OS_SUCCESS)
+			return 0;
 	}
 	else
 	{
@@ -125,9 +122,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 				case '\n':
 				{
 					// send out what we have currently
-					Result = NexShellProcessOutgoingData(DataStart, (PIPE*)OutputStream, (DataPtr - DataStart) - ReadInfo->ReadOptions.Bits.ShowLineEnds, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-					if (Result != SHELL_SUCCESS)
+					if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart) - ReadInfo->ReadOptions.Bits.ShowLineEnds, NULL) != OS_SUCCESS)
 						return 0;
 
 					if (*DataPtr == '\n')
@@ -154,9 +149,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 					if (ReadInfo->ReadOptions.Bits.ShowLineEnds == 1 && (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines <= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)))
 					{
 						// output a $
-						Result = NexShellProcessOutgoingData(END_OF_LINE_CAT_PRINT_CHARACTER SHELL_DEFAULT_END_OF_LINE_SEQUENCE, (PIPE*)OutputStream, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-						if (Result != SHELL_SUCCESS)
+						if (PipeWrite((PIPE*)OutputStream, END_OF_LINE_CAT_PRINT_CHARACTER SHELL_DEFAULT_END_OF_LINE_SEQUENCE, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 							return 0;
 					}
 
@@ -180,9 +173,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 							{
 								Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
-								Result = NexShellProcessOutgoingData(LineNumberBuffer, (PIPE*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-								if (Result != SHELL_SUCCESS)
+								if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 									return 0;
 							}
 						}
@@ -200,9 +191,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						{
 							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
-							Result = NexShellProcessOutgoingData(LineNumberBuffer, (PIPE*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-							if (Result != SHELL_SUCCESS)
+							if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 								return 0;
 						}
 
@@ -211,14 +200,10 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 					}
 
 					// send out what we have currently
-					Result = NexShellProcessOutgoingData(DataStart, (PIPE*)OutputStream, (DataPtr - DataStart) - 1, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-					if (Result != SHELL_SUCCESS)
+					if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
 						return 0;
 
-					Result = NexShellProcessOutgoingData("^I", (PIPE*)OutputStream, 2, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-					if (Result != SHELL_SUCCESS)
+					if (PipeWrite((PIPE*)OutputStream, "^I", 2, NULL) != OS_SUCCESS)
 						return 0;
 
 					// point to our new spot
@@ -238,9 +223,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						{
 							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
 
-							Result = NexShellProcessOutgoingData(LineNumberBuffer, (PIPE*)OutputStream, strlen(LineNumberBuffer), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-							if (Result != SHELL_SUCCESS)
+							if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 								return 0;
 						}
 
@@ -257,9 +240,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						if (ReadInfo->ReadOptions.Bits.ShowControlCharacters == 1)
 						{
 							// send out what we have currently
-							Result = NexShellProcessOutgoingData(DataStart, (PIPE*)OutputStream, (DataPtr - DataStart), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-							if (Result != SHELL_SUCCESS)
+							if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
 								return 0;
 
 							// do they have the option set
@@ -272,9 +253,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 								TempBuffer[1] = '@' + *DataPtr;
 
 								// now write the data
-								Result = NexShellProcessOutgoingData(TempBuffer, (PIPE*)OutputStream, 2, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-								
-								if (Result != SHELL_SUCCESS)
+								if (PipeWrite((PIPE*)OutputStream, TempBuffer, 2, NULL) != OS_SUCCESS)
 									return 0;
 							}
 							else
@@ -288,9 +267,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 								TempBuffer[3] = '@' + (*DataPtr) - 128;
 
 								// now write the data
-								Result = NexShellProcessOutgoingData(TempBuffer, (PIPE*)OutputStream, 4, SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-								if (Result != SHELL_SUCCESS)
+								if (PipeWrite((PIPE*)OutputStream, TempBuffer, 4, NULL) != OS_SUCCESS)
 									return 0;
 							}
 
@@ -316,9 +293,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 		if (DataPtr != DataStart)
 		{
 			// send out what we have currently
-			Result = NexShellProcessOutgoingData(DataStart, (PIPE*)OutputStream, (DataPtr - DataStart), SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES, NexShellWriteTasks);
-
-			if (Result != SHELL_SUCCESS)
+			if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
 				return 0;
 		}
 	}
@@ -422,7 +397,7 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 			while (Result == SHELL_SUCCESS && !f_eof(&File))
 			{
 				// forward more data
-				Result = f_forward(&File, cat_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
+				Result = f_forward(&File, cat_ForwardData, PipeGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, (void*)&ReadInfo);
 
 				// did we read ok?
 				if (Result != SHELL_SUCCESS)

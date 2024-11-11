@@ -196,13 +196,13 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	#endif // end of #if (USE_USER_COMMANDS == 1)
 
 	// initialize our input and output streams
-	if (CreateGenericBuffer(&gStandardOutputStream, SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES, gOutputStreamBuffer) == NULL)
+	if (CreatePipe(&gStandardOutputStream, gOutputStreamBuffer, SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
-	if (CreateGenericBuffer(&gStandardInputStream, SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES, gInputStreamBuffer) == NULL)
+	if (CreatePipe(&gStandardInputStream, gInputStreamBuffer, SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
-	if (CreateGenericBuffer(&gShellOperatorStream, SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES, gShellOperatorBuffer) == NULL)
+	if (CreatePipe(&gShellOperatorStream, gShellOperatorBuffer, SIZE_OF_SHELL_OPERATOR_STREAM_BUFFER_IN_BYTES) == NULL)
 		return SHELL_GENERIC_BUFFER_CREATE_FAILURE;
 
 	if (isalpha((int)CurrentDrive) == 0)
@@ -808,50 +808,6 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 		return SHELL_SUCCESS;
 	}
 #endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
-
-SHELL_RESULT NexShellProcessOutgoingData(char* Data, PIPE* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(PIPE * OutputStream))
-{
-	SHELL_RESULT Result;
-	UINT32 DataWritten, NumberOfBytesToWrite;
-
-	// check that they want to send a valid number of bytes
-	if (NumberOfBytesToProcess == 0)
-		return SHELL_SUCCESS;
-
-	// perform the write tasks
-	Result = WriteTasks(OutputStream);
-
-	// did it work ok?
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	while (NumberOfBytesToProcess != 0)
-	{
-		// get the next chunk of data to send
-		if (TransferSizeInBytes < (UINT32)NumberOfBytesToProcess)
-			NumberOfBytesToWrite = TransferSizeInBytes;
-		else
-			NumberOfBytesToWrite = (UINT32)NumberOfBytesToProcess;
-
-		// update the number of bytes left to transfer
-		NumberOfBytesToProcess -= NumberOfBytesToWrite;
-
-		// now get some data
-		DataWritten = GenericBufferWrite(OutputStream, NumberOfBytesToWrite, Data);
-
-		// advance the pointer
-		Data += DataWritten;
-
-		// perform the write tasks
-		Result = WriteTasks(OutputStream);
-
-		// did it work ok?
-		if (Result != SHELL_SUCCESS)
-			return Result;
-	}
-
-	return SHELL_SUCCESS;
-}
 
 static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 NumberOfBytes, PIPE *InputStream, PIPE *OutputStream)
 {

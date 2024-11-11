@@ -161,7 +161,6 @@ typedef struct
 	char* Help;
 }COMMAND_INFO;
 
-SHELL_RESULT NexShellProcessOutgoingData(char* Data, PIPE* OutputStream, UINT32 NumberOfBytesToProcess, UINT32 TransferSizeInBytes, SHELL_RESULT(*WriteTasks)(PIPE* OutputStream));
 SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
 SHELL_RESULT NexShellInit(char CurrentDrive);
 char NexShellGetRootDriveVolume(void);

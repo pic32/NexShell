@@ -203,7 +203,7 @@ SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *Fi
 		return SHELL_INVALID_INPUT_PARAMETER;
 
 	// now, is the name valid?
-	if (VirtualFileNameIsValid(FileName) == FALSE)
+	if (VirtualFileNameIsValid((char*)FileName) == FALSE)
 		return SHELL_INVALID_DIRECTORY_NAME;
 
 	// set the name

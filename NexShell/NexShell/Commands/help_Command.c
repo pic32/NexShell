@@ -89,7 +89,7 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 			while (Result == SHELL_SUCCESS && !f_eof(&File))
 			{
 				// forward more data
-				Result = f_forward(&File, help_ForwardData, GenericBufferGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, NULL);
+				Result = f_forward(&File, help_ForwardData, PipeGetRemainingBytes(OutputStream), &DataRead, (void*)OutputStream, NULL);
 
 				// did we read ok?
 				if (Result != SHELL_SUCCESS)
