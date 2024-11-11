@@ -1,0 +1,3 @@
+[submodule "NexShell/SupportLibraries/GenericBuffer"]
+	path = NexShell/SupportLibraries/GenericBuffer
+	url = https://github.com/pic32/GenericBuffer
