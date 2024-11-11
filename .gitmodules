@@ -1,3 +1,6 @@
 [submodule "NexShell/SupportLibraries/GenericBuffer"]
 	path = NexShell/SupportLibraries/GenericBuffer
 	url = https://github.com/pic32/GenericBuffer
+[submodule "NexShell/SupportLibraries/LinkedList"]
+	path = NexShell/SupportLibraries/LinkedList
+	url = https://github.com/pic32/LinkedList
