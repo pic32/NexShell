@@ -146,7 +146,7 @@
 #define USE_CD_COMMAND												1
 #define USE_CLEAR_COMMAND											1
 #define USE_DATE_COMMAND											1
-#define USE_ECHO_COMMAND											0
+#define USE_ECHO_COMMAND											1
 #define USE_HELP_COMMAND											1
 #define USE_LS_COMMAND												1
 #define USE_PWD_COMMAND												1

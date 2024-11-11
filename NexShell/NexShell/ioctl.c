@@ -37,7 +37,7 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 		case GET_DATE_TIME_CMD:
 		{
 			SHELL_RESULT Result;
-			GENERIC_BUFFER Stream;
+			PIPE Stream;
 			BYTE Buffer[sizeof(rtc_time)];
 			rtc_time *UserTime;
 
@@ -47,7 +47,7 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 			UserTime = (rtc_time*)arg;
 
 			// create a temporary buffer for communicating with the rtc0 file
-			if (CreateGenericBuffer(&Stream, sizeof(Buffer), Buffer) == NULL)
+			if (CreatePipe(&Stream, Buffer, sizeof(Buffer)) == NULL)
 				return -EIO;
 
 			// now get the current time
@@ -57,7 +57,7 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 				return -EIO;
 
 			// read our answer from the ioctl inside the file read
-			if (GenericBufferRead(&Stream, sizeof(rtc_time), (BYTE*)UserTime, sizeof(rtc_time), FALSE) != sizeof(rtc_time))
+			if (PipeRead(&Stream, (BYTE*)UserTime, sizeof(rtc_time), sizeof(rtc_time), FALSE) != OS_SUCCESS)
 				return -EIO;
 
 			return 0;

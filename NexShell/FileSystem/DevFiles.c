@@ -73,7 +73,7 @@
 		CurrentTime.tm_isdst = TimeInfo->tm_isdst;
 		CurrentTime.tm_yday = TimeInfo->tm_yday;
 
-		if (GenericBufferWrite(OutputStream, sizeof(rtc_time), (BYTE*)&CurrentTime) != sizeof(rtc_time))
+		if (PipeWrite(OutputStream, (BYTE*)&CurrentTime, sizeof(rtc_time), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

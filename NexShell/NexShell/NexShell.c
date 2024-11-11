@@ -86,6 +86,7 @@ const char* gNexShellError[] = {
 	"shell: virtual directory name already exists",
 	"shell: virtual filename already exsits",
 	"shell: command already exists",
+	"shell: command not found",
 	"shell: ioctl failed"
 };
 

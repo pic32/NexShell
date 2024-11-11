@@ -225,6 +225,9 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	// we're done?
 	if (NumberOfArgs == 0)
 	{
+		if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
 		// yes, we're done
 		if(AppendNewLine == TRUE)
 			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
@@ -233,75 +236,33 @@ SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 		return SHELL_SUCCESS;
 	}
 
-	// so now we have the options, process the backslash if it was specified
-	if (EnableBackslash == TRUE)
-	{
-		// we have to go through each area and interpret any values
-		// that have a backslash before them
-		UpdateBackslashCharacters(Args[StringArguments]);
-	}
-
-	// now where's the data going?
-	NumberOfArgs--;
-
 	// is that all they specified
-	if (NumberOfArgs == 0)
+	do
 	{
+		// now where's the data going?
+		NumberOfArgs--;
+
+		// so now we have the options, process the backslash if it was specified
+		if (EnableBackslash == TRUE)
+		{
+			// we have to go through each area and interpret any values
+			// that have a backslash before them
+			UpdateBackslashCharacters(Args[StringArguments]);
+		}
+
 		if (PipeWrite(OutputStream, Args[StringArguments], (UINT32)strlen(Args[StringArguments]), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		if (AppendNewLine == TRUE)
-			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+		StringArguments++;
 	}
+	while (NumberOfArgs != 0);
 
-	// are we in append mode?
-	if (strcmp(Args[StringArguments + 1], ">>") == 0)
-	{
-		// we are
-		FSAppend = FA_OPEN_APPEND;
-	}
-	else
-	{
-		// we need to be in write mode
-		if (strcmp(Args[StringArguments + 1], ">") != 0)
-			return SHELL_INVALID_INPUT_PARAMETER;
+	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-		FSAppend = 0;
-	}
-
-	NumberOfArgs--;
-
-	if (NumberOfArgs == 0)
-	{
-		// this is an error
-		if (AppendNewLine == TRUE)
-			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-	}
-
-	// find the file
-	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	NumberOfArgs--;
-
-	if(NumberOfArgs != 0)
-		return SHELL_INVALID_INPUT_PARAMETER;
-
-	// now open the file
-	Result = f_open(&File, Args[StringArguments + 2], FA_OPEN_ALWAYS | FA_WRITE | FSAppend);
-
-	// did we find it?
-	if (Result != SHELL_SUCCESS)
-		return Result;
-
-	// append the new line if they wanted it
 	if (AppendNewLine == TRUE)
 		if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-	return Result;
+	return SHELL_SUCCESS;
 }

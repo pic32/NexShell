@@ -19,6 +19,10 @@
 	#include "date_Command.h"
 #endif // end of #if (USE_DATE_COMMAND == 1)
 
+#if (USE_ECHO_COMMAND == 1)
+	#include "echo_Command.h"
+#endif // end of #if (USE_ECHO_COMMAND == 1)
+
 #if (USE_HELP_COMMAND == 1)
 	#include "help_Command.h"
 #endif // end of #if (USE_HELP_COMMAND == 1)
