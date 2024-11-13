@@ -7,6 +7,7 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 #include <string.h>
+#include <stdio.h>
 
 #include "ff.h"			/* Obtains integer types */
 #include "diskio.h"		/* Declarations of disk functions */
@@ -17,6 +18,7 @@
 #define DEV_MMC		1	/* Example: Map MMC/SD card to physical drive 1 */
 #define DEV_USB		2	/* Example: Map USB MSD to physical drive 2 */
 
+FILE *gDiskContentsFile = NULL;
 BYTE gRAMBuffer[1024 * 1024 * 32];
 
 /*-----------------------------------------------------------------------*/
@@ -60,9 +62,45 @@ DSTATUS disk_initialize (
 	{
 		case DEV_RAM:
 		{
-			//memset(gRAMBuffer, 0xFFFF, sizeof(gRAMBuffer));
+			if (gDiskContentsFile != NULL)
+				return 0;
 
-			// translate the reslut code here
+			// open the file, this assumes it exists
+			gDiskContentsFile = fopen("Disk.txt", "r+");
+
+			if (gDiskContentsFile == NULL)
+			{
+				// we must make the file
+				gDiskContentsFile = fopen("Disk.txt", "w+");
+
+				if (gDiskContentsFile == NULL)
+				{
+					// error 
+					return STA_NOINIT;
+				}
+
+				// now initialize the contents, make it look like flash
+				memset(gRAMBuffer, 0xFF, sizeof(gRAMBuffer));
+
+				if (fwrite(gRAMBuffer, 1, sizeof(gRAMBuffer), gDiskContentsFile) != sizeof(gRAMBuffer))
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return STA_NOINIT;
+				}
+
+				// now go back to the beginning
+				if (fseek(gDiskContentsFile, 0, SEEK_SET) != 0)
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return STA_NOINIT;
+				}
+			}
 
 			return 0;
 		}
@@ -95,7 +133,23 @@ DRESULT disk_read (
 
 			for (i = 0; i < count; i++)
 			{
-				memcpy(buff, &gRAMBuffer[(sector + i) * 512], 512);
+				if (fseek(gDiskContentsFile, (sector + i) * 512, SEEK_SET) != 0)
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return RES_ERROR;
+				}
+
+				if (fread(buff, 1, 512, gDiskContentsFile) != 512)
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return RES_ERROR;
+				}
 
 				buff += 512;
 			}
@@ -135,7 +189,24 @@ DRESULT disk_write (
 
 			for (i = 0; i < count; i++)
 			{
-				memcpy(&gRAMBuffer[(sector + i) * 512], buff, 512);
+				// go to the sector
+				if (fseek(gDiskContentsFile, (sector + i) * 512, SEEK_SET) != 0)
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return RES_ERROR;
+				}
+
+				if (fwrite(buff, 1, 512, gDiskContentsFile) != 512)
+				{
+					// some kind of disk error
+					fclose(gDiskContentsFile);
+
+					// error 
+					return RES_ERROR;
+				}
 
 				buff += 512;
 			}

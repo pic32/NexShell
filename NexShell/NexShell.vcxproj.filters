@@ -141,11 +141,11 @@
     <ClCompile Include="OS\Pipe.c">
       <Filter>Source Files\OS</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\FileSystems.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SupportLibraries\GenericTypeDefs.h">
-      <Filter>Source Files\Support-Libraries</Filter>
-    </ClInclude>
     <ClInclude Include="FileSystem\diskio.h">
       <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
@@ -238,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="SupportLibraries\GenericTypes.h">
       <Filter>Header Files\Support-Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FileSystems.h">
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

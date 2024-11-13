@@ -1,14 +1,26 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "FileSystems.h"
 #include "NexShell.h"
 #include "NexShellCommands.h"
 
 SHELL_RESULT gShellResult;
+extern FILE* gDiskContentsFile;
 
 void ShellPowerDownCallback(void)
 {
 	// this is called at power down
+	SHELL_RESULT Result = f_unmount("R:");
+
+	if (Result == 0)
+	{
+		// close the file now that we have the contents updated
+		if (fclose(gDiskContentsFile) != 0)
+		{
+			return;
+		}
+	}
 }
 
 void StartThreads(void);
@@ -77,34 +89,43 @@ int main()
 		exit(0);
 	}
 
-	gShellResult = f_mkdir("R:/folder1");
-
-	// did it work?
-	if (gShellResult != SHELL_SUCCESS)
+	if (DirectoryExists("R:/folder1") == FALSE)
 	{
-		printf("f_mkdir() Failed\r\n");
+		gShellResult = f_mkdir("R:/folder1");
 
-		exit(0);
+		// did it work?
+		if (gShellResult != SHELL_SUCCESS)
+		{
+			printf("f_mkdir() Failed\r\n");
+
+			exit(0);
+		}
 	}
 
-	gShellResult = f_mkdir("R:/folder2");
-
-	// did it work?
-	if (gShellResult != SHELL_SUCCESS)
+	if (DirectoryExists("R:/folder2") == FALSE)
 	{
-		printf("f_mkdir() Failed\r\n");
+		gShellResult = f_mkdir("R:/folder2");
 
-		exit(0);
+		// did it work?
+		if (gShellResult != SHELL_SUCCESS)
+		{
+			printf("f_mkdir() Failed\r\n");
+
+			exit(0);
+		}
 	}
 
-	gShellResult = f_mkdir("R:/folder2/folder3");
-
-	// did it work?
-	if (gShellResult != SHELL_SUCCESS)
+	if (DirectoryExists("R:/folder2/folder3") == FALSE)
 	{
-		printf("f_mkdir() Failed\r\n");
+		gShellResult = f_mkdir("R:/folder2/folder3");
 
-		exit(0);
+		// did it work?
+		if (gShellResult != SHELL_SUCCESS)
+		{
+			printf("f_mkdir() Failed\r\n");
+
+			exit(0);
+		}
 	}
 
 	gShellResult = AddUserCommand(gACommandName, gADescription, gHelpText, CommandExecuteFile);

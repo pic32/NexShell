@@ -3,16 +3,6 @@
 
 extern char gCurrentWorkingDirectory[];
 
-BOOL FileExists(char* FullFilePath)
-{
-	FIL File;
-
-	if (f_open(&File, FullFilePath, FA_OPEN_EXISTING) != FR_OK)
-		return FALSE;
-
-	return (BOOL)(f_close(&File) == FR_OK);
-}
-
 SHELL_RESULT NexShellFileOpen(char* FilePath, SHELL_FILE* File, FILE_MODE OperatingMode)
 {
 

@@ -157,6 +157,7 @@
     <ClCompile Include="FileSystem\ff.c" />
     <ClCompile Include="FileSystem\ffsystem.c" />
     <ClCompile Include="FileSystem\ffunicode.c" />
+    <ClCompile Include="FileSystem\FileSystems.c" />
     <ClCompile Include="FileSystem\VirtualFile.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="NexShell\Commands\cat_Command.c" />
@@ -184,6 +185,7 @@
     <ClInclude Include="FileSystem\diskio.h" />
     <ClInclude Include="FileSystem\ff.h" />
     <ClInclude Include="FileSystem\ffconf.h" />
+    <ClInclude Include="FileSystem\FileSystems.h" />
     <ClInclude Include="FileSystem\VirtualFile.h" />
     <ClInclude Include="NexShell\Commands\cat_Command.h" />
     <ClInclude Include="NexShell\Commands\cd_Command.h" />
@@ -207,7 +209,6 @@
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBuffer.h" />
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferConfig.h" />
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBufferObject.h" />
-    <ClInclude Include="SupportLibraries\GenericTypeDefs.h" />
     <ClInclude Include="SupportLibraries\GenericTypes.h" />
     <ClInclude Include="SupportLibraries\LinkedList\LinkedList.h" />
     <ClInclude Include="SupportLibraries\LinkedList\LinkedListConfig.h" />
