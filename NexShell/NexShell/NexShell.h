@@ -84,11 +84,11 @@ typedef union
 	{
 		unsigned int ShowLineEnds : 1;					// -E
 		unsigned int NumberAllLines : 1;				// -n
-		unsigned int SupressRepeativeEmptyLines : 1;	// -s
+		unsigned int SupressRepeativeEmptyLines : 1;	// -s (unsupported for now)
 		unsigned int ShowTabs : 1;						// -T
 		unsigned int ShowControlCharacters : 1;			// -v
-		unsigned int OutputNewLine : 1;					// Internal Use
-		unsigned int NewLinePrior : 1;					// Internal Use
+		unsigned int LineNumberSent : 1;				// Internal Use
+		unsigned int CarriageReturnPresent : 1;			// Internal Use
 		unsigned int Reserved : 1;
 	}Bits;
 }READ_OPTIONS;

@@ -30,12 +30,9 @@
 // this is the size in bytes of SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 #define SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES					2
 
-// this is how many consecutive lines need to be found before
-// the cat suppress option goes into effect if the user has it on
-#define SHELL_NEW_LINE_SUPPRESS_THRESHOLD							2
-
 // this is used for tab, it could be \t or spaces
-#define SHELL_TAB                                                   "  "
+#define SHELL_TAB													"  "
+#define SHELL_TAB_STRING_LENGTH_IN_BYTES							strlen(SHELL_TAB)
 
 #include <stdio.h>
 

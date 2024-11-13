@@ -69,6 +69,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 	SHELL_RESULT Result;
 	char LineNumberBuffer[8];
 	READ_INFO* ReadInfo = (READ_INFO*)Options;
+	UINT btfCopy = btf;
 
 	// this is to find out if ready for transfer
 	if (btf == 0)
@@ -76,181 +77,191 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 		if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 		{
 			ReadInfo->LineNumber++;
-
-			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
-
-			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-				return 0;
 		}
+
+		ReadInfo->ReadOptions.Bits.LineNumberSent = 0;
 
 		return 1;
-	}
-
-	// if this was set, output the new line and clear the bit
-	if (ReadInfo->ReadOptions.Bits.OutputNewLine == 1)
-	{
-		ReadInfo->ReadOptions.Bits.OutputNewLine = 0;
-
-		if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines <= SHELL_NEW_LINE_SUPPRESS_THRESHOLD))
-		{
-			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
-
-			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-				return 0;
-		}
 	}
 
 	if (ReadInfo->ReadOptions.Value == 0)
 	{
 		if (PipeWrite((PIPE*)OutputStream, DataToWrite, strlen(DataToWrite), NULL) != OS_SUCCESS)
 			return 0;
+
+		return btf;
 	}
 	else
 	{
 		// now we have to iterate through and see if we found anything
-		UINT32 i, LineNumber;
-		char* DataPtr = DataToWrite;
+		UINT i;
 		char* DataStart = DataToWrite;
 
-		LineNumber = 0;
-
-		for (i = 0; i < strlen(DataToWrite); i++)
+		// if this was set, output the new line and clear the bit
+		if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 		{
-			switch (*DataPtr++)
+			ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
+
+			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
+
+			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+				return 0;
+		}
+
+		for(i = 0; i < btf; i++)
+		{
+			switch (DataToWrite[i])
 			{
 				case '\r':
-				case '\n':
 				{
 					// send out what we have currently
-					if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart) - ReadInfo->ReadOptions.Bits.ShowLineEnds, NULL) != OS_SUCCESS)
-						return 0;
+					if (DataStart != &DataToWrite[i])
+						if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
+							return 0;
 
-					if (*DataPtr == '\n')
-					{
-						if (ReadInfo->ReadOptions.Bits.NewLinePrior == 1)
-						{
-							if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1)
-								ReadInfo->NumberOfEmptyLines++;
-						}
-						else
-						{
-							ReadInfo->ReadOptions.Bits.NewLinePrior = 1;
-
-							ReadInfo->NumberOfEmptyLines++;
-						}
-
-						DataPtr++;
-					}
+					// just set the flag and move on, we don't want to send anything yet
+					ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 1;
 
 					// point to our new spot
-					DataStart = DataPtr;
+					DataStart = &DataToWrite[i + 1];
 
-					// are we outputting end of line characters?
-					if (ReadInfo->ReadOptions.Bits.ShowLineEnds == 1 && (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines <= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)))
+					break;
+				}
+
+				case '\n':
+				{
+					// if this was set, output the new line and clear the bit
+					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 					{
-						// output a $
-						if (PipeWrite((PIPE*)OutputStream, END_OF_LINE_CAT_PRINT_CHARACTER SHELL_DEFAULT_END_OF_LINE_SEQUENCE, 1 + SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
+
+						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 							return 0;
 					}
 
-					// are we numbering lines?
-					if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
+					// clear this becuase we're outputting a new line
+					ReadInfo->ReadOptions.Bits.LineNumberSent = 0;
+
+					// send out what we have currently
+					if (DataStart != &DataToWrite[i])
+						if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
+							return 0;
+
+					// show the line end
+					if (ReadInfo->ReadOptions.Bits.ShowLineEnds == 1)
 					{
-						// increment our line number
-						ReadInfo->LineNumber++;
-
-						if (*DataStart == 0)
-						{
-							// this could be EOF, or just end of the current write, we don't know.
-							// mark this so that if the file reenters, it outputs the new line
-							ReadInfo->ReadOptions.Bits.OutputNewLine = 1;
-						}
-						else
-						{
-							// output the new line if required
-
-							if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 0 || (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1 && ReadInfo->NumberOfEmptyLines < SHELL_NEW_LINE_SUPPRESS_THRESHOLD))
-							{
-								Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
-
-								if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-									return 0;
-							}
-						}
+						if (PipeWrite((PIPE*)OutputStream, "$", 1, NULL) != OS_SUCCESS)
+							return 0;
 					}
+
+					// did they have a '\r'?
+					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					{
+						// now clear this
+						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+
+						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
+							return 0;
+					}
+
+					// now output the new line
+					if (PipeWrite((PIPE*)OutputStream, "\n", 1, NULL) != OS_SUCCESS)
+						return 0;
+
+					// point to our new spot
+					DataStart = &DataToWrite[i + 1];
 
 					break;
 				}
 
 				case '\t':
 				{
-					if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1)
+					// if this was set, output the new line and clear the bit
+					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 					{
-						// if they have line count on, output a new line
-						if (ReadInfo->NumberOfEmptyLines >= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)
-						{
-							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
+						ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
 
-							if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-								return 0;
-						}
+						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
 
-						ReadInfo->NumberOfEmptyLines = 0;
-						ReadInfo->ReadOptions.Bits.NewLinePrior = 0;
+						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+							return 0;
+					}
+
+					// did they have a '\r'?
+					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					{
+						// now clear this
+						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+
+						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
+							return 0;
 					}
 
 					// send out what we have currently
-					if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
-						return 0;
+					if(DataStart != &DataToWrite[i])
+						if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
+							return 0;
 
-					if (PipeWrite((PIPE*)OutputStream, "^I", 2, NULL) != OS_SUCCESS)
-						return 0;
+					if (ReadInfo->ReadOptions.Bits.ShowTabs == 1)
+					{
+						if (PipeWrite((PIPE*)OutputStream, "^I", 2, NULL) != OS_SUCCESS)
+							return 0;
+					}
+					else
+					{
+						if (PipeWrite((PIPE*)OutputStream, SHELL_TAB, SHELL_TAB_STRING_LENGTH_IN_BYTES, NULL) != OS_SUCCESS)
+							return 0;
+					}
 
 					// point to our new spot
-					DataStart = DataPtr;
+					DataStart = &DataToWrite[i + 1];
 
 					break;
 				}
 
 				default:
 				{
-					DataPtr--;
-
-					if (ReadInfo->ReadOptions.Bits.SupressRepeativeEmptyLines == 1)
+					// if this was set, output the new line and clear the bit
+					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 					{
-						// if they have line count on, output a new line
-						if (ReadInfo->NumberOfEmptyLines >= SHELL_NEW_LINE_SUPPRESS_THRESHOLD)
-						{
-							Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber);
+						ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
 
-							if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-								return 0;
-						}
+						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
 
-						ReadInfo->NumberOfEmptyLines = 0;
-						ReadInfo->ReadOptions.Bits.NewLinePrior = 0;
+						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+							return 0;
+					}
+
+					// did they have a '\r'?
+					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					{
+						// now clear this
+						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+
+						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
+							return 0;
 					}
 
 					// if the character is print, print it out
-					if (isprint(*DataPtr) == FALSE && isspace(*DataPtr) == FALSE)
+					if (isprint(DataToWrite[i]) == FALSE && isspace(DataToWrite[i]) == FALSE)
 					{
-						// its not print
+						// the charcter is not print
 
-						// do they have the option set for printing non printable characters?
-						if (ReadInfo->ReadOptions.Bits.ShowControlCharacters == 1)
-						{
-							// send out what we have currently
-							if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
+						// send out what we have currently
+						if (DataStart != &DataToWrite[i])
+							if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
 								return 0;
 
+						if (ReadInfo->ReadOptions.Bits.ShowControlCharacters == 1)
+						{
 							// do they have the option set
-							if (*DataPtr < 128)
+							if (DataToWrite[i] < 128)
 							{
 								// we are under 128, use ^@
 								char TempBuffer[2];
 
 								TempBuffer[0] = '^';
-								TempBuffer[1] = '@' + *DataPtr;
+								TempBuffer[1] = '@' + DataToWrite[i];
 
 								// now write the data
 								if (PipeWrite((PIPE*)OutputStream, TempBuffer, 2, NULL) != OS_SUCCESS)
@@ -264,24 +275,20 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 								TempBuffer[0] = 'M';
 								TempBuffer[1] = '-';
 								TempBuffer[2] = '^';
-								TempBuffer[3] = '@' + (*DataPtr) - 128;
+								TempBuffer[3] = '@' + (DataToWrite[i]) - 128;
 
 								// now write the data
 								if (PipeWrite((PIPE*)OutputStream, TempBuffer, 4, NULL) != OS_SUCCESS)
 									return 0;
 							}
+						}
 
-							// point to our new spot
-							DataStart = ++DataPtr;
-						}
-						else
-						{
-							DataPtr++;
-						}
+						// point to our new spot
+						DataStart = &DataToWrite[i + 1];
 					}
 					else
 					{
-						DataPtr++;
+						// do nothing
 					}
 
 					break;
@@ -289,13 +296,10 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 			}
 		}
 
-		// output any residual data
-		if (DataPtr != DataStart)
-		{
-			// send out what we have currently
-			if (PipeWrite((PIPE*)OutputStream, DataStart, (DataPtr - DataStart), NULL) != OS_SUCCESS)
+		// send out what we have currently
+		if (DataStart != &DataToWrite[i])
+			if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
 				return 0;
-		}
 	}
 
 	return btf;
@@ -431,15 +435,12 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 				return Result;
 		}
 
-		if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
-			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
-
 		ArgsProcessed++;
 
 		// clear out the status of the read info
 		ReadInfo.LineNumber = 0;
 		ReadInfo.NumberOfEmptyLines = 0;
-		ReadInfo.ReadOptions.Bits.NewLinePrior = ReadInfo.ReadOptions.Bits.OutputNewLine = 0;
+		ReadInfo.ReadOptions.Bits.LineNumberSent = 0;
 	}
 
 	return SHELL_SUCCESS;
