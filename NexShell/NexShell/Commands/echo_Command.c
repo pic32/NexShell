@@ -163,12 +163,8 @@ void UpdateBackslashCharacters(char *String)
 
 SHELL_RESULT echoCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {
-	FIL File;
-	BYTE FSAppend;
 	char *SpecialCharacters;
 	UINT32 StringArguments;
-	SHELL_RESULT Result;
-	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 	BOOL EnableBackslash = FALSE;
 	BOOL AppendNewLine = TRUE;
 

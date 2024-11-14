@@ -20,7 +20,7 @@ SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIP
 		// output help if they asked
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (PipeWrite(OutputStream, SHUTDOWN_HELP_TEXT, strlen(SHUTDOWN_HELP_TEXT), NULL) != OS_SUCCESS)
+			if (PipeWrite(OutputStream, SHUTDOWN_HELP_TEXT, (UINT32)strlen(SHUTDOWN_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;

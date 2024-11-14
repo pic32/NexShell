@@ -3,21 +3,25 @@
 
 #include "ffconf.h"
 
+// if set to a 1 the shell prompt will be used
+#define SHELL_USE_PROMPT											1
+
 // these are the defines for the prompt
 // the prompt looks like this with the defines
 // PROMPT_LEADING_SEQUENCE + USERNAME + USERNAME_DIRECTORY_SEPERATION_SEQUENCE + 
 // current directory + PROMPT_ENDING_SEQUENCE + ATTENTION_CHARACTER
-#define SHELL_USE_PROMPT											1
 #define SHELL_PROMPT_LEADING_SEQUENCE								"["
 #define SHELL_USERNAME												"brodie"
 #define SHELL_USERNAME_DIRECTORY_SEPERATION_SEQUENCE				" | "
 #define SHELL_PROMPT_ENDING_SEQUENCE								"]"
 #define SHELL_ATTENTION_CHARACTER									"$"
 
+// if set to a 1 the project name will be used
+#define SHELL_USE_PROJECT_NAME										1
+
 // these are the defines for the system startup string
 // the system startup string looks like this with the defines
 // PROJECT_NAME + " " + MAJOR_VERSION + "." + MINOR_VERSION + "." + TEST_VERSION
-#define SHELL_USE_PROJECT_NAME										1
 #define SHELL_PROJECT_NAME											"NexShell"
 #define SHELL_MAJOR_VERSION											"0"
 #define SHELL_MINOR_VERSION											"00"
@@ -34,8 +38,10 @@
 #define SHELL_TAB													"  "
 #define SHELL_TAB_STRING_LENGTH_IN_BYTES							strlen(SHELL_TAB)
 
+// this is here to support the choice made for #define Shell_sprintf
 #include <stdio.h>
 
+// whenever the shell needs to call sprintf() it will call Shell_sprintf()
 #define Shell_sprintf												sprintf
 
 // these are all the sizes of various buffers used within the Nano Shell
@@ -129,7 +135,13 @@
 	#define SHELL_ERROR_COLOR										
 #endif // end of #if (USE_SHELL_COLOR == 1)
 
+// this is how many characters in a file to display in the shell.  Once
+// SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY characters are displayed 
+// the shell will append "..." to the file name.
 #define SHELL_NUMBER_OF_FILE_CHARACTERS_TO_DISPLAY					16
+
+// if this is set to a 1 the ability to add global commands that show
+// up in the help menu will be enabled.
 #define USE_USER_COMMANDS											1
 
 // these are virtual files that can be turned on and off in dev folder
@@ -149,6 +161,8 @@
 #define USE_PWD_COMMAND												1
 #define USE_SHUTDOWN_COMMAND										1
 
+// if set to a 1 the cd command will remember the last path used that
+// was valid and the - character will go to it when used in the cd command.
 #define EXTENDED_CD_SUPPORT											1
 
 // these are called when the shutdown command is received
@@ -156,18 +170,26 @@
 #define ShellPowerDownSleep()										exit(0)
 #define ShellPowerReset()											exit(0)
 
-// this is the home directory when ~ is used for a path
+// this is the home directory when ~ is used for a path in the cd command.
 #define USE_SHELL_HOME_DIRECTORY									1
 #define SHELL_HOME_DIRECTORY_CHARACTER								'~'
 #define SHELL_HOME_DIRECTORY_CHARACTER_STRING						"~"
 #define SHELL_HOME_DIRECTORY										"R:/"
 
-
-// this is the config for the history feature
+// this is here to support the #define NexShellMalloc and #define NexShellFreeMethod macros
 #include <stdlib.h>
 
+// if set to a 1 the shell history will be used.  This allows the up and
+// down arrows to scroll through the history.
 #define USE_SHELL_COMMAND_HISTORY									1
+
+// this is how many entries in the shell history to stash.  It is implemented
+// as a rolling buffer.  When NUMBER_OF_ENTRIES_IN_HISTORY number of commands
+// have been sent to the shell the first one will be lost and the new one added.
 #define NUMBER_OF_ENTRIES_IN_HISTORY								3
+
+// whenever the shell needs to do dynamic memory allocation or freeing it will
+// call the below methods.
 #define NexShellMalloc												malloc
 #define NexShellFreeMethod											free
 
@@ -180,6 +202,5 @@
 // this is how many characters the help file allocates for a commnad
 // before it displays the description
 #define HELP_COMMAND_NAME_SIZE_IN_BYTES								16
-
 
 #endif // end of #ifndef NEXSHELL_CONFIG_H

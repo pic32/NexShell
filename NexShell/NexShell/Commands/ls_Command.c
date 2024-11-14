@@ -42,7 +42,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 
 		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellFileInfoDay(Date), GetNexShellFileInfoMonth(Date), GetNexShellFileInfoYear(Date))), MonthToString(GetNexShellFileInfoMonth(Date) - 1), GetNexShellFileInfoDay(Date), GetNexShellFileInfoYear(Date));
 
-		if (PipeWrite(OutputStream, Buffer, strlen(Buffer), NULL) != OS_SUCCESS)
+		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 
@@ -310,7 +310,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 		// output help if they asked
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (PipeWrite(OutputStream, LS_HELP_TEXT, strlen(LS_HELP_TEXT), NULL) != OS_SUCCESS)
+			if (PipeWrite(OutputStream, LS_HELP_TEXT, (UINT32)strlen(LS_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;

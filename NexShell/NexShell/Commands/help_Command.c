@@ -49,7 +49,7 @@ static UINT help_ForwardData(   /* Returns number of bytes sent or stream status
 	}
 
 	// write the description
-	if (PipeWrite((PIPE*)OutputStream, DataToWrite, (UINT32)btf, NULL) != OS_SUCCESS)
+	if (PipeWrite((PIPE*)OutputStream, (BYTE*)DataToWrite, (UINT32)btf, NULL) != OS_SUCCESS)
 		return 0;
 
 	return btf;
@@ -124,7 +124,7 @@ SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 	{
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (PipeWrite(OutputStream, HELP_HELP_TEXT, strlen(HELP_HELP_TEXT), NULL) != OS_SUCCESS)
+			if (PipeWrite(OutputStream, HELP_HELP_TEXT, (UINT32)strlen(HELP_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;

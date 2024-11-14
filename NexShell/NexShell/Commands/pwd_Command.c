@@ -12,7 +12,7 @@ SHELL_RESULT pwdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 	{
 		if (strcmp(Args[0], "--help") == 0)
 		{
-			if (PipeWrite(OutputStream, PWD_HELP_TEXT, strlen(PWD_HELP_TEXT), NULL) != OS_SUCCESS)
+			if (PipeWrite(OutputStream, PWD_HELP_TEXT, (UINT32)strlen(PWD_HELP_TEXT), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 			return SHELL_SUCCESS;
@@ -28,7 +28,7 @@ SHELL_RESULT pwdCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	if (PipeWrite(OutputStream, CurrentWorkingDirectory, strlen(CurrentWorkingDirectory), NULL) != OS_SUCCESS)
+	if (PipeWrite(OutputStream, CurrentWorkingDirectory, (UINT32)strlen(CurrentWorkingDirectory), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)

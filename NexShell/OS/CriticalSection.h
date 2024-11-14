@@ -72,4 +72,6 @@ void EnterCritical(void);
 */
 void ExitCritical(void);
 
+void SurrenderCPU(void);
+
 #endif // end of #ifndef CRITICAL_SECTIONS_H

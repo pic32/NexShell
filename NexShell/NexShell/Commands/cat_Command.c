@@ -66,7 +66,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 	void *Options
 )
 {
-	SHELL_RESULT Result;
 	char LineNumberBuffer[8];
 	READ_INFO* ReadInfo = (READ_INFO*)Options;
 	UINT btfCopy = btf;
@@ -80,7 +79,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
 
-			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, (UINT32)strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 				return 0;
 		}
 
@@ -89,7 +88,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 	if (ReadInfo->ReadOptions.Value == 0)
 	{
-		if (PipeWrite((PIPE*)OutputStream, DataToWrite, strlen(DataToWrite), NULL) != OS_SUCCESS)
+		if (PipeWrite((PIPE*)OutputStream, (BYTE*)DataToWrite, (UINT32)strlen(DataToWrite), NULL) != OS_SUCCESS)
 			return 0;
 
 		return btf;
@@ -98,7 +97,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 	{
 		// now we have to iterate through and see if we found anything
 		UINT i;
-		char* DataStart = DataToWrite;
+		char* DataStart = (char*)DataToWrite;
 
 		for(i = 0; i < btf; i++)
 		{
@@ -153,7 +152,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 					{
 						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
 
-						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, (UINT32)strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
 							return 0;
 					}
 
@@ -187,7 +186,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 					}
 					else
 					{
-						if (PipeWrite((PIPE*)OutputStream, SHELL_TAB, SHELL_TAB_STRING_LENGTH_IN_BYTES, NULL) != OS_SUCCESS)
+						if (PipeWrite((PIPE*)OutputStream, SHELL_TAB, (UINT32)SHELL_TAB_STRING_LENGTH_IN_BYTES, NULL) != OS_SUCCESS)
 							return 0;
 					}
 
@@ -287,7 +286,7 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 	// output help if they asked
 	if (strcmp(Args[0], "--help") == 0)
 	{
-		if (PipeWrite(OutputStream, CAT_HELP_TEXT, strlen(CAT_HELP_TEXT), NULL) != OS_SUCCESS)
+		if (PipeWrite(OutputStream, CAT_HELP_TEXT, (UINT32)strlen(CAT_HELP_TEXT), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 		return SHELL_SUCCESS;

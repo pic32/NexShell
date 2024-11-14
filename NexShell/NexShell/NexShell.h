@@ -161,6 +161,25 @@ typedef struct
 }COMMAND_INFO;
 
 SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
+
+/**
+ * @brief Initializes the NexShell.
+ *
+ * This function will initialize all data structures needed to run the NexShell.
+ * This method should be called before any other method in the NexShell library.
+ *
+ * @param CurrentDrive - The main drive to initialize.  This is the disk drive
+ * that the NexShell will work out of.
+ *
+ * @return SHELL_RESULT - The outcome of the operation.
+ *
+ * @details
+ * The factorial of a non-negative integer n is the product
+ * of all positive integers less than or equal to n. For
+ * example, the factorial of 5 is 5 * 4 * 3 * 2 * 1 = 120.
+ * This function uses recursion to compute the factorial.
+ *
+ */
 SHELL_RESULT NexShellInit(char CurrentDrive);
 char NexShellGetRootDriveVolume(void);
 

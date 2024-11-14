@@ -120,7 +120,7 @@ static SHELL_RESULT OutputPrompt(char *CurrentDirectory, PIPE *OutputStream)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of #if (USE_SHELL_COLOR == 1)
 
-	if (PipeWrite(OutputStream, (const BYTE*)CurrentDirectory, (UINT32)strlen(CurrentDirectory), NULL) != OS_SUCCESS)
+	if (PipeWrite(OutputStream, (BYTE*)CurrentDirectory, (UINT32)strlen(CurrentDirectory), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	#ifdef SHELL_PROMPT_ENDING_SEQUENCE
@@ -138,7 +138,7 @@ static SHELL_RESULT OutputPrompt(char *CurrentDirectory, PIPE *OutputStream)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	#endif // end of #if (USE_SHELL_COLOR == 1)
 
-	if (PipeWrite(OutputStream, (const BYTE*)" ", 1, NULL) != OS_SUCCESS)
+	if (PipeWrite(OutputStream, (BYTE*)" ", 1, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
@@ -249,7 +249,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 			if (PipeWrite(&gStandardOutputStream, SHELL_MAJOR_VERSION, (UINT32)strlen(SHELL_MAJOR_VERSION), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if (PipeWrite(&gStandardOutputStream, (const BYTE*)".", 1, NULL) != OS_SUCCESS)
+			if (PipeWrite(&gStandardOutputStream, (BYTE*)".", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_MAJOR_VERSION
 
@@ -257,7 +257,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 			if (PipeWrite(&gStandardOutputStream, SHELL_MINOR_VERSION, (UINT32)strlen(SHELL_MINOR_VERSION), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-			if (PipeWrite(&gStandardOutputStream, (const BYTE*)".", 1, NULL) != OS_SUCCESS)
+			if (PipeWrite(&gStandardOutputStream, (BYTE*)".", 1, NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		#endif // end of SHELL_MINOR_VERSION
 
@@ -1017,7 +1017,7 @@ static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, cha
 							return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 					#endif // end of #if (USE_SHELL_COLOR == 1)
 
-					if(PipeWrite(OutputStream, gNexShellError[Result], (UINT32)strlen(gNexShellError[Result]), NULL) != OS_SUCCESS)
+					if(PipeWrite(OutputStream, (BYTE*)gNexShellError[Result], (UINT32)strlen(gNexShellError[Result]), NULL) != OS_SUCCESS)
 						return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 					if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)

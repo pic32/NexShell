@@ -81,7 +81,7 @@ SHELL_RESULT dateCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 			CurrentDateTime.tm_year + 1900);
 
 		// write our answer out the stream they passed in
-		if (PipeWrite(OutputStream, Filename, strlen(Filename), NULL) != OS_SUCCESS)
+		if (PipeWrite(OutputStream, Filename, (UINT32)strlen(Filename), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 	}
 	else

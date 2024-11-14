@@ -22,6 +22,7 @@
  */
 
 #include <Windows.h>
+#include <stdio.h>
 
 CRITICAL_SECTION CriticalSection;
 
