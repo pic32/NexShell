@@ -77,9 +77,12 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 		if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
 		{
 			ReadInfo->LineNumber++;
-		}
 
-		ReadInfo->ReadOptions.Bits.LineNumberSent = 0;
+			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
+
+			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+				return 0;
+		}
 
 		return 1;
 	}
@@ -96,17 +99,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 		// now we have to iterate through and see if we found anything
 		UINT i;
 		char* DataStart = DataToWrite;
-
-		// if this was set, output the new line and clear the bit
-		if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
-		{
-			ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
-
-			Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
-
-			if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-				return 0;
-		}
 
 		for(i = 0; i < btf; i++)
 		{
@@ -130,18 +122,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 				case '\n':
 				{
-					// if this was set, output the new line and clear the bit
-					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
-					{
-						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
-
-						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-							return 0;
-					}
-
-					// clear this becuase we're outputting a new line
-					ReadInfo->ReadOptions.Bits.LineNumberSent = 0;
-
 					// send out what we have currently
 					if (DataStart != &DataToWrite[i])
 						if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
@@ -168,6 +148,15 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 					if (PipeWrite((PIPE*)OutputStream, "\n", 1, NULL) != OS_SUCCESS)
 						return 0;
 
+					// if this was set, output the new line and clear the bit
+					if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
+					{
+						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
+
+						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
+							return 0;
+					}
+
 					// point to our new spot
 					DataStart = &DataToWrite[i + 1];
 
@@ -176,17 +165,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 				case '\t':
 				{
-					// if this was set, output the new line and clear the bit
-					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
-					{
-						ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
-
-						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
-
-						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-							return 0;
-					}
-
 					// did they have a '\r'?
 					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
 					{
@@ -221,17 +199,6 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 
 				default:
 				{
-					// if this was set, output the new line and clear the bit
-					if (ReadInfo->ReadOptions.Bits.LineNumberSent == 0 && ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
-					{
-						ReadInfo->ReadOptions.Bits.LineNumberSent = 1;
-
-						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
-
-						if (PipeWrite((PIPE*)OutputStream, LineNumberBuffer, strlen(LineNumberBuffer), NULL) != OS_SUCCESS)
-							return 0;
-					}
-
 					// did they have a '\r'?
 					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
 					{
@@ -372,6 +339,10 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 
 			if (Result != SHELL_SUCCESS)
 				return Result;
+
+			// output a new line
+			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 		else
 		{
@@ -440,8 +411,11 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 		// clear out the status of the read info
 		ReadInfo.LineNumber = 0;
 		ReadInfo.NumberOfEmptyLines = 0;
-		ReadInfo.ReadOptions.Bits.LineNumberSent = 0;
 	}
+
+	// output a new line
+	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	return SHELL_SUCCESS;
 }

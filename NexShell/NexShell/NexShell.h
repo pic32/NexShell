@@ -87,9 +87,8 @@ typedef union
 		unsigned int SupressRepeativeEmptyLines : 1;	// -s (unsupported for now)
 		unsigned int ShowTabs : 1;						// -T
 		unsigned int ShowControlCharacters : 1;			// -v
-		unsigned int LineNumberSent : 1;				// Internal Use
 		unsigned int CarriageReturnPresent : 1;			// Internal Use
-		unsigned int Reserved : 1;
+		unsigned int Reserved : 2;
 	}Bits;
 }READ_OPTIONS;
 
