@@ -304,14 +304,21 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 	ArgsProcessed = 0;
 
 	// get any potential options
-	if ((Result = ProcessOptions(Args[0], &ReadInfo.ReadOptions)) == TRUE)
+	while (*(Args[ArgsProcessed]) == '-' && NumberOfArgs != 0)
 	{
-		// if we only have one set of arguments, that's an issue
-		if (NumberOfArgs == 1)
-			return SHELL_INVALID_INPUT_PARAMETER;
+		if ((Result = ProcessOptions(Args[ArgsProcessed], &ReadInfo.ReadOptions)) == TRUE)
+		{
+			// if we only have one set of arguments, that's an issue
+			if (NumberOfArgs == 1)
+				return SHELL_MISSING_OPERANDS;
 
-		ArgsProcessed++;
-		NumberOfArgs--;
+			ArgsProcessed++;
+			NumberOfArgs--;
+		}
+		else
+		{
+			return SHELL_INVALID_OPTION;
+		}
 	}
 
 	while (NumberOfArgs--)

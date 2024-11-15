@@ -31,6 +31,10 @@
 	#include "ls_Command.h"
 #endif // end of #if (USE_LS_COMMAND == 1)
 
+#if (USE_MKDIR_COMMAND == 1)
+	#include "mkdir_Command.h"
+#endif // end of #if (USE_MKDIR_COMMAND == 1)
+
 #if (USE_PWD_COMMAND == 1)
 	#include "pwd_Command.h"
 #endif // end of #if (USE_PWD_COMMAND == 1)
@@ -68,6 +72,10 @@ static COMMAND_INFO gCommandList[] =
 	#if (USE_LS_COMMAND == 1)
 		{LS_COMMAND_NAME, lsCommandExecuteMethod, "List the contents of a directory", LS_HELP_TEXT},
 	#endif // end of #if (USE_LS_COMMAND == 1)
+
+	#if (USE_MKDIR_COMMAND == 1)
+		{MKDIR_COMMAND_NAME, mkdirCommandExecuteMethod, "Make a directory", MKDIR_HELP_TEXT},
+	#endif // end of #if (USE_MKDIR_COMMAND == 1)
 
 	#if (USE_PWD_COMMAND == 1)
 		{PWD_COMMAND_NAME, pwdCommandExecuteMethod, "Outputs the current full directory", PWD_HELP_TEXT},

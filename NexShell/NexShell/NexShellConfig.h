@@ -158,6 +158,7 @@
 #define USE_ECHO_COMMAND											1
 #define USE_HELP_COMMAND											1
 #define USE_LS_COMMAND												1
+#define USE_MKDIR_COMMAND											1
 #define USE_PWD_COMMAND												1
 #define USE_SHUTDOWN_COMMAND										1
 

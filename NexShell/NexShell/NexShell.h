@@ -60,6 +60,9 @@ typedef enum
 	SHELL_COMMAND_ALREADY_EXISTS,
 	SHELL_COMMAND_NOT_FOUND,
 	SHELL_IO_CTL_FAILED,
+	SHELL_INVALID_OPTION,
+	SHELL_MISSING_OPERANDS,
+	SHELL_CANNOT_CREATE_DIRECTORY,
 
 	// always put this one at the lowest of the valid list
 	SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER,
@@ -134,6 +137,7 @@ typedef union
 #define HELP_COMMAND_NAME										"help"
 #define HEXDUMP_COMMAND_NAME									"hexdump"
 #define LS_COMMAND_NAME											"ls"
+#define MKDIR_COMMAND_NAME										"mkdir"
 #define PEEK_COMMAND_NAME										"peek"
 #define POKE_COMMAND_NAME										"poke"
 #define PWD_COMMAND_NAME										"pwd"
