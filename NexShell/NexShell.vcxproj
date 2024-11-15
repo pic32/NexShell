@@ -170,6 +170,7 @@
     <ClCompile Include="NexShell\Commands\mkdir_Command.c" />
     <ClCompile Include="NexShell\Commands\NexShellCommands.c" />
     <ClCompile Include="NexShell\Commands\pwd_Command.c" />
+    <ClCompile Include="NexShell\Commands\rm_Command.c" />
     <ClCompile Include="NexShell\Commands\shutdown_Command.c" />
     <ClCompile Include="NexShell\ioctl.c" />
     <ClCompile Include="NexShell\NexShell.c" />
@@ -198,6 +199,7 @@
     <ClInclude Include="NexShell\Commands\mkdir_Command.h" />
     <ClInclude Include="NexShell\Commands\NexShellCommands.h" />
     <ClInclude Include="NexShell\Commands\pwd_Command.h" />
+    <ClInclude Include="NexShell\Commands\rm_Command.h" />
     <ClInclude Include="NexShell\Commands\shutdown_Command.h" />
     <ClInclude Include="NexShell\ioctl.h" />
     <ClInclude Include="NexShell\NexShell.h" />

@@ -141,6 +141,7 @@ typedef union
 #define PEEK_COMMAND_NAME										"peek"
 #define POKE_COMMAND_NAME										"poke"
 #define PWD_COMMAND_NAME										"pwd"
+#define RM_COMMAND_NAME											"rm"
 #define SHUTDOWN_COMMAND_NAME									"shutdown"
 
 // this is the ascii value for the backspace character

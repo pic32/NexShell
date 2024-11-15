@@ -39,6 +39,10 @@
 	#include "pwd_Command.h"
 #endif // end of #if (USE_PWD_COMMAND == 1)
 
+#if (USE_RM_COMMAND == 1)
+	#include "rm_Command.h"
+#endif // end of #if (USE_RM_COMMAND == 1)
+
 #if (USE_SHUTDOWN_COMMAND == 1)
 	#include "shutdown_Command.h"
 #endif // end of #if (USE_SHUTDOWN_COMMAND == 1)
@@ -80,6 +84,10 @@ static COMMAND_INFO gCommandList[] =
 	#if (USE_PWD_COMMAND == 1)
 		{PWD_COMMAND_NAME, pwdCommandExecuteMethod, "Outputs the current full directory", PWD_HELP_TEXT},
 	#endif // end of #if (USE_PWD_COMMAND == 1)
+
+	#if (USE_RM_COMMAND == 1)
+		{RM_COMMAND_NAME, rmCommandExecuteMethod, "Remove a directory or file", RM_HELP_TEXT},
+	#endif // end of #if (USE_RM_COMMAND == 1)
 
 	#if (USE_SHUTDOWN_COMMAND == 1)
 		{SHUTDOWN_COMMAND_NAME, shutdownCommandExecuteMethod, "Bring the system down", SHUTDOWN_HELP_TEXT}

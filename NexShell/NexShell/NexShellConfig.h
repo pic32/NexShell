@@ -160,6 +160,7 @@
 #define USE_LS_COMMAND												1
 #define USE_MKDIR_COMMAND											1
 #define USE_PWD_COMMAND												1
+#define USE_RM_COMMAND												1
 #define USE_SHUTDOWN_COMMAND										1
 
 // if set to a 1 the cd command will remember the last path used that
