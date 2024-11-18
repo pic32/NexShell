@@ -174,14 +174,13 @@ typedef struct
 
 SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
 
-/**
+/*!
  * @brief Initializes the NexShell.
  *
  * This function will initialize all data structures needed to run the NexShell.
  * This method should be called before any other method in the NexShell library.
  *
- * @param CurrentDrive - The main drive to initialize.  This is the disk drive
- * that the NexShell will work out of.
+ * @param[in] BYTE CurrentDrive - The main drive to initialize.  This is the disk drive that the NexShell will work out of.
  *
  * @return SHELL_RESULT - The outcome of the operation.
  *
