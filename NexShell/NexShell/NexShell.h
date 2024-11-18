@@ -92,7 +92,7 @@ typedef union
 		unsigned int ShowControlCharacters : 1;			// -v
 		unsigned int CarriageReturnPresent : 1;			// Internal Use
 		unsigned int Reserved : 2;
-	}Bits;
+	}BITS;
 }READ_OPTIONS;
 
 #define SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS		(SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS + 2)

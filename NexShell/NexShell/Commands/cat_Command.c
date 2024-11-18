@@ -16,35 +16,35 @@ static BOOL ProcessOptions(char* OptionsString, READ_OPTIONS* Options)
 		{
 			case 'E':
 			{
-				Options->Bits.ShowLineEnds = 1;
+				Options->BITS.ShowLineEnds = 1;
 
 				break;
 			}
 
 			case 'n':
 			{
-				Options->Bits.NumberAllLines = 1;
+				Options->BITS.NumberAllLines = 1;
 
 				break;
 			}
 
 			case 's':
 			{
-				Options->Bits.SupressRepeativeEmptyLines = 1;
+				Options->BITS.SupressRepeativeEmptyLines = 1;
 
 				break;
 			}
 
 			case 'T':
 			{
-				Options->Bits.ShowTabs = 1;
+				Options->BITS.ShowTabs = 1;
 
 				break;
 			}
 
 			case 'v':
 			{
-				Options->Bits.ShowControlCharacters = 1;
+				Options->BITS.ShowControlCharacters = 1;
 
 				break;
 			}
@@ -73,7 +73,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 	// this is to find out if ready for transfer
 	if (btf == 0)
 	{
-		if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
+		if (ReadInfo->ReadOptions.BITS.NumberAllLines == 1)
 		{
 			ReadInfo->LineNumber++;
 
@@ -111,7 +111,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 							return 0;
 
 					// just set the flag and move on, we don't want to send anything yet
-					ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 1;
+					ReadInfo->ReadOptions.BITS.CarriageReturnPresent = 1;
 
 					// point to our new spot
 					DataStart = &DataToWrite[i + 1];
@@ -127,17 +127,17 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 							return 0;
 
 					// show the line end
-					if (ReadInfo->ReadOptions.Bits.ShowLineEnds == 1)
+					if (ReadInfo->ReadOptions.BITS.ShowLineEnds == 1)
 					{
 						if (PipeWrite((PIPE*)OutputStream, "$", 1, NULL) != OS_SUCCESS)
 							return 0;
 					}
 
 					// did they have a '\r'?
-					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					if (ReadInfo->ReadOptions.BITS.CarriageReturnPresent == 1)
 					{
 						// now clear this
-						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+						ReadInfo->ReadOptions.BITS.CarriageReturnPresent = 0;
 
 						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
 							return 0;
@@ -148,7 +148,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						return 0;
 
 					// if this was set, output the new line and clear the bit
-					if (ReadInfo->ReadOptions.Bits.NumberAllLines == 1)
+					if (ReadInfo->ReadOptions.BITS.NumberAllLines == 1)
 					{
 						Shell_sprintf(LineNumberBuffer, "% 6i ", ReadInfo->LineNumber++);
 
@@ -165,10 +165,10 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 				case '\t':
 				{
 					// did they have a '\r'?
-					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					if (ReadInfo->ReadOptions.BITS.CarriageReturnPresent == 1)
 					{
 						// now clear this
-						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+						ReadInfo->ReadOptions.BITS.CarriageReturnPresent = 0;
 
 						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
 							return 0;
@@ -179,7 +179,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 						if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
 							return 0;
 
-					if (ReadInfo->ReadOptions.Bits.ShowTabs == 1)
+					if (ReadInfo->ReadOptions.BITS.ShowTabs == 1)
 					{
 						if (PipeWrite((PIPE*)OutputStream, "^I", 2, NULL) != OS_SUCCESS)
 							return 0;
@@ -199,10 +199,10 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 				default:
 				{
 					// did they have a '\r'?
-					if (ReadInfo->ReadOptions.Bits.CarriageReturnPresent == 1)
+					if (ReadInfo->ReadOptions.BITS.CarriageReturnPresent == 1)
 					{
 						// now clear this
-						ReadInfo->ReadOptions.Bits.CarriageReturnPresent = 0;
+						ReadInfo->ReadOptions.BITS.CarriageReturnPresent = 0;
 
 						if (PipeWrite((PIPE*)OutputStream, "\r", 1, NULL) != OS_SUCCESS)
 							return 0;
@@ -218,7 +218,7 @@ UINT cat_ForwardData(   /* Returns number of bytes sent or stream status */
 							if (PipeWrite((PIPE*)OutputStream, DataStart, (&DataToWrite[i] - DataStart), NULL) != OS_SUCCESS)
 								return 0;
 
-						if (ReadInfo->ReadOptions.Bits.ShowControlCharacters == 1)
+						if (ReadInfo->ReadOptions.BITS.ShowControlCharacters == 1)
 						{
 							// do they have the option set
 							if (DataToWrite[i] < 128)

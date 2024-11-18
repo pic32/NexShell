@@ -20,6 +20,18 @@ SHELL_TAB SHELL_TAB LS_COMMAND_NAME " ../" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB SHELL_TAB LS_COMMAND_NAME " -l" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+typedef union
+{
+	BYTE Value;
+
+	struct
+	{
+		unsigned int ListAll : 1;
+		unsigned int LongListing : 1;
+		unsigned int Reserved : 6;
+	}BITS;
+}LS_OPTIONS;
+
 SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream);
 
 #endif // end of LS_COMMAND_H

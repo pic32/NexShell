@@ -51,8 +51,10 @@ static BOOL ProcessOptions(char* OptionsString, MKDIR_OPTIONS_DATA* Options)
 					OptionsString++;
 				}
 
-				// it should have been -m 75\0
-				// if we got here there was something after the digit
+				// only valud if we are null at this point
+				if (*OptionsString == 0)
+					return TRUE;
+				
 				return FALSE;
 			}
 

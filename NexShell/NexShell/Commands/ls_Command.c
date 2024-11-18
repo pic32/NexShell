@@ -9,7 +9,40 @@
 
 #define INVALID_FILE_SIZE					0xFFFFFFFF
 
-static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UINT16 Date, UINT16 Time, PIPE* OutputStream)
+static BOOL ProcessOptions(char* OptionsString, LS_OPTIONS* Options)
+{
+	if (*OptionsString++ != '-')
+		return FALSE;
+
+	while (*OptionsString)
+	{
+		switch (*OptionsString++)
+		{
+			case 'l':
+			{
+				Options->BITS.LongListing = 1;
+
+				break;
+			}
+
+			case 'a':
+			{
+				Options->BITS.ListAll = 1;
+
+				break;
+			}
+
+			default:
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UINT16 Date, UINT16 Time, BOOL ReadOnly, BOOL Hidden, BOOL System, BOOL Archive, PIPE* OutputStream)
 {
 	char FileAttributes[6];
 
@@ -17,10 +50,27 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	memset(FileAttributes, 0, sizeof(FileAttributes));
 
 	FileAttributes[0] = 'd';
-	FileAttributes[1] = '-';
-	FileAttributes[2] = '-';
-	FileAttributes[3] = '-';
-	FileAttributes[4] = '-';
+
+	if (ReadOnly == TRUE)
+		FileAttributes[1] = 'r';
+	else
+		FileAttributes[1] = '-';
+
+	if (Hidden == TRUE)
+		FileAttributes[2] = 'h';
+	else
+		FileAttributes[2] = '-';
+
+	if (System == TRUE)
+		FileAttributes[3] = 's';
+	else
+		FileAttributes[3] = '-';
+
+	if (Archive != NULL)
+		FileAttributes[4] = 'a';
+	else
+		FileAttributes[4] = '-';
+
 	FileAttributes[5] = ' ';
 
 	if (PipeWrite(OutputStream, FileAttributes, sizeof(FileAttributes), NULL) != OS_SUCCESS)
@@ -78,7 +128,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date, UINT16 Time, BOOL Virtual, BOOL Read, BOOL Write, BOOL Execute, char *Description, char *Help, PIPE* OutputStream)
+static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date, UINT16 Time, BOOL Virtual, BOOL Read_ReadOnly, BOOL Write_Hidden, BOOL Execute_System, char *Description, char *Help_Archive, PIPE* OutputStream)
 {
 	char FileAttributes[6];
 
@@ -88,27 +138,53 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 	if (Virtual == TRUE)
 		FileAttributes[0] = 'v';
 	else
-		FileAttributes[0] = '-';
+		FileAttributes[0] = 'f';
 
-	if (Read == TRUE)
-		FileAttributes[1] = 'r';
-	else
-		FileAttributes[1] = '-';
+	if (Virtual == TRUE)
+	{
+		if (Read_ReadOnly == TRUE)
+			FileAttributes[1] = 'r';
+		else
+			FileAttributes[1] = '-';
 
-	if (Write == TRUE)
-		FileAttributes[2] = 'w';
-	else
-		FileAttributes[2] = '-';
+		if (Write_Hidden == TRUE)
+			FileAttributes[2] = 'w';
+		else
+			FileAttributes[2] = '-';
 
-	if (Execute  == TRUE)
-		FileAttributes[3] = 'x';
-	else
-		FileAttributes[3] = '-';
+		if (Execute_System == TRUE)
+			FileAttributes[3] = 'x';
+		else
+			FileAttributes[3] = '-';
 
-	if (Help != NULL)
-		FileAttributes[4] = 'h';
+		if (Help_Archive != NULL)
+			FileAttributes[4] = 'h';
+		else
+			FileAttributes[4] = '-';
+	}
 	else
-		FileAttributes[4] = '-';
+	{
+		// we are a disk file, not virtual
+		if (Read_ReadOnly == TRUE)
+			FileAttributes[1] = 'r';
+		else
+			FileAttributes[1] = '-';
+
+		if (Write_Hidden == TRUE)
+			FileAttributes[2] = 'h';
+		else
+			FileAttributes[2] = '-';
+
+		if (Execute_System == TRUE)
+			FileAttributes[3] = 's';
+		else
+			FileAttributes[3] = '-';
+
+		if (Help_Archive != NULL)
+			FileAttributes[4] = 'a';
+		else
+			FileAttributes[4] = '-';
+	}
 
 	FileAttributes[5] = ' ';
 
@@ -196,12 +272,12 @@ static SHELL_RESULT OutputRelativeDirectories(PIPE* OutuputStream)
 	SHELL_RESULT Result;
 
 	// output the relative directories since we're not in root
-	Result = OutputDirectoryInfo(".", INVALID_FILE_SIZE, 0, 0, OutuputStream);
+	Result = OutputDirectoryInfo(".", INVALID_FILE_SIZE, 0, 0, FALSE, FALSE, FALSE, FALSE, OutuputStream);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;
 
-	Result = OutputDirectoryInfo("..", INVALID_FILE_SIZE, 0, 0, OutuputStream);
+	Result = OutputDirectoryInfo("..", INVALID_FILE_SIZE, 0, 0, FALSE, FALSE, FALSE, FALSE, OutuputStream);
 
 	if (Result != SHELL_SUCCESS)
 		return Result;
@@ -209,7 +285,7 @@ static SHELL_RESULT OutputRelativeDirectories(PIPE* OutuputStream)
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, PIPE* OutputStream)
+static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, BOOL ShowHidden, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 	FILINFO FileInfo;
@@ -251,18 +327,24 @@ static SHELL_RESULT OutputDirectoryContents(DIR *Directory, BOOL LongFormat, PIP
 		if (FileInfo.fattrib & AM_DIR)
 		{
 			// it was a directory
-			Result = OutputDirectoryInfo(FileInfo.fname, Size, Date, Time, OutputStream);
+			if (((FileInfo.fattrib & AM_HID) == 0) || (ShowHidden == TRUE))
+			{
+				Result = OutputDirectoryInfo(FileInfo.fname, Size, Date, Time, (BOOL)((FileInfo.fattrib & AM_RDO) != 0), (BOOL)((FileInfo.fattrib & AM_HID) != 0), (BOOL)((FileInfo.fattrib & AM_SYS) != 0), (BOOL)((FileInfo.fattrib & AM_ARC) != 0), OutputStream);
 
-			if (Result != SHELL_SUCCESS)
-				return Result;
+				if (Result != SHELL_SUCCESS)
+					return Result;
+			}
 		}
 		else
 		{
 			// it was a file
-			Result = OutputFileInfo(FileInfo.fname, Size, Date, Time, FALSE, TRUE, !(FileInfo.fattrib & AM_RDO), FALSE, NULL, NULL, OutputStream);
+			if (((FileInfo.fattrib & AM_HID) == 0) || (ShowHidden == TRUE))
+			{
+				Result = OutputFileInfo(FileInfo.fname, Size, Date, Time, FALSE, (BOOL)(FileInfo.fattrib & AM_RDO), (BOOL)(FileInfo.fattrib & AM_HID), (BOOL)(FileInfo.fattrib & AM_SYS), NULL, (char*)(FileInfo.fattrib & AM_ARC), OutputStream);
 
-			if (Result != SHELL_SUCCESS)
-				return Result;
+				if (Result != SHELL_SUCCESS)
+					return Result;
+			}
 		}
 	}
 
@@ -300,9 +382,13 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 	SHELL_RESULT Result;
 	char* WorkingDirectoryPath;
 	DIR Directory;
+	LS_OPTIONS Options;
 	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
-	BOOL LongFormat = FALSE;
 
+	// clear it out first
+	memset(&Options, 0, sizeof(Options));
+
+	// zero this out at the start
 	ArgIndex = 0;
 
 	if (NumberOfArgs != 0)
@@ -316,11 +402,22 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 			return SHELL_SUCCESS;
 		}
 
-		if (strcmp(Args[ArgIndex], "-l") == 0)
+		// get any potential options
+		while (*(Args[ArgIndex]) == '-' && NumberOfArgs != 0)
 		{
-			LongFormat = TRUE;
+			if ((Result = ProcessOptions(Args[ArgIndex], &Options)) == TRUE)
+			{
+				ArgIndex++;
+				NumberOfArgs--;
 
-			ArgIndex++;
+				// if we only have one set of arguments, just leave
+				if (NumberOfArgs == 0)
+					break;
+			}
+			else
+			{
+				return SHELL_INVALID_OPTION;
+			}
 		}
 	}
 
@@ -349,7 +446,7 @@ SHELL_RESULT lsCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Out
 			return Result;
 
 		// output the directories
-		Result = OutputDirectoryContents(&Directory, LongFormat, OutputStream);
+		Result = OutputDirectoryContents(&Directory, (BOOL)Options.BITS.LongListing, (BOOL)Options.BITS.ListAll, OutputStream);
 
 		if (Result != SHELL_SUCCESS)
 			return Result;
