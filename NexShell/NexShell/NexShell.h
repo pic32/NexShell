@@ -1,6 +1,13 @@
 #ifndef NEXSHELL_H
 	#define NEXSHELL_H
 
+/*! \mainpage NexShell
+ *  \brief A Unix type shell interface with the FatFs.
+ *  \author brodie
+ *  \version 0.00.01
+ *  \date   November 18, 2024
+ */
+
 #include "NexShellConfig.h"
 #include "GenericTypes.h"
 #include "Pipe.h"
