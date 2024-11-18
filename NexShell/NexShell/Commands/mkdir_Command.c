@@ -1,4 +1,6 @@
 #include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 #include "NexShell.h"
 #include "mkdir_Command.h"
@@ -14,11 +16,46 @@ static BOOL ProcessOptions(char* OptionsString, MKDIR_OPTIONS_DATA* Options)
 		{
 			case 'm':
 			{
+				UINT32 ModeValue;
+
 				Options->Options.Bits.Mode = 1;
 
 				// now get the mode
+				while (isspace((int)*OptionsString) != 0)
+				{
+					if (*OptionsString == 0)
+						return FALSE;
 
-				break;
+					OptionsString++;
+				}
+
+				// now we are pointing to a value assumingly
+				if (isdigit((int)*OptionsString) == 0)
+					return FALSE;
+
+				// get the value
+				ModeValue = atol(OptionsString);
+
+				if (ModeValue < 0 || ModeValue > 255)
+					return FALSE;
+
+				// the value is acceptable
+				Options->FolderCreateMode = (BYTE)ModeValue;
+
+				// now iterate beyond the digiets
+				while (isdigit((int)*OptionsString) != 0)
+				{
+					if (*OptionsString == 0)
+						return TRUE;
+
+					OptionsString++;
+				}
+
+				// only valud if we are null at this point
+				if (*OptionsString == 0)
+					return TRUE;
+				
+				return FALSE;
 			}
 
 			case 'p':
@@ -146,6 +183,15 @@ SHELL_RESULT mkdirCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* 
 
 			if (Result != SHELL_SUCCESS)
 				return Result;
+
+			// did they have options?
+			if (Options.Options.Bits.Mode == 1)
+			{
+				Result = f_chmod(CurrentDir, Options.FolderCreateMode, Options.FolderCreateMode);
+
+				if (Result != SHELL_SUCCESS)
+					return Result;
+			}
 
 			Result = f_chdir(CurrentDir);
 
