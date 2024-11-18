@@ -852,6 +852,71 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 						break;
 					}
 
+					case CTRL_PLUS_L_VALUE:
+					{
+						SHELL_RESULT Result, TempResult;
+
+						Result = clearCommandExecuteMethod(NULL, 0, OutputStream);
+
+						if (Result != SHELL_SUCCESS)
+						{
+							// to string the error and output it
+
+							if (Result != SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER)
+							{
+								#if (USE_SHELL_COLOR == 1)
+									if (PipeWrite(OutputStream, SHELL_ERROR_COLOR, (UINT32)strlen(SHELL_ERROR_COLOR), NULL) != OS_SUCCESS)
+										return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+								#endif // end of #if (USE_SHELL_COLOR == 1)
+
+								if (PipeWrite(OutputStream, (BYTE*)gNexShellError[Result], (UINT32)strlen(gNexShellError[Result]), NULL) != OS_SUCCESS)
+									return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+
+								if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
+									return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+							}
+						}
+						else
+						{
+							// output everything in the input buffer
+							BYTE TempBuffer[SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES];
+							UINT32 BytesRead;
+							SHELL_RESULT PromptResponse;
+
+							TempResult = f_chdir(gCurrentWorkingDirectory);
+
+							// if we didn't get a main error, output it, otherwise output the result of f_chdir()
+							if (Result == SHELL_SUCCESS)
+								Result = TempResult;
+
+							PromptResponse = OutputPrompt(GetLastDirectoryPresent(gCurrentWorkingDirectory), OutputStream);
+
+							if (PromptResponse == SHELL_SUCCESS)
+							{
+								// get the data
+								if (PipePeek(InputStream, TempBuffer, sizeof(TempBuffer), PipeGetSize(InputStream), &BytesRead) != OS_SUCCESS)
+								{
+									return SHELL_GENERIC_BUFFER_READ_FAILURE;
+								}
+								else
+								{
+									// now write it
+									if (PipeWrite(OutputStream, TempBuffer, BytesRead, NULL) != OS_SUCCESS)
+										return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+								}
+							}
+
+							// if temp result was a success, copy the result from prompt
+							if (TempResult == SHELL_SUCCESS)
+								TempResult = PromptResponse;
+						}
+
+						if (Result == SHELL_SUCCESS)
+							Result = TempResult;
+
+						return Result;
+					}
+
 					case ESCAPE_ASCII_VALUE:
 					{
 						gEscapeSequence = 1;
