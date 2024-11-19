@@ -1,6 +1,10 @@
 ﻿#ifndef NEXSHELL_CONFIG_H
 	#define NEXSHELL_CONFIG_H
 
+/** \file
+ * This file contains all configurations for the NexShell.
+ */
+
 #include "ffconf.h"
 
 // if set to a 1 the shell prompt will be used
@@ -45,6 +49,11 @@
 #define Shell_sprintf												sprintf
 
 // these are all the sizes of various buffers used within the Nano Shell
+
+/*!
+  \def SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES
+  Determines the size of the standard output stream in bytes.
+*/
 #ifndef SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES
 	#define SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES					512
 #endif // end of #ifndef SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES

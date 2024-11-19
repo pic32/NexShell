@@ -327,7 +327,7 @@ SHELL_RESULT NexShellInit(char CurrentDrive)
 	return OutputPrompt(GetLastDirectoryPresent(&gCurrentWorkingDirectory[2]), &gStandardOutputStream);
 }
 
-SHELL_RESULT NexShellWriteTasks(PIPE *OutputStream)
+static SHELL_RESULT NexShellWriteTasks(PIPE *OutputStream)
 {
 	if (PipeGetSize(OutputStream) != 0)
 	{
@@ -1008,7 +1008,7 @@ static SHELL_RESULT NexShellProcessIncomingBuffer(char *IncomingData, UINT32 Num
 	return SHELL_SUCCESS;
 }
 
-static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, char *CurrentWorkingDirectory)
+SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, char *CurrentWorkingDirectory)
 {
 	SHELL_RESULT Result;
 	BYTE CharacterBuffer[SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES + 1];
@@ -1101,15 +1101,12 @@ static SHELL_RESULT NexShellReadTasks(PIPE *InputStream, PIPE *OutputStream, cha
 	return SHELL_SUCCESS;
 }
 
-unsigned long UserNexShellWriteTasks(void)
+SHELL_RESULT NexShellUserWriteTasks(void)
 {
 	return NexShellWriteTasks(&gStandardOutputStream);
 }
 
-SHELL_RESULT NexShellTasks(void)
+SHELL_RESULT NexShellUserReadTasks(void)
 {
-	//SHELL_RESULT WriteResult = NexShellWriteTasks(&gStandardOutputStream);
-	SHELL_RESULT ReadResult = NexShellReadTasks(&gStandardInputStream, &gStandardOutputStream, gCurrentWorkingDirectory);
-
-	return SHELL_SUCCESS;
+	return NexShellReadTasks(&gStandardInputStream, &gStandardOutputStream, gCurrentWorkingDirectory);
 }

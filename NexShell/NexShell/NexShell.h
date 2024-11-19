@@ -8,6 +8,11 @@
  *  \date   November 18, 2024
  */
 
+ /** \file
+  * This is the main interface to the NexShell.
+  * This file contains all the methods to initialize and run the NexShell.
+  */
+
 #include "NexShellConfig.h"
 #include "GenericTypes.h"
 #include "Pipe.h"
@@ -172,8 +177,6 @@ typedef struct
 	char* Help;
 }COMMAND_INFO;
 
-SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
-
 /*!
  * @brief Initializes the NexShell.
  *
@@ -185,16 +188,61 @@ SHELL_RESULT NexShellWriteTasks(PIPE* OutputStream);
  * @return SHELL_RESULT - The outcome of the operation.
  *
  * @details
- * The factorial of a non-negative integer n is the product
- * of all positive integers less than or equal to n. For
- * example, the factorial of 5 is 5 * 4 * 3 * 2 * 1 = 120.
- * This function uses recursion to compute the factorial.
- *
+ * This function initializes everything in the NexShell.  It should be called before any other method in the NexShell.
+ * The drive will be initialized through the FatFs.  If no valid file system is found this method will attempt to create one
+ * with a call to \ref f_mkfs() on the root.  This function initializes all standard streams too.  Afterwards the methods 
+ * \ref NexShellReadTasks() and NexShellWriteTasks() should be called to run the shell.  These can be called from the same thread,
+ * but the size of data writing out cannot exceed \ref SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES found in NexShellConfig.h.
+ * If \ref NexShellReadTasks() and \ref NexShellWriteTasks() are called from different threads then the data written to the standard
+ * stream can exceed \ref SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES.
+ * 
+ * @sa NexShellUserReadTasks(), NexShellUserWriteTasks()
  */
 SHELL_RESULT NexShellInit(char CurrentDrive);
-char NexShellGetRootDriveVolume(void);
 
-// call this continuously
-SHELL_RESULT NexShellTasks(void);
+/*!
+ * @brief Updates the input stream of the NexShell.
+ *
+ * This function must be called periodically to update the standard input stream of the NexShell.  This method is thread safe.
+ *
+ * @return SHELL_RESULT - The outcome of the operation.
+ *
+ * @details
+ * This function updates the input stream of the NexShell and will execute any commands sent to the NexShell.
+ * The function \ref StreamReaderDataHALCallback() is called from this method and will update the standard input
+ * stream with the data returned.
+ *
+ * @sa NexShellInit(), NexShellUserWriteTasks(), StreamReaderDataHALCallback()
+ */
+SHELL_RESULT NexShellUserReadTasks(void);
+
+/*!
+ * @brief Updates the input stream of the NexShell.
+ *
+ * This function must be called periodically to update the standard output stream of the NexShell.  This method is thread safe.
+ *
+ * @return SHELL_RESULT - The outcome of the operation.
+ *
+ * @details
+ * This function updates the input stream of the NexShell and will execute any commands sent to the NexShell.
+ * The function \ref StreamWriteDataHALCallback() is called from this method and will read data from the standard
+ * output stream and pass it to \ref StreamWriteDataHALCallback() for transmission.
+ *
+ * @sa NexShellInit(), NexShellUserReadTasks(), StreamReaderDataHALCallback()
+ */
+SHELL_RESULT NexShellUserWriteTasks(void);
+
+/*!
+ * @brief Gets the root drive of the NexShell.
+ *
+ * @return char - The NexShell root drive.
+ *
+ * @details
+ * This function can be called to get the root drive of the NexShell.  The NexShell root drive is determined by what
+ * was passed in to \ref NexShellInit() for the parameter CurrentDrive.
+ *
+ * @sa NexShellInit()
+ */
+char NexShellGetRootDriveVolume(void);
 
 #endif // end of NEXSHELL_H

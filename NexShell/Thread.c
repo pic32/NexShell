@@ -17,15 +17,13 @@ BYTE gDataRead = 0;
 #define RIGHT_ARROW_ASCII_VALUE									43
 #define LEFT_ARROW_ASCII_VALUE									44
 
-unsigned long UserNexShellWriteTasks(void);
-
 DWORD WINAPI ShellWriteTasksThreadCode(void* data)
 {
 	unsigned long WriteResult;
 
 	while (1)
 	{
-		WriteResult = UserNexShellWriteTasks();
+		WriteResult = NexShellUserWriteTasks();
 
 		Sleep(0);
 	}
