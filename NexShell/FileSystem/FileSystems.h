@@ -10,7 +10,7 @@
 // 512 bytes is the value used by most cards
 #define MEDIA_SECTOR_SIZE_IN_BYTES                  FF_MAX_SS
 #define MAX_FILENAME_LENGTH_IN_BYTES                FF_MAX_LFN
-#define FILE_LIST_ROOT_DIRECTORY_SIZE_IN_BYTES     (FF_MAX_LFN + 1) 
+#define FILE_LIST_ROOT_DIRECTORY_SIZE_IN_BYTES      (FF_MAX_LFN + 1) 
 
 #define FileSystemMemAlloc(Mem)                     malloc(Mem)
 #define FileSystemMemDealloc(Mem)                   free(Mem)
