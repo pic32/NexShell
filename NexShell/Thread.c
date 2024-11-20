@@ -135,18 +135,18 @@ DWORD WINAPI ThreadFunc(void* data)
 }
 
 // this is the callback that the shell calls to send data out
-UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes)
+UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes)
 {
 	UINT32 i;
 
-	for(i = 0; i < DataBuffersSizeInBytes; i++)
+	for(i = 0; i < DataBufferSizeInBytes; i++)
 		printf("%c", DataBuffer[i]);
 
-	return DataBuffersSizeInBytes;
+	return DataBufferSizeInBytes;
 }
 
 // this is the callback that the shell calls to read data in
-UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBuffersSizeInBytes)
+UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes)
 {
 	if (gDataRead != 0)
 	{

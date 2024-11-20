@@ -23,11 +23,11 @@ typedef struct
 	char* DirectoryName;
 }VIRTUAL_FILE_DIRECTORY;
 
+SHELL_RESULT VirtualFileInit(void);
+
 LINKED_LIST* GetVirtualFileList(char* Directory);
 
 SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE* VirtualFile, char* DirectoryPath);
-
-SHELL_RESULT VirtualFileInit(void);
 
 VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind);
 

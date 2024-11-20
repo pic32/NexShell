@@ -58,6 +58,10 @@
 	#define SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES					512
 #endif // end of #ifndef SIZE_OF_OUTPUT_STREAM_BUFFER_IN_BYTES
 
+/*!
+  \def SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES
+  Determines the size of the standard input stream in bytes.
+*/
 #ifndef SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES
 	#define SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES					256
 #endif // end of #ifndef SIZE_OF_INPUT_STREAM_BUFFER_IN_BYTES
