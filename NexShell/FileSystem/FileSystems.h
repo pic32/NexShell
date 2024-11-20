@@ -61,8 +61,6 @@ BOOL FileExists(BYTE *FilePath);
 
 BOOL DirectoryExists(BYTE *DirectoryPath);
 
-BYTE *GetMediaVolumeName(MEDIA_VOLUME_NAME MediaVolume);
-
 BOOL GetFileInfo(BYTE *FullFilename, FILINFO *FileInfo);
 //----------------------------------------------------------------------------------------------------
 

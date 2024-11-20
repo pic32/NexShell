@@ -2,8 +2,7 @@
 
 #include "shutdown_Command.h"
 #include "ioctl.h"
-
-void ShellPowerDownCallback(void);
+#include "NexShellCallbacks.h"
 
 SHELL_RESULT shutdownCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* OutputStream)
 {

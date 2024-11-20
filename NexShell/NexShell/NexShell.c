@@ -11,6 +11,7 @@
 #include "VirtualFile.h"
 #include "DevFiles.h"
 #include "NexShellCommands.h"
+#include "NexShellCallbacks.h"
 
 /** \file
  * This is the main implementation interface to the NexShell.
@@ -102,39 +103,6 @@ const char* gNexShellError[] = {
 	LINKED_LIST gHistoryList; // this holds data of type char *
 	UINT32 gHistoryIndex; // this is the index inside the linked list to read for hte next history
 #endif // end of #if (USE_SHELL_COMMAND_HISTORY == 1)
-
-/*!
- * @brief Writes data out from the standard output stream.
- * 
- * @param[in] BYTE *DataBuffer - The data to write.
- * @param[in] UINT32 DataBuffersSizeInBytes - The requested number of bytes in DataBuffer to write.
- *
- * @return UINT32 - The number of bytes successfully written by the callback function.
- *
- * @details
- * This function must be implemented by the user.  It is designed to take data from the shell and
- * output it to a hardware device like a UART.
- *
- * @sa StreamReaderDataHALCallback()
- */
-UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes);
-
-/*!
- * @brief Read data in from another source.
- *
- * @param[in/out] BYTE *DataBuffer - The buffer to store the data in.
- * @param[in] UINT32 DataBuffersSizeInBytes - The requested number of bytes in DataBuffer to write.
- *
- * @return UINT32 - The number of bytes successfully written by the callback function.
- *
- * @details
- * This function must be implemented by the user.  It is designed to take data from another source
- * (usually a hardware peripheral like a UART) and write it to DataBuffer.  The max number that 
- * DataBufferSizeInBytes would contain is \ref SHELL_HAL_MAX_TRANSFER_SIZE_IN_BYTES.
- *
- * @sa StreamWriteDataHALCallback()
- */
-UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes);
 
 static SHELL_RESULT OutputPrompt(char *CurrentDirectory, PIPE *OutputStream)
 {

@@ -147,6 +147,9 @@
     <ClCompile Include="NexShell\Commands\mkdir_Command.c">
       <Filter>Source Files\NexShell\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="NexShell\NexShellCallbacks.c">
+      <Filter>Source Files\NexShell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileSystem\diskio.h">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="NexShell\Commands\mkdir_Command.h">
       <Filter>Header Files\NexShell\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="NexShell\NexShellCallbacks.h">
+      <Filter>Header Files\NexShell</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

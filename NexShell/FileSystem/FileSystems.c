@@ -4,10 +4,6 @@
 
 #include "FileSystems.h"
 
-static const BYTE gSDVolumeName[] = "S:";
-static const BYTE gUSBVolumeName[] = "U:";
-static const BYTE gFlashVolumeName[] = "F:";
-
 const BYTE* gNewLineStrings[] = {
     (const BYTE*)"\n",
     (const BYTE*)"\r\n"
@@ -340,22 +336,4 @@ BOOL GetFileInfo(BYTE* FullFilename, FILINFO* FileInfo)
         return FALSE;
 
     return TRUE;
-}
-
-BYTE* GetMediaVolumeName(MEDIA_VOLUME_NAME MediaVolume)
-{
-    switch (MediaVolume)
-    {
-    case SD_CARD_VOLUME:
-        return (BYTE*)gSDVolumeName;
-
-    case USB_VOLUME:
-        return (BYTE*)gUSBVolumeName;
-
-    case FLASH_VOLUME:
-        return (BYTE*)gFlashVolumeName;
-
-    default:
-        return (BYTE*)NULL;
-    }
 }
