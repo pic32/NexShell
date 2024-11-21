@@ -45,6 +45,10 @@ typedef enum
 	NUMBER_OF_NEXSHELL_FILE_RESULTS
 }NEXSHELL_FILE_RESULTS;
 
+/*!
+* \enum SHELL_RESULT
+* This is the main return type of the NexShell.  It contains all error values of an opertion.
+*/
 typedef enum
 {
 	SHELL_SUCCESS = 0,
