@@ -84,10 +84,34 @@ SHELL_RESULT VirtualFileInit(void);
  */
 LINKED_LIST* GetVirtualFileList(char* Directory);
 
+/*!
+ * @brief Adds a VIRTUAL_FILE to the virtual file system.
+ *
+ * @param[in] VIRTUAL_FILE* VirtualFile - A pointer to a valid VIRTUAL_FILE.  Most likely this will
+ * be a VIRTUAL_FILE which was initialized with a call to CreateVirtualFile().
+ * 
+ * @param[in] char* DirectoryPath - A pointer to the path the VIRTUAL_FILE will reside in.  This
+ * would be something like "R:/dev/".
+ *
+ * @return SHELL_RESULT - The result of the operation.
+ *
+ * @sa CreateVirtualFile()
+ */
 SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE* VirtualFile, char* DirectoryPath);
 
-VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST* FileList, char* FileNameToFind);
-
+/*!
+ * @brief Returns the \ref VIRTUAL_FILE specified by the directory and filename.
+ *
+ * @param[in] char *Directory - The directory of the \ref VIRTUAL_FILE.  This is the full path
+ * of the directory of interest.  An example path might be "R:/dev".
+ * 
+ * @param[in] char *Filename - The filename of the \ref VIRTUAL_FILE.  This is the full filename.
+ * An example filename might be "rtc0".
+ *
+ * @return VIRTUAL_FILE * - A pointer to a VIRTUAL_FILE upon successfully being found.  If no
+ * file is found NULL is returned.
+ *
+ */
 VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
 
 /*!

@@ -6,7 +6,7 @@
 #include "VirtualFile.h"
 
 // this holds data of type VIRTUAL_FILE_DIRECTORY
-LINKED_LIST gUserVirtualFilesDirectories;
+static LINKED_LIST gUserVirtualFilesDirectories;
 
 static BOOL VirtualFileCharacterIsValid(char Character)
 {
@@ -45,27 +45,6 @@ static BOOL VirtualFileNameIsValid(char* Buffer)
 		if (VirtualFileCharacterIsValid(*Buffer++) == FALSE)
 			return FALSE;
 	}
-}
-
-VIRTUAL_FILE* VirtualFileNameExists(LINKED_LIST *FileList, char* FileNameToFind)
-{
-	UINT32 i, Size;
-
-	if (FileList == NULL || FileNameToFind == NULL)
-		return NULL;
-
-	Size = LinkedListGetSize(FileList);
-
-	for (i = 1; i <= Size; i++)
-	{
-		VIRTUAL_FILE* FileNodeToCompare = LinkedListGetData(FileList, i);
-
-		// compare the names
-		if (strcmp(FileNodeToCompare->FileName, FileNameToFind) == 0)
-			return FileNodeToCompare;
-	}
-
-	return NULL;
 }
 
 static INT32 UserVirtualFileDirectoryCompareTo(const void *Data1, const void *Data2)
