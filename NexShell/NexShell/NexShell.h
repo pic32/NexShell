@@ -50,40 +50,96 @@ typedef enum
 * This is the main return type of the NexShell.  It contains all error values of an opertion.
 */
 typedef enum
-{
-	SHELL_SUCCESS = 0,
-	SHELL_INVALID_INPUT_PARAMETER = NUMBER_OF_NEXSHELL_FILE_RESULTS,
-	SHELL_INVALID_INPUT,
-	SHELL_ARGUMENT_OVERFLOW,
-	SHELL_INVALID_CHARACTER_FOUND,
-	SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE,
-	SHELL_INVALID_ARGUMENT,
-	SHELL_FILE_NOT_FOUND,
-	SHELL_FILE_NOT_EXECUTABLE,
-	SHELL_FILE_NOT_READABLE,
-	SHELL_FILE_NOT_WRITABLE,
-	SHELL_HISTORY_BUFFER_FAILURE,
-	SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED,
-	SHELL_GENERIC_BUFFER_CREATE_FAILURE,
-	SHELL_GENERIC_BUFFER_WRITE_FAILURE,
-	SHELL_GENERIC_BUFFER_READ_FAILURE,
-	SHELL_LINKED_LIST_CREATE_FAILURE,
-	SHELL_LINKED_LIST_OPERATION_FAILURE,
-	SHELL_MALLOC_FAILURE,
-	SHELL_INVALID_DIRECTORY_NAME,
-	SHELL_VIRTUAL_DIRECTORY_NAME_ALREADY_EXISTS,
-	SHELL_VIRTUAL_FILENAME_ALREADY_EXISTS,
-	SHELL_COMMAND_ALREADY_EXISTS,
-	SHELL_COMMAND_NOT_FOUND,
-	SHELL_IO_CTL_FAILED,
-	SHELL_INVALID_OPTION,
-	SHELL_MISSING_OPERANDS,
-	SHELL_CANNOT_CREATE_DIRECTORY,
+{	/*! This is returned upon success of the requested operation */
+	SHELL_SUCCESS = 0,								
+
+	/*! This is an offset based off of SHELL_FILE_DISK_ERR in the NEXSHELL_FILE_RESULTS enum */
+	SHELL_INVALID_INPUT_PARAMETER = NUMBER_OF_NEXSHELL_FILE_RESULTS, 
+
+	/*! The shell command got an invalid input parameter */
+	SHELL_INVALID_INPUT,							
+
+	/*! The shell command got too many arguments for the operation */
+	SHELL_ARGUMENT_OVERFLOW,						
+
+	/*! The shell found an invalid character in the stream */
+	SHELL_INVALID_CHARACTER_FOUND,					
+
+	/*! The shell command did not get enough arguments for the operation */
+	SHELL_INSUFFICIENT_ARGUMENTS_FOR_FILE,			
+
+	/*! The shell command got an invalid argument */
+	SHELL_INVALID_ARGUMENT,							
+
+	/*! The shell could not find the requested file */
+	SHELL_FILE_NOT_FOUND,							
+
+	/*! Attempted execution of a non executable file */
+	SHELL_FILE_NOT_EXECUTABLE,						
+
+	/*! Attempted read of a non readable file */
+	SHELL_FILE_NOT_READABLE,						
+
+	/*! Attempted write of a non writable file */
+	SHELL_FILE_NOT_WRITABLE,						
+
+	/*! Failed interaction with the shell history feature */
+	SHELL_HISTORY_BUFFER_FAILURE,					
+
+	/*! The HAL callback method for the shell returned an invalid number of bytes */
+	SHELL_INVALID_NUMBER_OF_BYTES_TRANSFERRED,		
+
+	/*! A \ref GENERIC_BUFFER create operation failed */
+	SHELL_GENERIC_BUFFER_CREATE_FAILURE,			
+
+	/*! A \ref GENERIC_BUFFER write operation failed */
+	SHELL_GENERIC_BUFFER_WRITE_FAILURE,				
+
+	/*! A \ref GENERIC_BUFFER read operation failed */
+	SHELL_GENERIC_BUFFER_READ_FAILURE,				
+
+	/*! A \ref LINKED_LIST create operation failed */
+	SHELL_LINKED_LIST_CREATE_FAILURE,				
+
+	/*! A \ref LINKED_LIST read, write, etc. operation failed */
+	SHELL_LINKED_LIST_OPERATION_FAILURE,			
+
+	/*! Dynamic memory allocation failed */
+	SHELL_MALLOC_FAILURE,							
+
+	/*! An invalid directory name was specified */
+	SHELL_INVALID_DIRECTORY_NAME,					
+
+	/*! The requested virtual directory alredy exists */
+	SHELL_VIRTUAL_DIRECTORY_NAME_ALREADY_EXISTS,	
+
+	/*! The requested virtual file already exists */
+	SHELL_VIRTUAL_FILENAME_ALREADY_EXISTS,			
+
+	/*! The requested shell command already exists */
+	SHELL_COMMAND_ALREADY_EXISTS,					
+
+	/*! The requested shell command does not exist */
+	SHELL_COMMAND_NOT_FOUND,						
+
+	/*! The ioctl() operation failed */
+	SHELL_IO_CTL_FAILED,							
+
+	/*! An invalid option was specified in a shell command */
+	SHELL_INVALID_OPTION,							
+
+	/*! A shell command was expecting arguments but didn't get them */
+	SHELL_MISSING_OPERANDS,							
+
+	/*! The requested directory could not be created */
+	SHELL_CANNOT_CREATE_DIRECTORY,					
 
 	// always put this one at the lowest of the valid list
-	SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER,
+	/*! An error happened that was non standard and the user buffer contains the error message */
+	SHELL_OPERATION_FAILED_OUTPUT_USER_BUFFER,		
 
-	NUMBER_OF_NEXSHELL_RESULTS
+	/*! Used internally by the shell */
+	NUMBER_OF_NEXSHELL_RESULTS						
 }SHELL_RESULT;
 
 typedef enum

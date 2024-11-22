@@ -36,7 +36,6 @@
 * the contents of.  The system will first try to interpret this string as a valid file (with full path).  If the file exists
 * the contents of the file will be shown when the "help" command is used, otherwise the contents pointed to by FileHelp
 * are displayed for help.
-* 
 */
 typedef struct
 {
@@ -93,7 +92,7 @@ LINKED_LIST* GetVirtualFileList(char* Directory);
  * @param[in] char* DirectoryPath - A pointer to the path the VIRTUAL_FILE will reside in.  This
  * would be something like "R:/dev/".
  *
- * @return SHELL_RESULT - The result of the operation.
+ * @return \ref SHELL_RESULT - The result of the operation.
  *
  * @sa CreateVirtualFile()
  */
