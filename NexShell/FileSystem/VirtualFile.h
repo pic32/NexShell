@@ -129,12 +129,10 @@ VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
  * @param[in] ExecuteFile - The execute file method initialized when calling \ref CreateVirtualFile().
  * This parameter is not mandatory.  This method is called when the user calls by name the virtual file.
  * 
- * @param FileName - The name of the \ref VIRTUAL_FILE.  This should just be the name and no path.  This parameter is mandatory.
- * 
- * @param FileDescription - A description of the \ref VIRTUAL_FILE.  this parameter is optional.  The description
+ * @param const char *FileDescription - A description of the \ref VIRTUAL_FILE.  this parameter is optional.  The description
  * is shown when the user does an "ls" command on a directory or when the "help" command is done with -d option.
  * 
- * @param FileHelp - The help file associated with the \ref VIRTUAL_FILE.  This is to give the user help when typing in
+ * @param const char *FileHelp - The help file associated with the \ref VIRTUAL_FILE.  This is to give the user help when typing in
  * "help [virtual file name]".  This parameter is optional.  A file on disk can be referenced by this parameter to show
  * the contents of.  The system will first try to interpret this string as a valid file (with full path).  If the file exists
  * the contents of the file will be shown when the "help" command is used, otherwise the contents pointed to by FileHelp
