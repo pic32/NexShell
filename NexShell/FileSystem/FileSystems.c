@@ -4,9 +4,9 @@
 
 #include "FileSystems.h"
 
-const BYTE* gNewLineStrings[] = {
-    (const BYTE*)"\n",
-    (const BYTE*)"\r\n"
+const char* gNewLineStrings[] = {
+    (const char*)"\n",
+    (const char*)"\r\n"
 };
 
 static FRESULT GetDriveSizeInBytes(BYTE* Drive, UINT64* Size)
@@ -78,61 +78,35 @@ static FRESULT GetDiskSpaceBytes(BYTE* Drive, DISK_SPACE_TYPE DiskSpaceType, UIN
 {
     switch (DiskSpaceType)
     {
-    case TOTAL_DISK_SPACE:
-        return GetDriveSizeInBytes(Drive, Size);
+        case TOTAL_DISK_SPACE:
+            return GetDriveSizeInBytes(Drive, Size);
 
-    case FREE_DISK_SPACE:
-        return GetDriveFreeSpaceInBytes(Drive, Size);
+        case FREE_DISK_SPACE:
+            return GetDriveFreeSpaceInBytes(Drive, Size);
 
-    case USED_DISK_SPACE:
-        return GetDriveUsedSpaceInBytes(Drive, Size);
+        case USED_DISK_SPACE:
+            return GetDriveUsedSpaceInBytes(Drive, Size);
 
-    default:
-    case NUMBER_OF_DISK_SPACES:
-        return FR_INVALID_PARAMETER;
+        default:
+        case NUMBER_OF_DISK_SPACES:
+            return FR_INVALID_PARAMETER;
     }
 }
 
-BOOL ContainsNewLine(BYTE* Buffer)
+BOOL ContainsNewLine(char* Buffer)
 {
     UINT32 i;
 
-    for (i = 0; i < sizeof(gNewLineStrings) / sizeof(const BYTE*); i++)
+    for (i = 0; i < sizeof(gNewLineStrings) / sizeof(const char*); i++)
     {
-        if (strstr((char*)Buffer, (char*)gNewLineStrings[i]) != (char*)NULL)
+        if (strstr(Buffer, (char*)gNewLineStrings[i]) != NULL)
             return TRUE;
     }
 
     return FALSE;
 }
 
-BOOL FileReadLine(FIL* File, BYTE* Buffer, UINT32 BufferSize)
-{
-    UINT32 i;
-    UINT BytesRead;
-
-    // clear the buffer out first
-    memset((void*)Buffer, 0, BufferSize);
-
-    //  now read 1 byte at a time looking for the new line sequence
-    for (i = 0; i < BufferSize - 1; i++)
-    {
-        // read in 1 byte
-        if (f_read(File, &Buffer[i], 1, &BytesRead) != FR_OK)
-            return FALSE;
-
-        if (BytesRead != 1)
-            return FALSE;
-
-        // does the buffer contain a new line?
-        if (ContainsNewLine(Buffer) == TRUE)
-            return TRUE;
-    }
-
-    return FALSE;
-}
-
-BOOL FileExists(BYTE* FilePath)
+BOOL FileExists(char* FilePath)
 {
     FIL File;
     FRESULT FResult;
@@ -146,13 +120,13 @@ BOOL FileExists(BYTE* FilePath)
 
     // now close it
     if (FResult == FR_OK)
-        f_close(&File);
+        FResult = f_close(&File);
 
     // return the result
     return (BOOL)(FResult == FR_OK);
 }
 
-BOOL DirectoryExists(BYTE* DirectoryPath)
+BOOL DirectoryExists(char* DirectoryPath)
 {
     DIR Directory;
     FRESULT FResult;
@@ -166,7 +140,7 @@ BOOL DirectoryExists(BYTE* DirectoryPath)
 
     // now close it
     if (FResult == FR_OK)
-        f_closedir(&Directory);
+        FResult = f_closedir(&Directory);
 
     // return the result
     return (BOOL)(FResult == FR_OK);
@@ -273,20 +247,20 @@ BOOL FileNamesMatch(const BYTE* Filename1, const BYTE* Filename2, BOOL FileExten
     }
 }
 
-BOOL GetFileInfo(BYTE* FullFilename, FILINFO* FileInfo)
+BOOL GetFileInfo(char* FullFilename, FILINFO* FileInfo)
 {
     UINT32 i;
     DIR Directory;
     BOOL ForwardSlashFound = FALSE;
 
-    if (FullFilename == (BYTE*)NULL)
+    if (FullFilename == NULL)
         return FALSE;
 
-    if (FileInfo == (FILINFO*)NULL)
+    if (FileInfo == NULL)
         return FALSE;
 
     // we're going to get the date time first before modifying the file extension
-    for (i = strlen((char*)FullFilename); i > 0; i--)
+    for (i = strlen(FullFilename); i > 0; i--)
     {
         // did we find the beginning of the file extension?
         if (FullFilename[i] == '\\')
