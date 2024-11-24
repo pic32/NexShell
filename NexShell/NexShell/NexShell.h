@@ -151,22 +151,6 @@ typedef enum
 	NUMBER_OF_SHELL_LOGICAL_OPERATORS
 }SHELL_LOGICAL_OPERATOR;
 
-typedef union
-{
-	BYTE Value;
-
-	struct
-	{
-		unsigned int ShowLineEnds : 1;					// -E
-		unsigned int NumberAllLines : 1;				// -n
-		unsigned int SupressRepeativeEmptyLines : 1;	// -s (unsupported for now)
-		unsigned int ShowTabs : 1;						// -T
-		unsigned int ShowControlCharacters : 1;			// -v
-		unsigned int CarriageReturnPresent : 1;			// Internal Use
-		unsigned int Reserved : 2;
-	}BITS;
-}READ_OPTIONS;
-
 #define SHELL_WORKING_ARGUMENTS_FULL_ARRAY_SIZE_IN_ELEMENTS		(SHELL_WORKING_ARGUMENTS_ARRAY_SIZE_IN_ELEMENTS + 2)
 
 #define SHELL_FONT_STYLE_RESET									"\x1B[0m"

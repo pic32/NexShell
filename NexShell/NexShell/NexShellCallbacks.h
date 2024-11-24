@@ -1,6 +1,10 @@
 #ifndef NEXSHELL_CALLBACKS_H
 	#define NEXSHELL_CALLBACKS_H
 
+/** \file
+ * This contains the callbacks that need to be implemented by the user for the NexShell to run.
+ */
+
 #include "GenericTypes.h"
 
 /*!

@@ -6,7 +6,7 @@
 #include "NexShell.h"
 #include "DevFiles.h"
 
-const char* gMonth[] =
+const char* const gMonth[] =
 {
 	"January",
 	"February",
@@ -22,7 +22,7 @@ const char* gMonth[] =
 	"December"
 };
 
-const char* gWeekday[] =
+const char* const gWeekday[] =
 {
 	"Saturday",
 	"Sunday",
@@ -33,7 +33,7 @@ const char* gWeekday[] =
 	"Friday"
 };
 
-const char* MonthToString(BYTE Month)
+const char* const MonthToString(BYTE Month)
 {
 	if (Month > 11)
 		return NULL;
