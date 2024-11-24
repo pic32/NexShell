@@ -90,7 +90,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	{
 		BYTE Buffer[32];
 
-		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellFileInfoDay(Date), GetNexShellFileInfoMonth(Date), GetNexShellFileInfoYear(Date))), MonthToString(GetNexShellFileInfoMonth(Date) - 1), GetNexShellFileInfoDay(Date), GetNexShellFileInfoYear(Date));
+		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellPackedDateTimeDay(Date), GetNexShellPackedDateTimeMonth(Date), GetNexShellPackedDateTimeYear(Date))), MonthToString(GetNexShellPackedDateTimeMonth(Date) - 1), GetNexShellPackedDateTimeDay(Date), GetNexShellPackedDateTimeYear(Date));
 
 		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -100,7 +100,7 @@ static SHELL_RESULT OutputDirectoryInfo(char* DirectoryName, UINT32 FileSize, UI
 	{
 		BYTE Buffer[32];
 
-		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellFileInfoHours(Time), GetNexShellFileInfoMinutes(Time), GetNexShellFileInfoSeconds(Time));
+		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellPackedDateTimeHours(Time), GetNexShellPackedDateTimeMinutes(Time), GetNexShellPackedDateTimeSeconds(Time));
 
 		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -205,7 +205,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 	{
 		BYTE Buffer[32];
 
-		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellFileInfoDay(Date), GetNexShellFileInfoMonth(Date), GetNexShellFileInfoYear(Date))), MonthToString(GetNexShellFileInfoMonth(Date) - 1), GetNexShellFileInfoDay(Date), GetNexShellFileInfoYear(Date));
+		Shell_sprintf(Buffer, "%.3s %.3s % 2i %i ", WeekdayToString(CalculateDayOfWeek(GetNexShellPackedDateTimeDay(Date), GetNexShellPackedDateTimeMonth(Date), GetNexShellPackedDateTimeYear(Date))), MonthToString(GetNexShellPackedDateTimeMonth(Date) - 1), GetNexShellPackedDateTimeDay(Date), GetNexShellPackedDateTimeYear(Date));
 
 		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
@@ -215,7 +215,7 @@ static SHELL_RESULT OutputFileInfo(char *FileName, UINT32 FileSize, UINT16 Date,
 	{
 		BYTE Buffer[32];
 
-		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellFileInfoHours(Time), GetNexShellFileInfoMinutes(Time), GetNexShellFileInfoSeconds(Time));
+		Shell_sprintf(Buffer, "%02i:%02i:%02i ", GetNexShellPackedDateTimeHours(Time), GetNexShellPackedDateTimeMinutes(Time), GetNexShellPackedDateTimeSeconds(Time));
 
 		if (PipeWrite(OutputStream, Buffer, (UINT32)strlen(Buffer), NULL) != OS_SUCCESS)
 			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;

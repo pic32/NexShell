@@ -49,10 +49,21 @@ typedef struct
 	int tm_isdst;
 }rtc_time;
 
+/*!
+* @union PACKED_DATE_TIME
+*
+* @brief This union holds the packed date time.  This is the format used by the
+* FatFs to store the date and time which is different from the rest of the system.
+*/
 typedef union
 {
 	UINT32 Value;
 
+	/*!
+	* @struct BITS
+	*
+	* @brief This struct holds the bit definitions of the packed date time structure.
+	*/
 	struct
 	{
 		unsigned int Seconds : 5; // LSB 0 - 30 (it's seconds divided by 2)
@@ -63,6 +74,11 @@ typedef union
 		unsigned int Year : 6; // MSB (year since 1980, so 1981 is 1)
 	}BITS;
 
+	/*!
+	* @struct DATE_TIME
+	*
+	* @brief This struct holds the UINT16 values for the packed date time.
+	*/
 	struct
 	{
 		UINT16 Time;
@@ -118,25 +134,55 @@ DWORD get_fattime(void);
 /*!
  * @brief Get the seconds from a \ref PACKED_DATE_TIME.
  *
- * @param[in] UINT16 Time - 
+ * @param[in] UINT16 Time - The packed time from a \ref PACKED_DATE_TIME structure.
  *
- * @return BYTE - 
- *
- * @details
- * 
- *
- * @sa dateCommandExecuteMethod()
+ * @return BYTE - The number of seconds.  This value is from 0 to 60 and never odd.
  */
-BYTE GetNexShellFileInfoSeconds(UINT16 Time);
+BYTE GetNexShellPackedDateTimeSeconds(UINT16 Time);
 
-BYTE GetNexShellFileInfoMinutes(UINT16 Time);
+/*!
+ * @brief Get the minutes from a \ref PACKED_DATE_TIME.
+ *
+ * @param[in] UINT16 Time - The packed time from a \ref PACKED_DATE_TIME structure.
+ *
+ * @return BYTE - The number of minutes.  This value is from 0 to 59.
+ */
+BYTE GetNexShellPackedDateTimeMinutes(UINT16 Time);
 
-BYTE GetNexShellFileInfoHours(UINT16 Time);
+/*!
+ * @brief Get the hours from a \ref PACKED_DATE_TIME.
+ *
+ * @param[in] UINT16 Time - The packed time from a \ref PACKED_DATE_TIME structure.
+ *
+ * @return BYTE - The number of hours.  This value is from 0 to 23.
+ */
+BYTE GetNexShellPackedDateTimeHours(UINT16 Time);
 
-BYTE GetNexShellFileInfoDay(UINT16 Date);
+/*!
+ * @brief Get the day from a \ref PACKED_DATE_TIME.
+ *
+ * @param[in] UINT16 Date - The packed date from a \ref PACKED_DATE_TIME structure.
+ *
+ * @return BYTE - The day of the month.  This value is from 1 to 31.
+ */
+BYTE GetNexShellPackedDateTimeDay(UINT16 Date);
 
-BYTE GetNexShellFileInfoMonth(UINT16 Date);
+/*!
+ * @brief Get the month from a \ref PACKED_DATE_TIME.
+ *
+ * @param[in] UINT16 Date - The packed date from a \ref PACKED_DATE_TIME structure.
+ *
+ * @return BYTE - The month of the year.  This value is from 1 to 12.
+ */
+BYTE GetNexShellPackedDateTimeMonth(UINT16 Date);
 
-UINT16 GetNexShellFileInfoYear(UINT16 Date);
+/*!
+ * @brief Get the year from a \ref PACKED_DATE_TIME.
+ *
+ * @param[in] UINT16 Date - The packed date from a \ref PACKED_DATE_TIME structure.
+ *
+ * @return BYTE - The year.  If the year is 2024 the value returned is 2024.
+ */
+UINT16 GetNexShellPackedDateTimeYear(UINT16 Date);
 
 #endif // end of #ifndef NEXSHELL_TIME_H

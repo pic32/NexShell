@@ -41,7 +41,7 @@ const char* const MonthToString(BYTE Month)
 	return gMonth[Month];
 }
 
-const char* WeekdayToString(BYTE Weekday)
+const char* const WeekdayToString(BYTE Weekday)
 {
 	if (Weekday > 6)
 		return NULL;
@@ -49,18 +49,18 @@ const char* WeekdayToString(BYTE Weekday)
 	return gWeekday[Weekday];
 }
 
-int CalculateDayOfWeek(int day, int month, int year)
+BYTE CalculateDayOfWeek(BYTE Day, BYTE Month, UINT16 Year)
 {
-	if (month < 3)
+	if (Month < 3)
 	{
-		month += 12;
-		year -= 1;
+		Month += 12;
+		Year -= 1;
 	}
 
-	int k = year % 100;
-	int j = year / 100;
+	int k = Year % 100;
+	int j = Year / 100;
 
-	int DayOfWeek = (day + 13 * (month + 1) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
+	BYTE DayOfWeek = (Day + 13 * (Month + 1) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
 
 	return DayOfWeek;
 }
@@ -120,7 +120,7 @@ DWORD get_fattime(void)
 	return DateTime.Value;
 }
 
-BYTE GetNexShellFileInfoSeconds(UINT16 Time)
+BYTE GetNexShellPackedDateTimeSeconds(UINT16 Time)
 {
 	PACKED_DATE_TIME DateTime;
 
@@ -129,7 +129,7 @@ BYTE GetNexShellFileInfoSeconds(UINT16 Time)
 	return DateTime.BITS.Seconds * 2;
 }
 
-BYTE GetNexShellFileInfoMinutes(UINT16 Time)
+BYTE GetNexShellPackedDateTimeMinutes(UINT16 Time)
 {
 	PACKED_DATE_TIME DateTime;
 
@@ -138,7 +138,7 @@ BYTE GetNexShellFileInfoMinutes(UINT16 Time)
 	return DateTime.BITS.Minutes;
 }
 
-BYTE GetNexShellFileInfoHours(UINT16 Time)
+BYTE GetNexShellPackedDateTimeHours(UINT16 Time)
 {
 	PACKED_DATE_TIME DateTime;
 
@@ -147,7 +147,7 @@ BYTE GetNexShellFileInfoHours(UINT16 Time)
 	return DateTime.BITS.Hours;
 }
 
-BYTE GetNexShellFileInfoDay(UINT16 Date)
+BYTE GetNexShellPackedDateTimeDay(UINT16 Date)
 {
 	PACKED_DATE_TIME DateTime;
 
@@ -156,7 +156,7 @@ BYTE GetNexShellFileInfoDay(UINT16 Date)
 	return DateTime.BITS.Day;
 }
 
-BYTE GetNexShellFileInfoMonth(UINT16 Date)
+BYTE GetNexShellPackedDateTimeMonth(UINT16 Date)
 {
 	PACKED_DATE_TIME DateTime;
 
@@ -165,7 +165,7 @@ BYTE GetNexShellFileInfoMonth(UINT16 Date)
 	return DateTime.BITS.Month;
 }
 
-UINT16 GetNexShellFileInfoYear(UINT16 Date)
+UINT16 GetNexShellPackedDateTimeYear(UINT16 Date)
 {
 	PACKED_DATE_TIME DateTime;
 
