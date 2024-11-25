@@ -1,0 +1,60 @@
+@startuml
+
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 5
+skinparam titleBorderColor red
+skinparam titleBackgroundColor Aqua-CadetBlue
+skinparam titleFontSize 36
+
+title User Command List
+
+Object gUserCommandList
+
+struct COMMAND_INFO_1  ##[bold]red
+{
+    char* CommandName;
+--
+    SHELL_RESULT(*ExecuteFile)(char* [], UINT32, PIPE*);
+--
+    char* Description;
+--
+    char* Help;
+}
+
+struct COMMAND_INFO_2  ##[bold]red
+{
+    char* CommandName;
+--
+    SHELL_RESULT(*ExecuteFile)(char* [], UINT32, PIPE*);
+--
+    char* Description;
+--
+    char* Help;
+}
+
+struct COMMAND_INFO_3  ##[bold]red
+{
+    char* CommandName;
+--
+    SHELL_RESULT(*ExecuteFile)(char* [], UINT32, PIPE*);
+--
+    char* Description;
+--
+    char* Help;
+}
+
+Object "'ble_send_data'"
+Object "'This command sends data to the specified peripheral BLE device'"
+Object "R:/ble/help/ble_send_data.'This uses a file path to look up\nat runtime that will hold the help file'"
+Object "SHELL_RESULT BLESendData(char* Args[], UINT32 NumberOfArguments, PIPE* OutputStream)"
+Object "'Instead of a file to display help\nthis just has a string that will display\n(probably should be a const char* const)'"
+
+gUserCommandList -[#red,thickness=3]-> COMMAND_INFO_1
+COMMAND_INFO_1<-[#red,thickness=3]-> COMMAND_INFO_2
+COMMAND_INFO_2<-[#red,thickness=3]-> COMMAND_INFO_3
+COMMAND_INFO_1::ExecuteFile-left-> "SHELL_RESULT BLESendData(char* Args[], UINT32 NumberOfArguments, PIPE* OutputStream)"
+COMMAND_INFO_1::CommandName-left-> "'ble_send_data'"
+COMMAND_INFO_1::Description-right-> "'This command sends data to the specified peripheral BLE device'"
+COMMAND_INFO_1::Help--> "R:/ble/help/ble_send_data.'This uses a file path to look up\nat runtime that will hold the help file'"
+COMMAND_INFO_2::Help--> "'Instead of a file to display help\nthis just has a string that will display\n(probably should be a const char* const)'"
+@enduml
