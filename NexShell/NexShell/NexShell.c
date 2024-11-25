@@ -689,59 +689,15 @@ static SHELL_RESULT NexShellProcessCommand(char* Buffer, PIPE *OutputStream)
 		if (argc == 0)
 			return SHELL_SUCCESS;
 
-		// look for a local virtual file that matches the name
+		// we if we can get a virtual file
+		VirtualFile = GetVirtualFile(argv[0]);
+
+		if (VirtualFile != NULL)
 		{
-			char* FileName;
-			SHELL_RESULT Result;
-			char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
+			if (VirtualFile->ExecuteFile == NULL)
+				return SHELL_FILE_NOT_EXECUTABLE;
 
-			// get the potential file name beginning
-			FileName = strrchr(argv[0], '/');
-
-			Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			if (FileName != NULL)
-			{
-				// so it is not just a filename, but also has a path
-				FileName++;
-
-				// copy in the path so we can modify it
-				strcpy(CurrentWorkingDirectory, argv[0]);
-
-				// knock out the / in the string
-				*(char*)strrchr(CurrentWorkingDirectory, '/') = 0;
-
-				// set the directory
-				Result = f_chdir(CurrentWorkingDirectory);
-
-				if (Result != SHELL_SUCCESS)
-					return Result;
-			}
-			else
-			{
-				FileName = argv[0];
-			}
-
-			// now get the current working directory
-			// get the current directory
-			Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-			if (Result != SHELL_SUCCESS)
-				return Result;
-
-			// now is the current directory request virtual?
-			VirtualFile = GetVirtualFile(CurrentWorkingDirectory, FileName);
-
-			if (VirtualFile != NULL)
-			{
-				if (VirtualFile->ExecuteFile == NULL)
-					return SHELL_FILE_NOT_EXECUTABLE;
-
-				return VirtualFile->ExecuteFile(&argv[1], argc - 1, StreamPtr);
-			}
+			return VirtualFile->ExecuteFile(&argv[1], argc - 1, StreamPtr);
 		}
 
 		// we didn't have a virtual file that matched, look for a global command
@@ -1170,4 +1126,9 @@ SHELL_RESULT NexShellUserWriteTasks(void)
 SHELL_RESULT NexShellUserReadTasks(void)
 {
 	return NexShellReadTasks(&gStandardInputStream, &gStandardOutputStream, gCurrentWorkingDirectory);
+}
+
+char* NexShellGetCurrentWorkingDirectory(void)
+{
+	return gCurrentWorkingDirectory;
 }

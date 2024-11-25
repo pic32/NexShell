@@ -115,19 +115,15 @@ LINKED_LIST* GetVirtualFileList(char* Directory);
 SHELL_RESULT VirtualFileAddToVirtualFileSystem(VIRTUAL_FILE* VirtualFile, char* DirectoryPath);
 
 /*!
- * @brief Returns the \ref VIRTUAL_FILE specified by the directory and filename.
- *
- * @param[in] char *Directory - The directory of the \ref VIRTUAL_FILE.  This is the full path
- * of the directory of interest.  An example path might be "R:/dev".
+ * @brief Returns the \ref VIRTUAL_FILE specified by the full filename.
  * 
- * @param[in] char *Filename - The filename of the \ref VIRTUAL_FILE.  This is the full filename.
- * An example filename might be "rtc0".
+ * @param[in] char *FullFilenamePath - The full filename of the \ref VIRTUAL_FILE.  This is the full filename.
+ * An example filename might be "/dev/rtc0".
  *
  * @return VIRTUAL_FILE * - A pointer to a VIRTUAL_FILE upon successfully being found.  If no
  * file is found NULL is returned.
- *
  */
-VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
+VIRTUAL_FILE* GetVirtualFile(char* FullFilenamePath);
 
 /*!
  * @brief Initializes a \ref VIRTUAL_FILE struct.

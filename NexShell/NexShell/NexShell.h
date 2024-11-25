@@ -312,4 +312,15 @@ SHELL_RESULT NexShellUserWriteTasks(void);
  */
 char NexShellGetRootDriveVolume(void);
 
+/*!
+ * @brief Returns the current working directory of the NexShell.
+ *
+ * @return char* - The NexShell working directory.
+ *
+ * @details
+ * This function can be called to get the working directory of the NexShell.
+ * The working directory is what is referenced with "./" in the shell.
+ */
+char* NexShellGetCurrentWorkingDirectory(void);
+
 #endif // end of NEXSHELL_H

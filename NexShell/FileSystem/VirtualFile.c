@@ -204,19 +204,68 @@ SHELL_RESULT CreateVirtualFile(VIRTUAL_FILE* NewFileToInitialize, const char *Fi
 	return SHELL_SUCCESS;
 }
 
-VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename)
+VIRTUAL_FILE* GetVirtualFile(char* FullFilenamePath)
 {
+	char* Filename;
 	VIRTUAL_FILE* VirtualFile;
 	UINT32 Index;
 	LINKED_LIST* VirtualFileList;
+	SHELL_RESULT Result;
+	char CurrentWorkingDirectory[SHELL_MAX_DIRECTORY_SIZE_IN_BYTES + 1];
 
-	if (Directory == NULL || Filename == NULL)
+	if (FullFilenamePath == NULL)
 		return NULL;
 
-	VirtualFileList = GetVirtualFileList(Directory);
+	// get the potential file name beginning
+	Filename = strrchr(FullFilenamePath, '/');
 
+	if (Filename != NULL)
+	{
+		// so it is not just a filename, but also has a path
+		Filename++;
+
+		// copy in the path so we can modify it
+		strcpy(CurrentWorkingDirectory, FullFilenamePath);
+
+		// knock out the / in the string
+		*(char*)strrchr(CurrentWorkingDirectory, '/') = 0;
+
+		// set the directory
+		Result = f_chdir(CurrentWorkingDirectory);
+
+		if (Result != SHELL_SUCCESS)
+			return NULL;
+	}
+	else
+	{
+		Filename = FullFilenamePath;
+	}
+
+	// now get the current working directory
+	// get the current directory
+	Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
+
+	if (Result != SHELL_SUCCESS)
+	{
+		// set the directory
+		f_chdir(NexShellGetCurrentWorkingDirectory());
+
+		return NULL;
+	}
+
+	// get the virtual file list
+	VirtualFileList = GetVirtualFileList(CurrentWorkingDirectory);
+
+	// get the index of the virtual file in the list
 	Index = LinkedListContains(VirtualFileList, Filename, 0, 0);
 
+	// set the directory back to the starting one
+	Result = f_chdir(NexShellGetCurrentWorkingDirectory());
+
+	if (Result != SHELL_SUCCESS)
+		return NULL;
+
+	// did we get the virtual file?
 	if (Index == 0)
 		return NULL;
 

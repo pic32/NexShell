@@ -324,42 +324,9 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 	while (NumberOfArgs--)
 	{
 		FIL File;
-		char* FileName;
-
-		// get the potential file name beginning
-		FileName = strrchr(Args[ArgsProcessed], '/');
-
-		if (FileName != NULL)
-		{
-			// so it is not just a filename, but also has a path
-			FileName++;
-
-			// copy in the path so we can modify it
-			strcpy(CurrentWorkingDirectory, Args[ArgsProcessed]);
-
-			// knock out the / in the string
-			*(char*)strrchr(CurrentWorkingDirectory, '/') = 0;
-
-			// set the directory
-			Result = f_chdir(CurrentWorkingDirectory);
-
-			if (Result != SHELL_SUCCESS)
-				return Result;
-		}
-		else
-		{
-			FileName = Args[ArgsProcessed];
-		}
-
-		// now get the current working directory
-		// get the current directory
-		Result = f_getcwd(CurrentWorkingDirectory, sizeof(CurrentWorkingDirectory));
-
-		if (Result != SHELL_SUCCESS)
-			return Result;
 
 		// now is the current directory request virtual?
-		VirtualFile = GetVirtualFile(CurrentWorkingDirectory, FileName);
+		VirtualFile = GetVirtualFile(Args[ArgsProcessed]);
 
 		if (VirtualFile == NULL)
 		{

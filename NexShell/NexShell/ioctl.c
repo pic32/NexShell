@@ -12,20 +12,8 @@ long ioctl(char *File, unsigned int cmd, void *arg)
 
 	if (File != NULL)
 	{
-		// copy over the file name so we can modify it
-		strcpy(Filename, File);
-
-		// get the file name
-		ActualFilename = strrchr(Filename, '/');
-
-		if (ActualFilename == NULL)
-			return -ENOENT;
-
-		// null out the / and iterate beyond it
-		*ActualFilename++ = 0;
-
 		// get a handle on the virtual file 
-		VirtualFile = GetVirtualFile(Filename, ActualFilename);
+		VirtualFile = GetVirtualFile(File);
 
 		// did we get it?
 		if (VirtualFile == NULL)
