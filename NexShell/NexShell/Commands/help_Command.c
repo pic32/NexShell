@@ -4,6 +4,7 @@
 #include "NexShellConfig.h"
 #include "NexShellCommands.h"
 #include "LinkedList.h"
+#include "VirtualFile.h"
 
 static OutputCommandHelp(COMMAND_INFO* CommandInfo, PIPE* OutputStream)
 {
@@ -55,30 +56,34 @@ static UINT help_ForwardData(   /* Returns number of bytes sent or stream status
 	return btf;
 }
 
-static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOnly, PIPE* OutputStream)
+static SHELL_RESULT OutputHelpFile(char *Name, char *Description, char *Help, BOOL DescriptionOnly, PIPE* OutputStream)
 {
 	SHELL_RESULT Result;
 
+	if (Name == NULL)
+		return SHELL_SUCCESS;
+
 	// write the command name
-	if (PipeWrite(OutputStream, CommandInfo->CommandName,(UINT32)strlen(CommandInfo->CommandName), NULL) != OS_SUCCESS)
+	if (PipeWrite(OutputStream, Name,(UINT32)strlen(Name), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	if (PipeWrite(OutputStream, ": ", (UINT32)strlen(": "), NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	// write the description
-	if (PipeWrite(OutputStream, CommandInfo->Description, (UINT32)strlen(CommandInfo->Description), NULL) != OS_SUCCESS)
-		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+	if(Description != NULL)
+		if (PipeWrite(OutputStream, Description, (UINT32)strlen(Description), NULL) != OS_SUCCESS)
+			return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
 	// write out a new line
 	if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
 		return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 
-	if (DescriptionOnly == FALSE)
+	if (DescriptionOnly == FALSE && Help != NULL)
 	{
 		FIL File;
 
-		Result = f_open(&File, CommandInfo->Help, FA_OPEN_EXISTING | FA_READ);
+		Result = f_open(&File, Help, FA_OPEN_EXISTING | FA_READ);
 
 		if (Result == SHELL_SUCCESS)
 		{
@@ -109,8 +114,9 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 		else
 		{
 			// write the help file
-			if (PipeWrite(OutputStream, CommandInfo->Help, (UINT32)strlen(CommandInfo->Help), NULL) != OS_SUCCESS)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
+			if(Help != NULL)
+				if (PipeWrite(OutputStream, Help, (UINT32)strlen(Help), NULL) != OS_SUCCESS)
+					return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 	}
 
@@ -202,6 +208,25 @@ SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 			{
 				CommandInfo = NULL;
 
+				// first search for a virtual file help
+				{
+					VIRTUAL_FILE* VirtualFile;
+
+					// now is the current directory request virtual?
+					VirtualFile = GetVirtualFile(Args[i]);
+
+					if (VirtualFile != NULL)
+					{
+						// we got a match
+						Result = OutputHelpFile(VirtualFile->FileName, VirtualFile->FileDescription, VirtualFile->FileHelp, DescriptionOnly, OutputStream);
+
+						if (Result != SHELL_SUCCESS)
+							return Result;
+
+						continue;
+					}
+				}
+
 				// search for a native command match
 				for(j = 0; j < GetNumberOfNextShellNativeCommands(); j++)
 				{
@@ -229,7 +254,7 @@ SHELL_RESULT helpCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* O
 				if (CommandInfo == NULL)
 					return SHELL_COMMAND_NOT_FOUND;
 
-				Result = OutputHelpFile(CommandInfo, DescriptionOnly, OutputStream);
+				Result = OutputHelpFile(CommandInfo->CommandName, CommandInfo->Description, CommandInfo->Help, DescriptionOnly, OutputStream);
 
 				if (Result != SHELL_SUCCESS)
 					return Result;
