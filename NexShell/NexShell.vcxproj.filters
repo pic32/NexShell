@@ -117,9 +117,6 @@
     <ClCompile Include="NexShell\Commands\echo_Command.c">
       <Filter>Source Files\NexShell\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="NexShell\NexShellFile.c">
-      <Filter>Source Files\NexShell</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem\VirtualFile.c">
       <Filter>Source Files\FileSystem</Filter>
     </ClCompile>
@@ -211,9 +208,6 @@
     </ClInclude>
     <ClInclude Include="NexShell\Commands\echo_Command.h">
       <Filter>Header Files\NexShell\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="NexShell\NexShellFile.h">
-      <Filter>Header Files\NexShell</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\VirtualFile.h">
       <Filter>Header Files\FileSystem</Filter>

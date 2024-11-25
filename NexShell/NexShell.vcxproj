@@ -174,7 +174,6 @@
     <ClCompile Include="NexShell\ioctl.c" />
     <ClCompile Include="NexShell\NexShell.c" />
     <ClCompile Include="NexShell\NexShellCallbacks.c" />
-    <ClCompile Include="NexShell\NexShellFile.c" />
     <ClCompile Include="NexShell\Time\NexShellTime.c" />
     <ClCompile Include="OS\CriticalSection.c" />
     <ClCompile Include="OS\Pipe.c" />
@@ -204,7 +203,6 @@
     <ClInclude Include="NexShell\NexShell.h" />
     <ClInclude Include="NexShell\NexShellCallbacks.h" />
     <ClInclude Include="NexShell\NexShellConfig.h" />
-    <ClInclude Include="NexShell\NexShellFile.h" />
     <ClInclude Include="NexShell\Time\NexShellTime.h" />
     <ClInclude Include="OS\CriticalSection.h" />
     <ClInclude Include="OS\Kernel.h" />
