@@ -248,5 +248,8 @@
     <ClInclude Include="NexShell\NexShellCallbacks.h">
       <Filter>Header Files\NexShell</Filter>
     </ClInclude>
+    <ClInclude Include="NexShell\NexShellReleaseNotes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

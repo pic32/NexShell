@@ -203,6 +203,7 @@
     <ClInclude Include="NexShell\NexShell.h" />
     <ClInclude Include="NexShell\NexShellCallbacks.h" />
     <ClInclude Include="NexShell\NexShellConfig.h" />
+    <ClInclude Include="NexShell\NexShellReleaseNotes.h" />
     <ClInclude Include="NexShell\Time\NexShellTime.h" />
     <ClInclude Include="OS\CriticalSection.h" />
     <ClInclude Include="OS\Kernel.h" />
