@@ -345,10 +345,6 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 
 			if (Result != SHELL_SUCCESS)
 				return Result;
-
-			// output a new line
-			if (PipeWrite(OutputStream, SHELL_DEFAULT_END_OF_LINE_SEQUENCE, SHELL_END_OF_LINE_SEQUENCE_SIZE_IN_BYTES, NULL) != OS_SUCCESS)
-				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
 		else
 		{
