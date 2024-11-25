@@ -7,6 +7,12 @@
  * \ref VIRTUAL_FILES are made at runtime and do not exist on disk.  They
  * can have read, write and execute handlers.  These are expected to
  * be implemented by the developer.
+ * 
+ * A \ref VIRTUAL_FILE is contained in a \ref LINKED_LIST.  This \ref LINKED_LIST is held
+ * by a \ref VIRTUAL_FILE_DIRECTORY.  The main \ref LINKED_LIST that holds all the \ref VIRTUAL_FILE_DIRECTORY
+ * is the variable gUserVirtualFilesDirectories.
+ * 
+ * \image html VirtualFileDirectories.png "Virtual File Directories"
  */
 
 #include "NexShell.h"
@@ -48,6 +54,16 @@ typedef struct
 	char* FileHelp;
 }VIRTUAL_FILE;
 
+/*!
+* @struct VIRTUAL_FILE_DIRECTORY
+*
+* @brief This struct holds the members for a \ref VIRTUAL_FILE_DIRECTORY.
+*
+* @param LINKED_LIST VirtualFileList - This is of type \ref VIRTUAL_FILE.  These are the virtual files that 
+* are stored in the directory.
+*
+* @param char *DirectoryName - This is the directory that the \ref VIRTUAL_FILE_DIRECTORY points to.
+*/
 typedef struct
 {
 	LINKED_LIST VirtualFileList;
@@ -116,7 +132,7 @@ VIRTUAL_FILE* GetVirtualFile(char* Directory, char* Filename);
 /*!
  * @brief Initializes a \ref VIRTUAL_FILE struct.
  *
- * @param[in/out] VIRTUAL_FILE *NewFileToInitialize - A pointer to a valid \ref VIRTUAL_FILE.  This parameter is mandatory.
+ * @param[in,out] VIRTUAL_FILE *NewFileToInitialize - A pointer to a valid \ref VIRTUAL_FILE.  This parameter is mandatory.
  * 
  * @param[in] const char *FileName - The file name of the virtual file.  This parameter is mandatory.
  *

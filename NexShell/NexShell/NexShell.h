@@ -213,6 +213,29 @@ typedef enum
 
 #define NexShellAssert(condition)								{if(!(condition)){while(1);}}
 
+/*!
+* @struct COMMAND_INFO
+*
+* @brief This struct holds all the information for global commands in the shell.
+*
+* @param char *CommandName - The name of the command.  This is something like "ls".
+*
+* @param ExecuteFile - The method to execute when the command is called.
+* 
+* @param char *Description - A short optional description of what the command does.  This 
+* is printed out with the help -d option or the ls command.
+* 
+* @param char *Help - The help file associated with the \ref COMMAND_INFO.  This is to give the user help when typing in
+* "help [command name]".  This parameter is optional.  A file on disk can be referenced by this parameter to show
+* the contents of.  The system will first try to interpret this string as a valid file (with full path).  If the file exists
+* the contents of the file will be shown when the "help" command is used, otherwise the contents pointed to by Help
+* are displayed for help.
+* 
+* @details
+* This data structure is used to store the needed information on a global command.  There is a single
+* \ref LINKED_LIST that holds all the user global commands, and an array that holds the system
+* native global commands.
+*/
 typedef struct
 {
 	char* CommandName;

@@ -61,7 +61,7 @@ typedef enum
  * @param[in] char *Directory - The volume drive to get the space of.  This is something like "R:/".
  * @param[in] DISK_SPACE_TYPE DiskSpaceType - The type of disk space to get the value of.
  * @param[in] DISK_SPACE_UNITS DiskSpaceUnits - The units to get the space in.
- * @param[in/out] UINT64 *Size - The calculated space is written here upon success of the method.
+ * @param[in,out] UINT64 *Size - The calculated space is written here upon success of the method.
  *
  * @return FRESULT - The result of the operation.  If anything but FR_OK is returned, the value in *Size
  * cannot be considered valid.
@@ -82,7 +82,7 @@ FRESULT GetDiskSpace(BYTE *Drive, DISK_SPACE_TYPE DiskSpaceType, DISK_SPACE_UNIT
  * @param[in] char *Directory - The volume drive to get the space of.  This is something like "R:/".
  * @param[in] DISK_SPACE_TYPE DiskSpaceType - The type of disk space to get the value of.
  * @param[in] DISK_SPACE_UNITS DiskSpaceUnits - The units to get the space in.
- * @param[in/out] FLOAT64 *Size - The calculated space is written here upon success of the method.
+ * @param[in,out] FLOAT64 *Size - The calculated space is written here upon success of the method.
  *
  * @return FRESULT - The result of the operation.  If anything but FR_OK is returned, the value in *Size
  * cannot be considered valid.
@@ -162,7 +162,7 @@ BOOL DirectoryExists(char *DirectoryPath);
  * @param[in] char *FullFilename - A pointer to a full file path and name.  An example would
  * be something like "R:/directory/filename.txt".
  * 
- * @param[in/out] FILINFO *FileInfo - An empty FILINFO structure to put the file information
+ * @param[in,out] FILINFO *FileInfo - An empty FILINFO structure to put the file information
  * into once found.
  *
  * @return BOOL - TRUE if the FILINFO was successfully read, FALSE otherwise.

@@ -54,6 +54,12 @@ typedef struct
 *
 * @brief This union holds the packed date time.  This is the format used by the
 * FatFs to store the date and time which is different from the rest of the system.
+* 
+* @param UINT32 Value - A single value to represent the packed date time.
+* 
+* @param struct BITS - Bit representations of the packed date time.
+* 
+* @param struct DATE_TIME - A packed date time of the FatFs format.
 */
 typedef union
 {
@@ -63,21 +69,37 @@ typedef union
 	* @struct BITS
 	*
 	* @brief This struct holds the bit definitions of the packed date time structure.
+	* 
+	* @param unsigned int Seconds - This is the LSB in the structure.  It is the seconds divided by 2 (values 0 to 30).
+	* 
+	* @param unsigned int Minutes - These are the minutes.  Valid values are 0 to 59.
+	* 
+	* @param unsigned int Hours - These are the hours.  Valid values are 0 to 23.
+	* 
+	* @param unsigned int Day - This is the day.  Valid values are 1 to 31.
+	* 
+	* @param unsigned int Month - This is the month.  Valid values are 1 to 12.
+	* 
+	* @param unsigned int Year - This is the MSB.  The year is the years since 1980.  So 1981 is a value of 1.
 	*/
 	struct
 	{
-		unsigned int Seconds : 5; // LSB 0 - 30 (it's seconds divided by 2)
-		unsigned int Minutes : 6; // 0 - 59
-		unsigned int Hours : 5; // 0 - 23
-		unsigned int Day : 5; // 1 - 31
-		unsigned int Month : 4; // 1 - 12
-		unsigned int Year : 6; // MSB (year since 1980, so 1981 is 1)
+		unsigned int Seconds : 5; // LSB
+		unsigned int Minutes : 6;
+		unsigned int Hours : 5;
+		unsigned int Day : 5;
+		unsigned int Month : 4;
+		unsigned int Year : 7; // MSB
 	}BITS;
 
 	/*!
 	* @struct DATE_TIME
 	*
 	* @brief This struct holds the UINT16 values for the packed date time.
+	* 
+	* @param UINT16 Time - The packed time.
+	* 
+	* @param UINT16 Date - The packed date.
 	*/
 	struct
 	{
@@ -128,8 +150,6 @@ const char* const WeekdayToString(BYTE Weekday);
  * @return BYTE - The weekday which is zero based on Sunday.  Sunday is 0, Monday is 1, etc.
  */
 BYTE CalculateDayOfWeek(BYTE Day, BYTE Month, UINT16 Year);
-
-DWORD get_fattime(void);
 
 /*!
  * @brief Get the seconds from a \ref PACKED_DATE_TIME.

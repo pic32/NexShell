@@ -26,7 +26,7 @@ UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes
 /*!
  * @brief Read data in from another source.
  *
- * @param[in/out] BYTE *DataBuffer - The buffer to store the data in.
+ * @param[in,out] BYTE *DataBuffer - The buffer to store the data in.
  * @param[in] UINT32 DataBuffersSizeInBytes - The requested number of bytes in DataBuffer to write.
  *
  * @return UINT32 - The number of bytes successfully written by the callback function.
@@ -39,6 +39,35 @@ UINT32 StreamWriteDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes
  * @sa StreamWriteDataHALCallback()
  */
 UINT32 StreamReaderDataHALCallback(BYTE* DataBuffer, UINT32 DataBufferSizeInBytes);
+
+/*!
+ * @brief Get the packed date time for the FatFs.
+ *
+ * @return DWORD - The packed date time for use by the FatFs.
+ *
+ * @details
+ * This function must be implemented by the user.  It is designed to return the packed date time
+ * for the FatFs.  The DWORD that is returned must have the following format:
+ *
+ *	bit 31:25
+ *	Year origin from the 1980 (0..127, e.g. 37 for 2017)
+ *
+ *	bit 24:21
+ *	Month (1..12)
+ *
+ *	bit 20:16
+ *	Day of the month (1..31)
+ *
+ *	bit 15:11
+ *	Hour (0..23)
+ *
+ *	bit 10:5
+ *	Minute (0..59)
+ *
+ *	bit 4:0
+ *	Second / 2 (0..29, e.g. 25 for 50) 
+ */
+DWORD get_fattime(void);
 
 /*!
  * @brief Shuts the system down and powers off.

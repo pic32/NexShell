@@ -1,0 +1,117 @@
+@startuml
+
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 5
+skinparam titleBorderColor red
+skinparam titleBackgroundColor Aqua-CadetBlue
+skinparam titleFontSize 36
+
+title Virtual File Directories 
+
+Object gUserVirtualFilesDirectories
+
+struct VIRTUAL_FILE_DIRECTORY_1  ##[bold]red
+{
+    VirtualFileList : LINKED_LIST  
+    ..
+    DirectoryName : char*
+}
+
+struct VIRTUAL_FILE_DIRECTORY_2  ##[bold]red
+{
+    VirtualFileList : LINKED_LIST
+    ..
+    DirectoryName : char*
+}
+
+struct VIRTUAL_FILE_DIRECTORY_3  ##[bold]red
+{
+    VirtualFileList : LINKED_LIST
+    ..
+    DirectoryName : char*
+}
+
+struct VIRTUAL_FILE_1 << null >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+struct VIRTUAL_FILE_2 << zero >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+struct VIRTUAL_FILE_3 << random >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+struct VIRTUAL_FILE_4 << vir_fil >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+struct VIRTUAL_FILE_5 << ble >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+struct VIRTUAL_FILE_6 << hex_dmp >> ##[bold]blue
+{
+	char* FileName;
+	char* FileDescription;
+	char* FileHelp;
+	
+	SHELL_RESULT(*Read)(PIPE*);
+	SHELL_RESULT(*Write)(char* [], UINT32, PIPE*);
+	SHELL_RESULT(*Execute)(char* [], UINT32, PIPE*);
+}
+
+Object "R:/dev"
+Object "R:/A/Virutal/File/Path"
+Object "R:/Another/Virutal/File/Path"
+
+gUserVirtualFilesDirectories -[#red,thickness=3]-> VIRTUAL_FILE_DIRECTORY_1
+VIRTUAL_FILE_DIRECTORY_1 <-[#red,thickness=3]-> VIRTUAL_FILE_DIRECTORY_2
+VIRTUAL_FILE_DIRECTORY_2 <-[#red,thickness=3]-> VIRTUAL_FILE_DIRECTORY_3
+VIRTUAL_FILE_DIRECTORY_1::DirectoryName --> "R:/dev"
+VIRTUAL_FILE_DIRECTORY_2::DirectoryName --> "R:/A/Virutal/File/Path"
+VIRTUAL_FILE_DIRECTORY_3::DirectoryName --> "R:/Another/Virutal/File/Path"
+VIRTUAL_FILE_DIRECTORY_1::VirtualFileList -[#blue,thickness=3]-> VIRTUAL_FILE_1
+VIRTUAL_FILE_DIRECTORY_2::VirtualFileList -[#blue,thickness=3]-> VIRTUAL_FILE_4
+VIRTUAL_FILE_4-[#blue,thickness=3]->VIRTUAL_FILE_5
+VIRTUAL_FILE_DIRECTORY_3::VirtualFileList -[#blue,thickness=3]-> VIRTUAL_FILE_6
+VIRTUAL_FILE_1 <-[#blue,thickness=3]-> VIRTUAL_FILE_2
+VIRTUAL_FILE_2 <-[#blue,thickness=3]-> VIRTUAL_FILE_3
+
+@enduml

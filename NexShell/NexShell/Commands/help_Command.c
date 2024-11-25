@@ -108,7 +108,7 @@ static SHELL_RESULT OutputHelpFile(COMMAND_INFO* CommandInfo, BOOL DescriptionOn
 		}
 		else
 		{
-			// write the description
+			// write the help file
 			if (PipeWrite(OutputStream, CommandInfo->Help, (UINT32)strlen(CommandInfo->Help), NULL) != OS_SUCCESS)
 				return SHELL_GENERIC_BUFFER_WRITE_FAILURE;
 		}
