@@ -18,29 +18,70 @@
 #include "Pipe.h"
 #include "ff.h"
 
+  /*!
+  * \enum NEXSHELL_FILE_RESULTS
+  * This is a renamed enum from the FatFs FRESULT enum.
+  */
 typedef enum
 {
 	SHELL_FILE_SUCCESS = 0,
 
-	SHELL_FILE_DISK_ERR,			/* (1) A hard error occurred in the low level disk I/O layer */
-	SHELL_FILE_INT_ERR,				/* (2) Assertion failed */
-	SHELL_FILE_NOT_READY,			/* (3) The physical drive cannot work */
-	SHELL_FILE_NO_FILE,				/* (4) Could not find the file */
-	SHELL_FILE_NO_PATH,				/* (5) Could not find the path */
-	SHELL_FILE_INVALID_NAME,		/* (6) The path name format is invalid */
-	SHELL_FILE_DENIED,				/* (7) Access denied due to prohibited access or directory full */
-	SHELL_FILE_EXIST,				/* (8) Access denied due to prohibited access */
-	SHELL_FILE_INVALID_OBJECT,		/* (9) The file/directory object is invalid */
-	SHELL_FILE_WRITE_PROTECTED,		/* (10) The physical drive is write protected */
-	SHELL_FILE_INVALID_DRIVE,		/* (11) The logical drive number is invalid */
-	SHELL_FILE_NOT_ENABLED,			/* (12) The volume has no work area */
-	SHELL_FILE_NO_FILESYSTEM,		/* (13) There is no valid FAT volume */
-	SHELL_FILE_MKFS_ABORTED,		/* (14) The f_mkfs() aborted due to any problem */
-	SHELL_FILE_TIMEOUT,				/* (15) Could not get a grant to access the volume within defined period */
-	SHELL_FILE_LOCKED,				/* (16) The operation is rejected according to the file sharing policy */
-	SHELL_FILE_NOT_ENOUGH_CORE,		/* (17) LFN working buffer could not be allocated */
-	SHELL_FILE_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > FF_FS_LOCK */
-	SHELL_FILE_INVALID_PARAMETER,	/* (19) Given parameter is invalid */
+	/*! (1) A hard error occurred in the low level disk I/O layer */
+	SHELL_FILE_DISK_ERR,
+
+	/*! (2) Assertion failed */
+	SHELL_FILE_INT_ERR,	
+
+	/*! (3) The physical drive cannot work */
+	SHELL_FILE_NOT_READY,
+
+	/*! (4) Could not find the file */
+	SHELL_FILE_NO_FILE,	
+
+	/*! (5) Could not find the path */
+	SHELL_FILE_NO_PATH,			
+
+	/*! (6) The path name format is invalid */
+	SHELL_FILE_INVALID_NAME,		
+
+	/*! (7) Access denied due to prohibited access or directory full */
+	SHELL_FILE_DENIED,			
+
+	/*! (8) Access denied due to prohibited access */
+	SHELL_FILE_EXIST,	
+
+	/*! (9) The file/directory object is invalid */
+	SHELL_FILE_INVALID_OBJECT,	
+
+	/*! (10) The physical drive is write protected */
+	SHELL_FILE_WRITE_PROTECTED,
+
+	/*! (11) The logical drive number is invalid */
+	SHELL_FILE_INVALID_DRIVE,	
+
+	/*! (12) The volume has no work area */
+	SHELL_FILE_NOT_ENABLED,		
+	
+	/*! (13) There is no valid FAT volume */
+	SHELL_FILE_NO_FILESYSTEM,		
+
+	/*! (14) The f_mkfs() aborted due to any problem */
+	SHELL_FILE_MKFS_ABORTED,	
+
+	/*! (15) Could not get a grant to access the volume within defined period */
+	SHELL_FILE_TIMEOUT,	
+
+	/*! (16) The operation is rejected according to the file sharing policy */
+	SHELL_FILE_LOCKED,		
+
+	/*! (17) LFN working buffer could not be allocated */
+	SHELL_FILE_NOT_ENOUGH_CORE,		
+
+	/*! (18) Number of open files > FF_FS_LOCK */
+	SHELL_FILE_TOO_MANY_OPEN_FILES,
+
+	/*! (19) Given parameter is invalid */
+	SHELL_FILE_INVALID_PARAMETER,	
 
 	NUMBER_OF_NEXSHELL_FILE_RESULTS
 }NEXSHELL_FILE_RESULTS;
