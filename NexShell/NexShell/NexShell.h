@@ -2,7 +2,7 @@
 	#define NEXSHELL_H
 
 /*! \mainpage NexShell
- *  \brief A Unix type shell interface with the <a href="../fatfs-documents/00index_e.html">FatFs</a> 
+ *  \brief A Unix type shell interface with the <a href="./fatfs-documents/00index_e.html">FatFs</a> 
  *  \author brodie
  *  \version 0.00.01
  *  \date   November 18, 2024
