@@ -10,3 +10,5 @@ There will also be support for devices in the dev folder.
 First port will be unknown (Probably one of the dev boards from SMT for the discovery kits), right now it is just a VS 2022 RAM drive with some virtual files supported in dev (only rtc is supported right now, serial will be next).
 
 This is still a work in progress with no official first release.
+
+For documentation visit: https://pic32.github.io/NexShell/
