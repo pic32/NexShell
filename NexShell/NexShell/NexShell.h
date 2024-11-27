@@ -193,6 +193,8 @@ typedef enum
 	SHELL_PIPE,
 	SHELL_WRITE,
 	SHELL_APPEND,
+
+	/*! Used internally by the shell */
 	NUMBER_OF_SHELL_LOGICAL_OPERATORS
 }SHELL_LOGICAL_OPERATOR;
 
