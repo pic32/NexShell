@@ -183,6 +183,10 @@ typedef enum
 	NUMBER_OF_NEXSHELL_RESULTS						
 }SHELL_RESULT;
 
+/*!
+* \enum SHELL_LOGICAL_OPERATOR
+* This is an enum for parsing input to the shell and creating a statement of logical operators.
+*/
 typedef enum
 {
 	SHELL_NO_LOGICAL_OPERATOR = 0,
