@@ -2,11 +2,9 @@ name: cpp-linter
 
 on:
   push:
-    paths:
-      - "NexShell/*"
+    branches: [ "main" ]
   pull_request:
-    paths:
-      - "NexShell/*"
+    branches: [ "main" ]
 
 
 jobs:
