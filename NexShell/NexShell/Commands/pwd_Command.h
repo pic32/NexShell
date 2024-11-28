@@ -18,7 +18,7 @@ SHELL_TAB SHELL_TAB PWD_COMMAND_NAME SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 /*!
- * @brief
+ * @brief Main entry point for the pwd command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

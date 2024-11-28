@@ -21,7 +21,7 @@ SHELL_TAB SHELL_TAB CLEAR_COMMAND_NAME SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 /*!
- * @brief
+ * @brief Main entry point for the clear command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

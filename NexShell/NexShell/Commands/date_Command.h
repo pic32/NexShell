@@ -61,10 +61,26 @@ SHELL_TAB SHELL_TAB DATE_COMMAND_NAME " \"-r help.txt\" \'+The last modified tim
 SHELL_TAB SHELL_TAB DATE_COMMAND_NAME SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+ /*!
+  * @brief Converts a packed date time to a rtc_time.
+  *
+  * @param[in] UINT16 Date - The packed date.  This is usually used with the FatFs.
+  *
+  * @param[in] UINT16 Time - The packed time.  This is usually used with the FatFs.
+  *
+  * @param[in,out] rtc_time* SystemDateTime - The rtc_time which will get its date 
+  * and time from Date and Time parameters passed to this method.
+  *
+  * @return BOOL - TRUE if the conversion succeeded, FALSE otherwise.
+  *
+  * @details
+  * This method will take the specified packed date and time and convert it into the rtc_time.
+  * The packed date and time are usually only used with the FatFs.
+  */
 BOOL ConvertFileSystemDateTimeToSystemDateTime(UINT16 Date, UINT16 Time, rtc_time* SystemDateTime);
 
 /*!
- * @brief
+ * @brief Main entry point for the date command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

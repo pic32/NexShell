@@ -24,6 +24,20 @@ SHELL_TAB SHELL_TAB LS_COMMAND_NAME " ../" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_TAB SHELL_TAB LS_COMMAND_NAME " -l" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+ /*!
+ * @union LS_OPTIONS
+ *
+ * @brief This data structure holds all the enable bits for options with the ls command.
+ *
+ * @param BYTE Value - The 8 bit value of the option bits to address in one read/write.
+ *
+ * @param unsigned int ListAll - If set, the ls command will list all files in the specified folders.
+ * @param unsigned int LongListing - If set, the ls command will output additional data for each item.
+ * @param unsigned int Reserved - Reserved for furture use.
+ *
+ * @details This data strucuture is used to set any flag bits of options that were parsed
+ * out from the user arguments for the ls command.
+ */
 typedef union
 {
 	BYTE Value;
@@ -37,7 +51,7 @@ typedef union
 }LS_OPTIONS;
 
 /*!
- * @brief
+ * @brief Main entry point for the ls command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

@@ -37,7 +37,7 @@ SHELL_TAB SHELL_TAB ECHO_COMMAND_NAME " -e \"\\x55 The hex value 0x55 (the lette
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 /*!
- * @brief
+ * @brief Main entry point for the echo command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

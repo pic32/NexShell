@@ -24,10 +24,19 @@ SHELL_TAB SHELL_TAB CD_COMMAND_NAME " " SHELL_HOME_DIRECTORY_CHARACTER_STRING SH
 SHELL_TAB SHELL_TAB CD_COMMAND_NAME " -" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+ /*!
+  * @brief Initializes the cd command.
+  * 
+  * @return SHELL_RESULT - The outcome of the operation.
+  *
+  * @details
+  * This function is called by NexShellInit().  It is only used when EXTENDED_CD_SUPPORT
+  * inside of NexShellConfig.h is set to a 1.  This method should not be called by the user.
+  */
 SHELL_RESULT cdInit(void);
 
 /*!
- * @brief
+ * @brief Main entry point for the cd command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

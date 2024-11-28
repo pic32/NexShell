@@ -26,6 +26,24 @@ SHELL_TAB SHELL_TAB CAT_COMMAND_NAME " /a-folder/file-to-get-the-text-of" SHELL_
 SHELL_TAB SHELL_TAB CAT_COMMAND_NAME " -EnT ../a-folder/file-to-get-the-text-of another-file-to-read" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+ /*!
+ * @union READ_OPTIONS
+ *
+ * @brief This union holds all the data for determining the options the user specified with the cat command.
+ *
+ * @param BYTE Value - The 8 bit value of the option bits to address in one read/write.
+ *
+ * @param unsigned int ShowLineEnds - If this bit is set the line ends will have a $.
+ * @param unsigned int NumberAllLines - If this bit is set all lines will be numbered.
+ * @param unsigned int SupressRepeativeEmptyLines  - Unsupported.
+ * @param unsigned int ShowTabs - If this bit is set the tabs will be shown with ^I.
+ * @param unsigned int ShowControlCharacters - If this bit is set non printable characters will be shown.
+ * @param unsigned int CarriageReturnPresent - Internal use for keeping track of \r.
+ * @param unsigned int Reserved - Reserved for future use.
+ *
+ * @details This data strucuture is used to set any flag bits of options that were parsed
+ * out from the user arguments for the cat command.
+ */
 typedef union
 {
 	BYTE Value;
@@ -42,11 +60,24 @@ typedef union
 	}BITS;
 }READ_OPTIONS;
 
+/*!
+* @struct READ_INFO
+*
+* @brief This data structure holds all the data for the options specified when using the cat command.
+*
+* @param BYTE Value - The 8 bit value of the option bits to address in one read/write.
+*
+* @param READ_OPTIONS ReadOptions - This holds the options bits that were parsed out from the user args to the cat command.
+* @param UINT32 LineNumber - The current line number the cat command is on in a file it is reading.
+*
+* @details This data strucuture is used to set any flag bits of options that were parsed
+* out from the user arguments for the cat command.  It also holds state data of the current
+* cat operation on a file.
+*/
 typedef struct
 {
 	READ_OPTIONS ReadOptions;
 	UINT32 LineNumber;
-	UINT32 NumberOfEmptyLines;
 }READ_INFO;
 
 /*!

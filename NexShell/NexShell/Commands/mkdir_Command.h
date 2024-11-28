@@ -29,9 +29,24 @@ SHELL_TAB SHELL_TAB MKDIR_COMMAND_NAME " -p ./a-folder/another-folder" SHELL_DEF
 SHELL_TAB SHELL_TAB MKDIR_COMMAND_NAME " -m5 directory-to-add" SHELL_DEFAULT_END_OF_LINE_SEQUENCE \
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
+ /*!
+ * @union MKDIR_OPTIONS
+ * 
+ * @brief This data structure holds all the enable bits for options with the mkdir command.
+ * 
+ * @param BYTE Value - The 8 bit value of the option bits to address in one read/write.
+ * 
+ * @param unsigned int AllowParentDirectoryCreation - If set, a folder with a parent folder(s) can be created.
+ * @param unsigned int Mode - If set, the mode bits are present in the \ref MKDIR_OPTIONS_DATA.
+ * @param unsigned int Reserved - Reserved for furture use.
+ * 
+ * @details This data strucuture is used to set any flag bits of options that were parsed
+ * out from the user arguments for the mkdir command.
+ */
 typedef union
 {
 	BYTE Value;
+
 	struct
 	{
 		unsigned int AllowParentDirectoryCreation : 1;
@@ -40,6 +55,19 @@ typedef union
 	}Bits;
 }MKDIR_OPTIONS;
 
+/*!
+* @struct MKDIR_OPTIONS_DATA
+*
+* @brief This struct holds all the options for creating a new folder.
+*
+* @param MKDIR_OPTIONS Options - The various options enable bits that go with folder creation.
+*
+* @param BYTE FolderCreateMode - The mode bits which will be set in the folder at creation.
+*
+* @details
+* This data structure is used when parsing the mkdir command.  The appropriate bits are set
+* within the struct and then passed to the actual portion of code that makes the directory.
+*/
 typedef struct
 {
 	MKDIR_OPTIONS Options;
@@ -47,7 +75,7 @@ typedef struct
 }MKDIR_OPTIONS_DATA;
 
 /*!
- * @brief
+ * @brief Main entry point for the mkdir command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *

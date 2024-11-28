@@ -379,7 +379,6 @@ SHELL_RESULT catCommandExecuteMethod(char* Args[], UINT32 NumberOfArgs, PIPE* Ou
 
 		// clear out the status of the read info
 		ReadInfo.LineNumber = 0;
-		ReadInfo.NumberOfEmptyLines = 0;
 	}
 
 	// output a new line

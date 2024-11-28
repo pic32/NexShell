@@ -26,7 +26,7 @@ SHELL_TAB SHELL_TAB HELP_COMMAND_NAME " -d /a-folder/file-to-get-help-about anot
 SHELL_DEFAULT_END_OF_LINE_SEQUENCE
 
 /*!
- * @brief
+ * @brief Main entry point for the help command in the shell.
  *
  * @param[in] char* Args[] - An array of string arguments to process.
  *
