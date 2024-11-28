@@ -63,18 +63,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FileSystem\diskio.c">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\ff.c">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\ffsystem.c">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\ffunicode.c">
-      <Filter>Source Files\FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="SupportLibraries\GenericBuffer\GenericBuffer.c">
       <Filter>Source Files\Support-Libraries\GenericBuffer</Filter>
     </ClCompile>
@@ -147,17 +135,20 @@
     <ClCompile Include="NexShell\NexShellCallbacks.c">
       <Filter>Source Files\NexShell</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\FatFs\source\diskio.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\FatFs\source\ff.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\FatFs\source\ffsystem.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\FatFs\source\ffunicode.c">
+      <Filter>Source Files\FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileSystem\diskio.h">
-      <Filter>Header Files\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\ff.h">
-      <Filter>Header Files\FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\ffconf.h">
-      <Filter>Header Files\FileSystem</Filter>
-    </ClInclude>
     <ClInclude Include="SupportLibraries\GenericBuffer\GenericBuffer.h">
       <Filter>Header Files\Support-Libraries\GenericBuffer</Filter>
     </ClInclude>
@@ -250,6 +241,15 @@
     </ClInclude>
     <ClInclude Include="NexShell\NexShellReleaseNotes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FatFs\source\diskio.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FatFs\source\ff.h">
+      <Filter>Header Files\FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FatFs\source\ffconf.h">
+      <Filter>Header Files\FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

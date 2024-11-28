@@ -106,7 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;.\NexShell\Commands;.\OS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\NexShell;.\SupportLibraries\LinkedList;.\SupportLibraries\GenericBuffer;.\SupportLibraries;.\FileSystem;.\NexShell\Time;.\NexShell\Commands;.\OS;.\FileSystem\FatFs\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,10 +153,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FileSystem\DevFiles.c" />
-    <ClCompile Include="FileSystem\diskio.c" />
-    <ClCompile Include="FileSystem\ff.c" />
-    <ClCompile Include="FileSystem\ffsystem.c" />
-    <ClCompile Include="FileSystem\ffunicode.c" />
+    <ClCompile Include="FileSystem\FatFs\source\diskio.c" />
+    <ClCompile Include="FileSystem\FatFs\source\ff.c" />
+    <ClCompile Include="FileSystem\FatFs\source\ffsystem.c" />
+    <ClCompile Include="FileSystem\FatFs\source\ffunicode.c" />
     <ClCompile Include="FileSystem\FileSystems.c" />
     <ClCompile Include="FileSystem\VirtualFile.c" />
     <ClCompile Include="main.c" />
@@ -183,9 +183,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileSystem\DevFiles.h" />
-    <ClInclude Include="FileSystem\diskio.h" />
-    <ClInclude Include="FileSystem\ff.h" />
-    <ClInclude Include="FileSystem\ffconf.h" />
+    <ClInclude Include="FileSystem\FatFs\source\diskio.h" />
+    <ClInclude Include="FileSystem\FatFs\source\ff.h" />
+    <ClInclude Include="FileSystem\FatFs\source\ffconf.h" />
     <ClInclude Include="FileSystem\FileSystems.h" />
     <ClInclude Include="FileSystem\VirtualFile.h" />
     <ClInclude Include="NexShell\Commands\cat_Command.h" />
